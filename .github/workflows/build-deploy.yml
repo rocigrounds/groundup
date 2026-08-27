@@ -1,0 +1,43 @@
+name: Build & deploy Ground Up
+
+on:
+  repository_dispatch:
+    types: [rebuild]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout book source (private repo)
+        uses: actions/checkout@v4
+        with:
+          repository: joewilbert/aisite
+          ref: main
+          token: ${{ secrets.AISITE_TOKEN }}
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install
+        run: bun install --frozen-lockfile
+
+      - name: Build (astro + pagefind)
+        run: bun run build
+
+      - name: Publish dist to gh-pages
+        run: |
+          cd dist
+          touch .nojekyll
+          git init -q -b gh-pages
+          git config user.name "rocigrounds"
+          git config user.email "clawmany@gmail.com"
+          git add -A
+          git commit -q -m "deploy $(date -u +%Y-%m-%dT%H:%MZ) (CI, ${GITHUB_EVENT_NAME})"
+          git push -q -f "https://x-access-token:${{ github.token }}@github.com/rocigrounds/groundup.git" gh-pages
