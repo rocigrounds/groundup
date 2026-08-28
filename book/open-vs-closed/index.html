@@ -1,0 +1,594 @@
+<!DOCTYPE html><html lang="en"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Open vs Closed Models · Ground Up</title><meta name="description" content="What &#34;open&#34; really means for a model, what the licenses actually permit, how fast the capability gap closed, and how to decide what to build on."><meta name="theme-color" content="#faf9f6"><meta property="og:title" content="Open vs Closed Models · Ground Up"><meta property="og:description" content="What &#34;open&#34; really means for a model, what the licenses actually permit, how fast the capability gap closed, and how to decide what to build on."><meta property="og:type" content="article"><meta property="og:site_name" content="Ground Up"><link rel="icon" href="/groundup/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="/groundup/apple-touch-icon.png"><link rel="manifest" href="/groundup/manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Ground Up"><script>
+      (function () {
+        try {
+          var t = localStorage.getItem('gu:theme');
+          var dark = t ? t === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+          if (dark) document.documentElement.classList.add('dark');
+          var fs = localStorage.getItem('gu:fontScale');
+          if (fs) document.documentElement.style.setProperty('--font-scale', fs);
+        } catch (e) {}
+      })();
+    </script><link rel="stylesheet" href="/groundup/_astro/_slug_.BCpHWCuJ.css"></head> <body> <header class="site-header"> <button class="hbtn" id="btn-toc" aria-label="Table of contents" title="Contents"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"></path></svg> </button> <a class="brand" href="/groundup/"> <span class="logo">G</span> <span class="brand-name">Ground&nbsp;Up</span> </a> <span class="header-crumb">Part VI · The Modern AI Landscape · Chapter 47</span> <div class="header-actions"> <button class="hbtn" id="btn-search" aria-label="Search" title="Search (/)"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg> </button> <button class="hbtn" id="btn-notes" aria-label="My notes" title="My notes & highlights"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg> </button> <button class="hbtn" id="btn-tutor" aria-label="AI tutor" title="AI tutor"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 1 1-4-6.9"></path><path d="M21 3v6h-6"></path><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"></circle><circle cx="8.5" cy="12" r="1.2" fill="currentColor" stroke="none"></circle><circle cx="15.5" cy="12" r="1.2" fill="currentColor" stroke="none"></circle></svg> </button> <button class="hbtn" id="btn-theme" aria-label="Toggle theme" title="Light / dark"> <svg class="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.5"></circle><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M19.4 4.6l-1.8 1.8M6.4 17.6l-1.8 1.8"></path></svg> </button> <button class="hbtn" id="btn-settings" aria-label="Settings" title="Settings"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.01a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.01a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.01a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"></path></svg> </button> </div> </header> <div class="shell"> <nav class="toc-rail" id="toc-rail" aria-label="Table of contents">  <div class="toc-part">Start here</div> <a class="toc-link" data-slug="how-to-read-this-book" href="/groundup/book/how-to-read-this-book/"> <span class="n">·</span> <span>How to Read This Book</span> </a><a class="toc-link" data-slug="the-whole-machine" href="/groundup/book/the-whole-machine/"> <span class="n">·</span> <span>Frontier AI In One Sitting</span> </a> <div class="toc-part">Part I · Mathematical Foundations</div> <a class="toc-link" data-slug="vectors-and-spaces" href="/groundup/book/vectors-and-spaces/"> <span class="n">1</span> <span>Vectors and Spaces</span> </a><a class="toc-link" data-slug="matrices-as-transformations" href="/groundup/book/matrices-as-transformations/"> <span class="n">2</span> <span>Matrices as Transformations</span> </a><a class="toc-link" data-slug="high-dimensional-geometry" href="/groundup/book/high-dimensional-geometry/"> <span class="n">3</span> <span>High-Dimensional Geometry</span> </a><a class="toc-link" data-slug="derivatives-and-gradients" href="/groundup/book/derivatives-and-gradients/"> <span class="n">4</span> <span>Derivatives and Gradients</span> </a><a class="toc-link" data-slug="chain-rule-and-jacobians" href="/groundup/book/chain-rule-and-jacobians/"> <span class="n">5</span> <span>The Chain Rule, Jacobians, and Curvature</span> </a><a class="toc-link" data-slug="probability" href="/groundup/book/probability/"> <span class="n">6</span> <span>Probability for Deep Learning</span> </a><a class="toc-link" data-slug="information-theory" href="/groundup/book/information-theory/"> <span class="n">7</span> <span>Information Theory: Surprise, Entropy, and KL</span> </a> <div class="toc-part">Part II · Deep Learning Foundations</div> <a class="toc-link" data-slug="neurons-and-mlps" href="/groundup/book/neurons-and-mlps/"> <span class="n">8</span> <span>Neurons, Layers, and MLPs</span> </a><a class="toc-link" data-slug="loss-functions" href="/groundup/book/loss-functions/"> <span class="n">9</span> <span>Loss Functions</span> </a><a class="toc-link" data-slug="gradient-descent-and-backprop" href="/groundup/book/gradient-descent-and-backprop/"> <span class="n">10</span> <span>Gradient Descent and Backpropagation</span> </a><a class="toc-link" data-slug="optimizers" href="/groundup/book/optimizers/"> <span class="n">11</span> <span>Optimizers: From SGD to AdamW and Muon</span> </a><a class="toc-link" data-slug="initialization-and-stability" href="/groundup/book/initialization-and-stability/"> <span class="n">12</span> <span>Initialization and Gradient Pathologies</span> </a><a class="toc-link" data-slug="regularization-and-generalization" href="/groundup/book/regularization-and-generalization/"> <span class="n">13</span> <span>Regularization and Generalization</span> </a><a class="toc-link" data-slug="normalization" href="/groundup/book/normalization/"> <span class="n">14</span> <span>Normalization: BatchNorm to RMSNorm</span> </a><a class="toc-link" data-slug="activation-functions" href="/groundup/book/activation-functions/"> <span class="n">15</span> <span>Activation Functions</span> </a><a class="toc-link" data-slug="residual-connections" href="/groundup/book/residual-connections/"> <span class="n">16</span> <span>Residual Connections and the Residual Stream</span> </a><a class="toc-link" data-slug="cnns-and-rnns" href="/groundup/book/cnns-and-rnns/"> <span class="n">17</span> <span>CNNs and RNNs: The World Before Transformers</span> </a> <div class="toc-part">Part III · Language Modeling</div> <a class="toc-link" data-slug="what-is-a-language-model" href="/groundup/book/what-is-a-language-model/"> <span class="n">18</span> <span>What a Language Model Is</span> </a><a class="toc-link" data-slug="tokenization" href="/groundup/book/tokenization/"> <span class="n">19</span> <span>Tokenization</span> </a><a class="toc-link" data-slug="embeddings" href="/groundup/book/embeddings/"> <span class="n">20</span> <span>Embeddings</span> </a><a class="toc-link" data-slug="evaluating-language-models" href="/groundup/book/evaluating-language-models/"> <span class="n">21</span> <span>Evaluating Language Models</span> </a> <div class="toc-part">Part IV · Attention &amp; Transformers</div> <a class="toc-link" data-slug="seq2seq-and-attention" href="/groundup/book/seq2seq-and-attention/"> <span class="n">22</span> <span>From seq2seq to Attention</span> </a><a class="toc-link" data-slug="scaled-dot-product-attention" href="/groundup/book/scaled-dot-product-attention/"> <span class="n">23</span> <span>Scaled Dot-Product Attention</span> </a><a class="toc-link" data-slug="multi-head-attention" href="/groundup/book/multi-head-attention/"> <span class="n">24</span> <span>Multi-Head Attention</span> </a><a class="toc-link" data-slug="transformer-architecture" href="/groundup/book/transformer-architecture/"> <span class="n">25</span> <span>The Transformer, Piece by Piece</span> </a><a class="toc-link" data-slug="positional-encodings" href="/groundup/book/positional-encodings/"> <span class="n">26</span> <span>Positional Information and RoPE</span> </a><a class="toc-link" data-slug="architecture-families" href="/groundup/book/architecture-families/"> <span class="n">27</span> <span>Architecture Families: BERT to Decoder-Only</span> </a><a class="toc-link" data-slug="kv-cache-and-efficient-attention" href="/groundup/book/kv-cache-and-efficient-attention/"> <span class="n">28</span> <span>The KV Cache and Efficient Attention</span> </a><a class="toc-link" data-slug="mixture-of-experts" href="/groundup/book/mixture-of-experts/"> <span class="n">29</span> <span>Mixture-of-Experts</span> </a><a class="toc-link" data-slug="state-space-models" href="/groundup/book/state-space-models/"> <span class="n">30</span> <span>State-Space Models and Hybrids</span> </a> <div class="toc-part">Part V · Training LLMs in Practice</div> <a class="toc-link" data-slug="pretraining-data" href="/groundup/book/pretraining-data/"> <span class="n">31</span> <span>Pretraining Data</span> </a><a class="toc-link" data-slug="scaling-laws" href="/groundup/book/scaling-laws/"> <span class="n">32</span> <span>Scaling Laws</span> </a><a class="toc-link" data-slug="compute-and-parallelism" href="/groundup/book/compute-and-parallelism/"> <span class="n">33</span> <span>Compute: GPUs, Precision, and Parallelism</span> </a><a class="toc-link" data-slug="the-training-run" href="/groundup/book/the-training-run/"> <span class="n">34</span> <span>The Training Run</span> </a><a class="toc-link" data-slug="sft-and-rlhf" href="/groundup/book/sft-and-rlhf/"> <span class="n">35</span> <span>Post-Training I: SFT, Reward Models, RLHF</span> </a><a class="toc-link" data-slug="dpo-and-friends" href="/groundup/book/dpo-and-friends/"> <span class="n">36</span> <span>Post-Training II: DPO and Its Family</span> </a><a class="toc-link" data-slug="reasoning-models" href="/groundup/book/reasoning-models/"> <span class="n">37</span> <span>Reasoning Training: RLVR, GRPO, and the o1/R1 Era</span> </a><a class="toc-link" data-slug="fine-tuning" href="/groundup/book/fine-tuning/"> <span class="n">38</span> <span>Fine-Tuning You Can Actually Do: LoRA and Friends</span> </a><a class="toc-link" data-slug="inference-and-serving" href="/groundup/book/inference-and-serving/"> <span class="n">39</span> <span>Inference: Sampling, Quantization, Serving</span> </a> <div class="toc-part">Part VI · The Modern AI Landscape</div> <a class="toc-link" data-slug="the-frontier" href="/groundup/book/the-frontier/"> <span class="n">40</span> <span>The Frontier Landscape (2023–2026)</span> </a><a class="toc-link" data-slug="multimodal-models" href="/groundup/book/multimodal-models/"> <span class="n">41</span> <span>Multimodal Models</span> </a><a class="toc-link" data-slug="diffusion-models" href="/groundup/book/diffusion-models/"> <span class="n">42</span> <span>Diffusion and Image/Video Generation</span> </a><a class="toc-link" data-slug="long-context" href="/groundup/book/long-context/"> <span class="n">43</span> <span>Long Context</span> </a><a class="toc-link" data-slug="agents-and-tools" href="/groundup/book/agents-and-tools/"> <span class="n">44</span> <span>Agents, Tool Use, and MCP</span> </a><a class="toc-link" data-slug="retrieval-augmented-generation" href="/groundup/book/retrieval-augmented-generation/"> <span class="n">45</span> <span>Retrieval-Augmented Generation</span> </a><a class="toc-link" data-slug="benchmarks-and-evaluation" href="/groundup/book/benchmarks-and-evaluation/"> <span class="n">46</span> <span>Benchmarks and How to Read Them</span> </a><a class="toc-link active" data-slug="open-vs-closed" href="/groundup/book/open-vs-closed/"> <span class="n">47</span> <span>Open vs Closed Models</span> </a> <div class="toc-part">Part VII · Interpretability</div> <a class="toc-link" data-slug="why-interpretability" href="/groundup/book/why-interpretability/"> <span class="n">48</span> <span>Why Interpretability</span> </a><a class="toc-link" data-slug="features-and-probes" href="/groundup/book/features-and-probes/"> <span class="n">49</span> <span>Features, Directions, and Probes</span> </a><a class="toc-link" data-slug="superposition" href="/groundup/book/superposition/"> <span class="n">50</span> <span>Superposition and Polysemanticity</span> </a><a class="toc-link" data-slug="sparse-autoencoders" href="/groundup/book/sparse-autoencoders/"> <span class="n">51</span> <span>Sparse Autoencoders</span> </a><a class="toc-link" data-slug="circuits" href="/groundup/book/circuits/"> <span class="n">52</span> <span>Circuits: Induction Heads to Attribution Graphs</span> </a><a class="toc-link" data-slug="causal-methods" href="/groundup/book/causal-methods/"> <span class="n">53</span> <span>Causal Methods: Patching, Ablation, and Lenses</span> </a><a class="toc-link" data-slug="steering-and-editing" href="/groundup/book/steering-and-editing/"> <span class="n">54</span> <span>Steering and Model Editing</span> </a><a class="toc-link" data-slug="cot-faithfulness" href="/groundup/book/cot-faithfulness/"> <span class="n">55</span> <span>Chain-of-Thought Faithfulness</span> </a><a class="toc-link" data-slug="frontier-interpretability" href="/groundup/book/frontier-interpretability/"> <span class="n">56</span> <span>Interpretability at the Frontier</span> </a> <div class="toc-part">Part VIII · Reference</div> <a class="toc-link" data-slug="where-to-go-next" href="/groundup/book/where-to-go-next/"> <span class="n">57</span> <span>Where to Go Next</span> </a><a class="toc-link" data-slug="glossary" href="/groundup/book/glossary/"> <span class="n">58</span> <span>Glossary</span> </a><a class="toc-link" data-slug="notation" href="/groundup/book/notation/"> <span class="n">59</span> <span>Notation Reference</span> </a> </nav> <div class="scrim" id="toc-scrim"></div> <main class="main-col">  <div class="article-wrap"> <article class="chapter" id="article" data-slug="open-vs-closed" data-title="Open vs Closed Models" data-file="47-open-vs-closed.md" data-pagefind-body> <div class="chapter-kicker">Part VI · The Modern AI Landscape · Chapter 47</div> <h1>Open vs Closed Models</h1> <p class="chapter-desc">What &quot;open&quot; really means for a model, what the licenses actually permit, how fast the capability gap closed, and how to decide what to build on.</p> <details class="section-nav"> <summary>In this chapter</summary> <ol> <li><a href="#what-open-actually-means">What “open” actually means</a></li><li><a href="#the-license-fine-print">The license fine print</a></li><li><a href="#the-capability-gap-measured-honestly">The capability gap, measured honestly</a></li><li><a href="#why-labs-choose-what-they-choose">Why labs choose what they choose</a></li><li><a href="#the-safety-debate-steel-manned">The safety debate, steel-manned</a></li><li><a href="#distillation-learning-from-the-frontier-at-a-discount">Distillation: learning from the frontier at a discount</a></li><li><a href="#choosing-in-practice">Choosing in practice</a></li><li><a href="#where-this-leaves-us">Where this leaves us</a></li> </ol> </details> <p>Every serious decision about building with AI eventually runs into the same
+fork: do you call someone else’s model over an application programming
+interface (API), or do you download weights
+and run them yourself? The question sounds logistical. It is not. It determines
+what your costs look like at scale, whether your data ever leaves your
+infrastructure, whether you can <a href="/groundup/book/fine-tuning/">fine-tune</a> at all, whether
+researchers can study the model’s internals — and, at the level of nations and
+labs, who sets the standards for the most consequential technology of the
+decade.</p>
+<p>The debate around it is also unusually noisy. “Open source” gets used for
+models that are nothing of the sort; capability comparisons get quoted from
+whichever month favors the speaker; and the safety argument is usually
+presented as a cartoon of whichever side the speaker dislikes. This chapter’s
+job is to be the calm version: define the terms precisely, read the actual
+licenses, measure the capability gap honestly, explain each lab’s strategy as
+the rational move it is, steel-man both sides of the safety debate, and end
+with practical guidance for choosing.</p>
+<p>One framing to carry throughout: “open vs closed” is not a binary. It is a
+ladder, and almost everything interesting happens on the middle rungs.</p>
+<h2 id="what-open-actually-means">What “open” actually means</h2>
+<p>A modern model is not one artifact. Releasing one involves at least four
+separable things:</p>
+<ol>
+<li><strong>Weights</strong> — the trained parameters, the multi-hundred-gigabyte tensor
+files. With weights you can run the model, fine-tune it, quantize it, and
+inspect its activations.</li>
+<li><strong>Code</strong> — the training and inference implementations.</li>
+<li><strong>Data</strong> — the pretraining and post-training corpora, or at least a precise
+description of them.</li>
+<li><strong>The recipe</strong> — hyperparameters, data mixture schedules, the
+<a href="/groundup/book/sft-and-rlhf/">post-training</a> pipeline, evaluation harnesses: the
+knowledge needed to <em>reproduce</em> the model, not merely run it.</li>
+</ol>
+<p>Different releases open different subsets, which gives a ladder rather than a
+switch:</p>
+<figure class="fig">
+  <svg viewBox="0 0 720 345" role="img" aria-label="A staircase diagram of four openness levels, from closed API access up to fully open source models">
+    <defs>
+      <marker id="arr47a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M 0 1 L 8 5 L 0 9" fill="none" stroke="currentColor" stroke-width="1.6"></path>
+      </marker>
+    </defs>
+    <text x="30" y="34" font-family="Inter Variable, sans-serif" font-size="14" fill="currentColor" font-weight="600">More of the system is released</text>
+    <line x1="290" y1="29" x2="600" y2="29" stroke="currentColor" opacity="0.45" stroke-width="1.4" marker-end="url(#arr47a)"></line>
+    <!-- ascending guide arrow -->
+    <line x1="110" y1="222" x2="620" y2="72" stroke="currentColor" opacity="0.25" stroke-width="1.2" stroke-dasharray="4 4" marker-end="url(#arr47a)"></line>
+    <!-- Step 1: Closed API -->
+    <rect x="25" y="250" width="150" height="60" rx="8" fill="#fb7185" fill-opacity="0.15" stroke="#fb7185" stroke-width="1.6"></rect>
+    <text x="100" y="270" text-anchor="middle" font-family="Inter Variable, sans-serif" font-size="13" font-weight="600" fill="currentColor">Closed API</text>
+    <text x="100" y="287" text-anchor="middle" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55">GPT-5, Claude,</text>
+    <text x="100" y="302" text-anchor="middle" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55">Gemini</text>
+    <!-- Step 2 -->
+    <rect x="200" y="200" width="150" height="110" rx="8" fill="#f59e0b" fill-opacity="0.15" stroke="#f59e0b" stroke-width="1.6"></rect>
+    <text x="275" y="221" text-anchor="middle" font-family="Inter Variable, sans-serif" font-size="13" font-weight="600" fill="currentColor">Weights + terms</text>
+    <text x="275" y="240" text-anchor="middle" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55">Llama 3 / Llama 4</text>
+    <text x="275" y="256" text-anchor="middle" font-family="Inter Variable, sans-serif" font-size="10.5" fill="currentColor" opacity="0.55">Mistral Large (research)</text>
+    <text x="275" y="272" text-anchor="middle" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55">custom licenses,</text>
+    <text x="275" y="288" text-anchor="middle" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55">usage restrictions</text>
+    <!-- Step 3 -->
+    <rect x="375" y="150" width="150" height="160" rx="8" fill="#38bdf8" fill-opacity="0.15" stroke="#38bdf8" stroke-width="1.6"></rect>
+    <text x="450" y="171" text-anchor="middle" font-family="Inter Variable, sans-serif" font-size="13" font-weight="600" fill="currentColor">Permissive weights</text>
+    <text x="450" y="190" text-anchor="middle" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55">DeepSeek-R1 (MIT)</text>
+    <text x="450" y="206" text-anchor="middle" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55">Qwen3 (Apache-2.0)</text>
+    <text x="450" y="222" text-anchor="middle" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55">gpt-oss, Mixtral</text>
+    <text x="450" y="241" text-anchor="middle" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55">weights + inference</text>
+    <text x="450" y="257" text-anchor="middle" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55">code; data and full</text>
+    <text x="450" y="273" text-anchor="middle" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55">recipe withheld</text>
+    <!-- Step 4 -->
+    <rect x="550" y="100" width="150" height="210" rx="8" fill="#14b8a6" fill-opacity="0.15" stroke="#14b8a6" stroke-width="1.6"></rect>
+    <text x="625" y="121" text-anchor="middle" font-family="Inter Variable, sans-serif" font-size="13" font-weight="600" fill="currentColor">Open source proper</text>
+    <text x="625" y="140" text-anchor="middle" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55">OLMo 2, Pythia</text>
+    <text x="625" y="159" text-anchor="middle" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55">weights + training</text>
+    <text x="625" y="175" text-anchor="middle" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55">code + data +</text>
+    <text x="625" y="191" text-anchor="middle" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55">recipe + logs</text>
+    <text x="625" y="210" text-anchor="middle" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55">reproducible</text>
+    <text x="625" y="226" text-anchor="middle" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55">end to end</text>
+    <!-- baseline -->
+    <line x1="15" y1="310" x2="705" y2="310" stroke="currentColor" opacity="0.35" stroke-width="1.2"></line>
+    <text x="100" y="331" text-anchor="middle" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55">tokens in, tokens out</text>
+    <text x="275" y="331" text-anchor="middle" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55">you run it, terms apply</text>
+    <text x="450" y="331" text-anchor="middle" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55">build anything</text>
+    <text x="625" y="331" text-anchor="middle" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55">reproduce everything</text>
+  </svg>
+  <figcaption><strong>Figure:</strong> The openness ladder. Almost all famous "open" models sit on the middle two rungs: weights are released, but the training data and full recipe are not. Model placements are a mid-2026 snapshot.</figcaption>
+</figure>
+<p>The rungs, precisely:</p>
+<p><strong>Closed API.</strong> You send tokens, you receive tokens. GPT-5, Claude, and Gemini
+live here. You never see weights, activations, or (usually) even the exact
+model version’s lifespan — the provider can silently update or retire what
+you build on. In exchange you get the frontier: the strongest capabilities,
+maintained infrastructure, and someone else’s graphics processing units
+(GPUs).</p>
+<p><strong>Open-weight.</strong> The parameters are downloadable, so you can serve, quantize,
+fine-tune, and inspect the model — but the training data and most of the
+recipe stay private, and a license governs what you may do. This rung splits
+in two, and the split matters commercially: <em>restricted</em> open-weight releases
+(Llama’s community license, Mistral’s research license) attach real conditions,
+while <em>permissive</em> releases (MIT, Apache 2.0) attach almost none.</p>
+<p><strong>Open source proper.</strong> Weights <em>and</em> code <em>and</em> data <em>and</em> recipe, under
+licenses meeting the classic open-source freedoms: use, study, modify,
+redistribute, for anyone, for any purpose. Very few capable models live here —
+the Allen Institute for AI’s <a href="https://allenai.org/olmo">OLMo</a> line and
+EleutherAI’s <a href="https://arxiv.org/abs/2304.01373">Pythia</a> suite are the standard
+examples, built explicitly so that researchers can study <em>training itself</em>,
+checkpoint by checkpoint.</p>
+<aside class="box box-warning" data-box="warning"><div class="box-title"><span class="box-icon" aria-hidden="true">⚠️</span>Careful</div><p><strong>“Open source” is a contested term for models, and most uses of it are
+wrong.</strong> The Open Source Initiative (OSI) — the traditional steward of the
+term for software — published its
+<a href="https://opensource.org/ai">Open Source AI Definition</a> in October 2024. To
+qualify, a release must grant the four freedoms and include the code, the
+parameters, and sufficiently detailed <em>data information</em> to allow a skilled
+person to substantially recreate the model. Llama fails (license
+restrictions); DeepSeek and Qwen release weights under open licenses
+but not their data or full recipe, so they are best called <strong>open-weight</strong>,
+not open source. The definition itself is contested from the other side too:
+critics argue that by requiring only “data information” rather than the data,
+OSI set the bar too <em>low</em>. When you read “open source model” in the wild,
+translate it to “open-weight” until proven otherwise — this book uses the
+narrower terms deliberately.</p></aside>
+<p>Why does anyone withhold the data while releasing the weights? Three honest
+reasons: the <a href="/groundup/book/pretraining-data/">pretraining mixture</a> is a competitive
+edge that took enormous effort to curate; the corpus almost certainly contains
+copyrighted material that is legally safer to describe than to redistribute;
+and the post-training data encodes the lab’s alignment choices. The weights
+are the product; the data is the process.</p>
+<h2 id="the-license-fine-print">The license fine print</h2>
+<p>Licenses are where “open” stops being a vibe and becomes a contract. The table
+below is the practical landscape; treat model placements as a mid-2026
+snapshot, because relicensing happens (DeepSeek, for instance, moved its
+releases to plain MIT in early 2025).</p>
+<figure class="fig" style="overflow-x:auto">
+  <table>
+    <thead>
+      <tr>
+        <th>Regime</th>
+        <th>Example models</th>
+        <th>Commercial use</th>
+        <th>Distill / train on outputs</th>
+        <th>Strings attached</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>MIT</strong></td>
+        <td>DeepSeek-R1, recent DeepSeek-V3 checkpoints</td>
+        <td>Yes</td>
+        <td>Yes</td>
+        <td>None beyond keeping the license notice.</td>
+      </tr>
+      <tr>
+        <td><strong>Apache 2.0</strong></td>
+        <td>Qwen3 (most sizes), gpt-oss, Mistral 7B / Mixtral, OLMo 2</td>
+        <td>Yes</td>
+        <td>Yes</td>
+        <td>Attribution; includes an explicit patent grant (why lawyers like it).</td>
+      </tr>
+      <tr>
+        <td><strong>Community license</strong></td>
+        <td>Llama 3.x, Llama 4</td>
+        <td>Yes — unless your products had ~700M monthly active users at release, in which case you must negotiate with Meta</td>
+        <td>Allowed (since Llama 3.1), but models trained on Llama or its outputs must have names beginning with "Llama"</td>
+        <td>Acceptable-use policy; "Built with Llama" attribution; not OSI-open.</td>
+      </tr>
+      <tr>
+        <td><strong>Research-only weights</strong></td>
+        <td>Mistral Large (Mistral Research License), Cohere Command R (CC-BY-NC)</td>
+        <td>No — separate paid license required</td>
+        <td>No commercial derivatives</td>
+        <td>Weights are for research, evaluation, and personal use only.</td>
+      </tr>
+      <tr>
+        <td><strong>Closed API terms</strong></td>
+        <td>GPT-5, Claude, Gemini</td>
+        <td>Yes, per terms of service (ToS)</td>
+        <td>Typically prohibited: ToS forbid using outputs to build competing models</td>
+        <td>No weights at all; provider controls pricing, versions, retirement.</td>
+      </tr>
+    </tbody>
+  </table>
+  <figcaption><strong>Figure:</strong> The license reality, mid-2026 snapshot. This is a summary, not legal advice: licenses get revised between model generations, and the one that binds you is the one attached to the exact checkpoint you downloaded.</figcaption>
+</figure>
+<p>Three practical readings of this table. First, <strong>MIT and Apache 2.0 mean what
+they always meant in software</strong>: build a product, charge money, keep your
+modifications private, no permission needed. This is why DeepSeek’s and Qwen’s
+choices were strategically loud — they handed the world frontier-adjacent
+models with fewer restrictions than Meta’s.</p>
+<p>Second, <strong>the <a href="https://www.llama.com/llama3/license/">Llama community license</a>
+is business-friendly for almost everyone but is not open source</strong>. The
+famous 700-million-monthly-active-users clause exists to stop exactly the
+handful of Meta-scale competitors (Google, Amazon, Apple, ByteDance) from
+free-riding; a startup will never hit it. The clauses that bite in practice
+are subtler: the acceptable-use policy, the attribution requirement, and the
+naming rule for derivatives (the name must <em>begin</em> with “Llama”) — which is
+why you see fine-tunes with names like
+“Llama-3.1-Nemotron” rather than fully rebranded models.</p>
+<p>Third, <strong>the sharpest legal line in the ecosystem is about outputs, not
+weights</strong>. Closed providers’ terms of service generally prohibit using their
+outputs to train competing models, while permissive open-weight licenses allow
+distillation freely. We return to why that asymmetry matters in the
+distillation section.</p>
+<aside class="box box-practice" data-box="practice"><div class="box-title"><span class="box-icon" aria-hidden="true">⚙️</span>In practice</div><p>When evaluating a model for commercial use in 2026, engineers check, in order:
+(1) the exact license file on the exact Hugging Face repo — not the blog post;
+(2) whether the license permits <em>hosting the model for third parties</em> (some
+research licenses forbid offering it as a service); (3) whether derivative
+naming or attribution requirements clash with the product; (4) for anything
+touching the EU, whether the EU AI Act’s general-purpose-AI obligations apply
+— the Act partially exempts models under free and open-source licenses,
+<em>unless</em> they cross the systemic-risk compute threshold (set at <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>10</mn><mn>25</mn></msup></mrow><annotation encoding="application/x-tex">10^{25}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">25</span></span></span></span></span></span></span></span></span></span></span></span>
+floating-point operations of training compute). Legal review of a model
+license is now a standard step in enterprise procurement, like reviewing a
+database license was in 2010.</p></aside>
+<h2 id="the-capability-gap-measured-honestly">The capability gap, measured honestly</h2>
+<p>In 2023, the question “open or closed?” answered itself for demanding
+applications: closed, because nothing open came close. The interesting story
+is how fast that stopped being true — and in exactly which ways it is still
+true.</p>
+<p>The honest metric is <strong>lag</strong>: how many months pass before an open-weight model
+matches a given closed capability level. Benchmark scores themselves are
+gameable and saturate (see
+<a href="/groundup/book/benchmarks-and-evaluation/">Benchmarks and How to Read Them</a>), but lag
+is robust to that, since both sides are measured on the same yardstick.</p>
+<figure class="fig">
+  <svg viewBox="0 0 720 320" role="img" aria-label="Schematic timeline from 2023 to 2026 showing the best closed and best open-weight model capabilities converging, with the lag shrinking from about sixteen months to a few months">
+    <defs>
+      <marker id="arr47b" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M 0 1 L 8 5 L 0 9" fill="none" stroke="currentColor" stroke-width="1.6"></path>
+      </marker>
+    </defs>
+    <text x="24" y="28" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.55">benchmark capability (schematic, not to scale)</text>
+    <!-- axes -->
+    <line x1="60" y1="40" x2="60" y2="270" stroke="currentColor" opacity="0.35" stroke-width="1.2"></line>
+    <line x1="60" y1="270" x2="700" y2="270" stroke="currentColor" opacity="0.35" stroke-width="1.2"></line>
+    <text x="70" y="292" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.55">2023</text>
+    <text x="247" y="292" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.55">2024</text>
+    <text x="424" y="292" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.55">2025</text>
+    <text x="601" y="292" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.55">2026</text>
+    <line x1="247" y1="266" x2="247" y2="274" stroke="currentColor" opacity="0.35"></line>
+    <line x1="424" y1="266" x2="424" y2="274" stroke="currentColor" opacity="0.35"></line>
+    <line x1="601" y1="266" x2="601" y2="274" stroke="currentColor" opacity="0.35"></line>
+    <!-- closed curve (indigo) -->
+    <path d="M 114 200 C 200 178, 300 152, 371 130 C 430 112, 480 96, 530 85 C 590 73, 650 66, 690 62" fill="none" stroke="#818cf8" stroke-width="2.4"></path>
+    <!-- open curve (teal) -->
+    <path d="M 173 248 C 215 240, 290 215, 336 196 C 380 178, 410 172, 418 166 C 428 156, 428 140, 433 130 C 465 118, 500 110, 528 106 C 590 96, 650 82, 690 74" fill="none" stroke="#14b8a6" stroke-width="2.4"></path>
+    <!-- series labels -->
+    <text x="150" y="148" font-family="Inter Variable, sans-serif" font-size="13" font-weight="600" fill="#818cf8">best closed (frontier)</text>
+    <text x="390" y="232" font-family="Inter Variable, sans-serif" font-size="13" font-weight="600" fill="#14b8a6">best open-weight</text>
+    <!-- milestones: closed -->
+    <circle cx="114" cy="200" r="4" fill="#818cf8"></circle>
+    <text x="76" y="185" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor">GPT-4 · Mar ’23</text>
+    <circle cx="371" cy="130" r="4" fill="#818cf8"></circle>
+    <text x="330" y="110" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor">o1 · Sep ’24</text>
+    <circle cx="530" cy="85" r="4" fill="#818cf8"></circle>
+    <text x="497" y="68" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor">GPT-5 · Aug ’25</text>
+    <!-- milestones: open -->
+    <circle cx="173" cy="248" r="4" fill="#14b8a6"></circle>
+    <text x="185" y="262" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor">Llama 2 · Jul ’23</text>
+    <circle cx="336" cy="196" r="4" fill="#14b8a6"></circle>
+    <text x="282" y="182" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor">Llama 3.1 405B</text>
+    <circle cx="418" cy="166" r="4" fill="#14b8a6"></circle>
+    <text x="398" y="192" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor">DeepSeek-V3</text>
+    <circle cx="433" cy="130" r="4" fill="#14b8a6"></circle>
+    <text x="447" y="134" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor">R1 · Jan ’25</text>
+    <circle cx="528" cy="106" r="4" fill="#14b8a6"></circle>
+    <text x="500" y="128" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor">gpt-oss</text>
+    <!-- lag arrows -->
+    <line x1="120" y1="207" x2="328" y2="207" stroke="currentColor" opacity="0.45" stroke-width="1.2" stroke-dasharray="4 3" marker-start="url(#arr47b)" marker-end="url(#arr47b)"></line>
+    <text x="150" y="224" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.7">lag ≈ 16 months</text>
+    <line x1="377" y1="141" x2="427" y2="141" stroke="currentColor" opacity="0.45" stroke-width="1.2" stroke-dasharray="4 3" marker-start="url(#arr47b)" marker-end="url(#arr47b)"></line>
+    <text x="367" y="158" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.7">≈ 4 months</text>
+  </svg>
+  <figcaption><strong>Figure:</strong> The shrinking lag, schematically. The vertical axis is a stylized "frontier benchmark capability," not a real scale; the horizontal gaps are the honest measurement. Open-weight models took roughly 16 months to match GPT-4-level capability, and roughly 4 months to match o1-level reasoning. Dates are release dates; lag estimates are approximate and benchmark-dependent.</figcaption>
+</figure>
+<p>The trajectory in words. GPT-4 shipped in March 2023 (see
+<a href="/groundup/book/the-frontier/">The Frontier Landscape</a> for the full timeline). The best
+open-weight models of that year — <a href="https://arxiv.org/abs/2307.09288">Llama 2</a>
+in July, <a href="https://arxiv.org/abs/2310.06825">Mistral 7B</a> in September — were
+useful but unmistakably a tier below. Open-weight models did not credibly reach
+GPT-4’s level until roughly mid-2024, with Llama 3.1 405B: a lag around
+12–16 months, depending on the benchmark you pick.</p>
+<p>Then the lag collapsed. OpenAI’s o1 introduced
+<a href="/groundup/book/reasoning-models/">reasoning-trained models</a> in September 2024;
+<a href="https://arxiv.org/abs/2501.12948">DeepSeek-R1</a> matched much of that
+capability in January 2025 — about four months — with MIT-licensed weights
+and a paper explaining the method. R1 is the inflection point of this whole
+chapter: it demonstrated that the reasoning-training recipe was reproducible
+outside the closed labs, at a cost that startled everyone (the underlying
+<a href="https://arxiv.org/abs/2412.19437">DeepSeek-V3</a> base model reported about
+2.79M H800 GPU-hours of pretraining compute, roughly $5.6M at $2 per
+GPU-hour — a figure that excludes research, ablations, staff, and
+infrastructure, and was widely misquoted as the total cost of the project).
+Through 2025 and into 2026, dense waves of strong permissive releases —
+Qwen3, further DeepSeek checkpoints, OpenAI’s own
+<a href="https://openai.com/index/introducing-gpt-oss/">gpt-oss</a> — kept the measured
+lag at months, not years. (These lag figures are fast-moving; treat them as a
+mid-2026 snapshot.)</p>
+<aside class="box box-intuition" data-box="intuition"><div class="box-title"><span class="box-icon" aria-hidden="true">💡</span>Intuition</div><p>Why does the gap keep closing? Because the ingredients of a frontier model
+diffuse at different speeds. <em>Ideas</em> — architectures, training recipes —
+travel at the speed of papers and job changes: months. <em>Outputs</em> leak by
+default, through distillation and through frontier-generated text landing on
+the public web. Only <em>compute</em> stays scarce, and compute buys the
+leader time rather than a permanent lead: it keeps moving the frontier
+outward, but the cost of reaching any <em>fixed</em> capability level falls
+relentlessly (see <a href="/groundup/book/scaling-laws/">Scaling Laws</a>). A closed lab’s moat
+is a moving frontier, not a wall.</p></aside>
+<p>Honesty requires the other half of the picture. <strong>Where closed still leads:</strong>
+the absolute frontier of reasoning — the hardest math, agentic
+software-engineering, and research-grade tasks — where the newest closed
+models hold a real edge for some months after each release;
+<a href="/groundup/book/multimodal-models/">multimodal</a> polish, especially natively integrated
+vision, audio, and image generation; and <em>reliability as a product</em> — uptime,
+safety tuning, long-tail robustness, and ecosystem tooling that a raw
+checkpoint does not include. <strong>Where open wins:</strong> cost at scale (next box),
+privacy and data control (the weights run inside your perimeter — decisive
+for hospitals, law firms, defense, and anyone with regulator problems),
+unrestricted <a href="/groundup/book/fine-tuning/">fine-tuning</a> on proprietary data, latency
+control and offline deployment, and — the reason Part VII of this book can
+exist at all — <strong>research access</strong>. You cannot attach a
+<a href="/groundup/book/features-and-probes/">probe</a> to an API. Every
+<a href="/groundup/book/sparse-autoencoders/">sparse autoencoder</a>, every activation-patching
+experiment, every open replication in
+<a href="/groundup/book/why-interpretability/">interpretability</a> runs on models whose weights
+someone released.</p>
+<aside class="box box-example" data-box="example"><div class="box-title"><span class="box-icon" aria-hidden="true">✏️</span>Worked example</div><p><strong>The self-hosting cost curve, with arithmetic.</strong> Suppose your product
+generates 1 billion output tokens per month. (All numbers below are rough
+mid-2026 magnitudes — recompute with current prices before deciding anything.)</p><p><em>Closed API:</em> frontier-model output tokens run on the order of $10 per
+million. Cost: <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1,000</mn><mo>×</mo><mstyle mathcolor="#cc0000"><mtext>\textdollar</mtext></mstyle><mn>10</mn><mo>=</mo><mstyle mathcolor="#cc0000"><mtext>\textdollar</mtext></mstyle><mn>10,000</mn></mrow><annotation encoding="application/x-tex">1{,}000 \times \textdollar 10 = \textdollar 10{,}000</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">1</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">000</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord text" style="color:#cc0000;"><span class="mord" style="color:#cc0000;">\textdollar</span></span><span class="mord">10</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord text" style="color:#cc0000;"><span class="mord" style="color:#cc0000;">\textdollar</span></span><span class="mord">10</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">000</span></span></span></span> per month.</p><p><em>Self-hosted open model:</em> an 8×H100 node rents for about $2 per GPU-hour,
+so $16 per node-hour. A well-batched inference stack (see
+<a href="/groundup/book/inference-and-serving/">Inference and Serving</a>) serving a 70B-class
+model can sustain on the order of 2,500 output tokens per second across the
+node. That is <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2,500</mn><mo>×</mo><mn>3,600</mn><mo>=</mo><mn>9</mn></mrow><annotation encoding="application/x-tex">2{,}500 \times 3{,}600 = 9</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">2</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">500</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">3</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">600</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">9</span></span></span></span> million tokens per hour, so the
+cost is <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#cc0000"><mtext>\textdollar</mtext></mstyle><mn>16</mn><mi mathvariant="normal">/</mi><mn>9</mn><mtext>M</mtext><mo>≈</mo><mstyle mathcolor="#cc0000"><mtext>\textdollar</mtext></mstyle><mn>1.80</mn></mrow><annotation encoding="application/x-tex">\textdollar 16 / 9\text{M} \approx \textdollar 1.80</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord text" style="color:#cc0000;"><span class="mord" style="color:#cc0000;">\textdollar</span></span><span class="mord">16/9</span><span class="mord text"><span class="mord">M</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord text" style="color:#cc0000;"><span class="mord" style="color:#cc0000;">\textdollar</span></span><span class="mord">1.80</span></span></span></span> per million tokens — roughly
+<strong>5–6× cheaper</strong>, before engineering salaries.</p><p><em>The catch is utilization.</em> That $1.80 assumed the node runs flat out. Your
+1B tokens per month need <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1,000</mn><mtext>M</mtext><mi mathvariant="normal">/</mi><mn>9</mn><mtext>M</mtext><mo>≈</mo><mn>111</mn></mrow><annotation encoding="application/x-tex">1{,}000\text{M} / 9\text{M} \approx 111</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">000</span><span class="mord text"><span class="mord">M</span></span><span class="mord">/9</span><span class="mord text"><span class="mord">M</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">111</span></span></span></span> node-hours
+— about 15% of one node’s month. If you keep the node up continuously for
+latency, you pay <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>720</mn><mo>×</mo><mstyle mathcolor="#cc0000"><mtext>\textdollar</mtext></mstyle><mn>16</mn><mo>=</mo><mstyle mathcolor="#cc0000"><mtext>\textdollar</mtext></mstyle><mn>11,520</mn></mrow><annotation encoding="application/x-tex">720 \times \textdollar 16 = \textdollar 11{,}520</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">720</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord text" style="color:#cc0000;"><span class="mord" style="color:#cc0000;">\textdollar</span></span><span class="mord">16</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord text" style="color:#cc0000;"><span class="mord" style="color:#cc0000;">\textdollar</span></span><span class="mord">11</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">520</span></span></span></span> for the month — <em>more</em> than
+the API. The rule of thumb this arithmetic produces: self-hosting wins at
+high, steady volume or under hard privacy constraints; APIs win for spiky,
+low, or exploratory workloads. The crossover moves every year as both GPU
+rental and API prices fall.</p></aside>
+<h2 id="why-labs-choose-what-they-choose">Why labs choose what they choose</h2>
+<p>None of the major release strategies is ideological accident; each is a
+rational move given the lab’s position. Understanding the incentives makes
+the landscape predictable.</p>
+<p><strong>Meta opened to commoditize its complements.</strong> Meta’s business is attention
+and advertising, not selling model access. If frontier-quality models become
+free commodities, the paid-API business of its competitors shrinks while
+Meta’s products get the capability anyway — the classic “commoditize your
+complement” strategy, plus real recruiting and ecosystem benefits: Llama
+became the substrate of academic and startup work, so the world’s tooling,
+optimizations, and talent pipeline organized around Meta’s architecture.
+Mark Zuckerberg made the strategic case explicitly in his July 2024 essay
+“Open Source AI Is the Path Forward.” (A wrinkle worth flagging: after Meta’s
+2025 superintelligence-lab reorganization, its leadership signaled more
+caution about opening its <em>most</em> capable future models — how far that shift
+goes is unsettled as of this writing.)</p>
+<p><strong>DeepSeek and Qwen opened for standards, talent, and reach.</strong> For a
+Chinese lab, open weights convert export-control disadvantage into influence:
+a model anyone on Earth can download and self-host spreads faster than any
+API, especially into markets and institutions that cannot or will not buy
+American API access. Open releases with strong papers also buy scientific
+credibility and recruiting power, and — for Alibaba’s Qwen — seed a cloud
+ecosystem the way Llama seeds Meta’s. The permissive licensing (MIT, Apache)
+is part of the point: maximal adoption <em>is</em> the strategy.</p>
+<p><strong>OpenAI, Anthropic, and Google DeepMind stay mostly closed</strong> for two reasons
+that reinforce each other. The business reason: frontier training runs cost
+billions, and selling access to the resulting model is how that capital is
+recouped; giving away the weights gives away the margin. The stated safety
+reason: releasing weights is irreversible, strips off every deployment-time
+safeguard, and — the labs argue — becomes dangerous as capabilities
+approach thresholds for serious misuse. Skeptics note how conveniently the
+safety argument aligns with the business one; the labs reply that both can be
+true at once. Both observations are correct.</p>
+<p><strong>gpt-oss is the interesting middle move.</strong> In August 2025, OpenAI — the
+company whose name had become the punchline about closed models — released
+<a href="https://openai.com/index/introducing-gpt-oss/">gpt-oss-120b and gpt-oss-20b</a>:
+Apache-2.0 <a href="/groundup/book/mixture-of-experts/">mixture-of-experts</a> reasoning models
+(roughly 117B and 21B total parameters, with about 5.1B and 3.6B active per
+token), its first open-weight language models since GPT-2 in 2019. The logic:
+concede the commodity tier, where DeepSeek and Qwen were setting standards
+anyway, and compete there for developer mindshare — while keeping the actual
+frontier closed. It is the clearest demonstration that “open vs closed” is a
+portfolio decision per capability tier, not a lab-level identity.</p>
+<p>One careful paragraph on the geopolitics, because it now shapes the release
+calendar. Since 2025, the strongest permissive open-weight models have come
+predominantly from Chinese labs — DeepSeek, Qwen, and a second rank including
+Moonshot, Zhipu, and MiniMax — while US labs keep their best models closed,
+with gpt-oss as the partial exception. This inverts the intuitive framing:
+US export controls restrict the <em>chips</em>, so Chinese labs compete on
+<em>diffusion</em> — being the weights the world builds on. In Washington this
+produced a genuine policy tension, between fear of accelerating a rival and
+fear that the global default stack becomes Chinese; the US National
+Telecommunications and Information Administration’s (NTIA) 2024 report on
+open-weight models landed on monitoring rather than restriction, and that has
+broadly held. These dynamics are fast-moving; treat any specific claim here as
+a snapshot, not a law of nature.</p>
+<aside class="box box-history" data-box="history"><div class="box-title"><span class="box-icon" aria-hidden="true">🕰</span>History</div><p>The open-weight era has a precise, slightly absurd origin story. OpenAI’s
+GPT-2 (2019) was initially released in <em>stages</em> out of misuse concern — the
+first mainstream “too dangerous to release” debate. EleutherAI, BigScience
+(BLOOM, 2022), and Meta’s OPT (2022) kept open replication alive through the
+GPT-3 years. Then in February 2023 Meta granted researchers gated access to
+<a href="https://arxiv.org/abs/2302.13971">LLaMA</a> — and within a week the weights
+were on BitTorrent via 4chan. The leak demonstrated overwhelming demand and
+an ecosystem (llama.cpp, low-rank adaptation (LoRA) fine-tunes on laptops) that Meta chose to embrace
+rather than fight: Llama 2 shipped in July 2023 with a commercial license,
+and the modern open-weight ecosystem dates from that decision.</p></aside>
+<h2 id="the-safety-debate-steel-manned">The safety debate, steel-manned</h2>
+<p>Whether powerful model weights <em>should</em> be released is the most consequential
+open question in AI policy, and this book will not pretend it has the answer.
+What it can do is present each side’s strongest form — not the strawman the
+other side prefers to quote.</p>
+<aside class="box box-note" data-box="note"><div class="box-title"><span class="box-icon" aria-hidden="true">✎</span>Note</div><p><strong>The case for restraint, at full strength.</strong> (1) <em>Irreversibility.</em> An API
+can be patched, monitored, rate-limited, or shut down; released weights are
+on ten thousand hard drives forever. Whatever the worst use of a model is, it
+is now permanent. (2) <em>Safeguard removal.</em> Deployment-time safety training is
+shallow relative to capability: published work — e.g.
+<a href="https://arxiv.org/abs/2310.03693">Qi et al., 2023</a>
+— shows that a small amount of fine-tuning, sometimes a few dozen examples,
+strips refusal behavior from an open model at trivial cost. Open-weight
+safety mitigations are therefore best understood as defaults, not guarantees.
+(3) <em>Dual-use uplift.</em> The concern is not today’s models writing phishing
+emails; it is tomorrow’s models providing meaningful uplift for biological or
+cyber weapons development. If capability trends continue, some future release
+crosses a line — and because of (1), the release decision must be made
+<em>before</em> the danger is demonstrated, under uncertainty, with no undo. (4)
+<em>Evaluation gaps.</em> We cannot currently prove a model lacks a dangerous
+capability; <a href="/groundup/book/benchmarks-and-evaluation/">benchmarks</a> miss what they do
+not test. Restraint buys time for evaluation science to catch up.</p></aside>
+<aside class="box box-note" data-box="note"><div class="box-title"><span class="box-icon" aria-hidden="true">✎</span>Note</div><p><strong>The case for openness, at full strength.</strong> (1) <em>Concentration of power.</em> If
+frontier AI stays closed, a handful of corporations control the most
+important cognitive infrastructure in history — its values, its pricing, its
+availability, and the surveillance of everything queried through it. That is
+a certain harm, weighed against speculative ones. (2) <em>Auditability.</em> Closed
+models cannot be independently verified for safety, bias, or backdoors;
+every claim reduces to “trust the vendor.” Meaningful external safety
+research — including the entire field of Part VII — requires weights.
+(3) <em>Defense via access.</em> Defenders, red-teamers, and safety researchers get
+the same access attackers do; historically (cryptography is the standard
+analogy) open scrutiny produced more security than obscurity. (4) <em>Marginal
+risk.</em> The right question — argued carefully in
+<a href="https://arxiv.org/abs/2403.07918">Kapoor et al., 2024</a>
+— is not “can open models do bad things?” but “what harm is possible <em>with</em>
+the open model that was not already possible <em>without</em> it — given search
+engines, textbooks, and closed models with imperfect guardrails?” For
+documented harms to date, that measured marginal risk has been modest.
+(5) <em>Diffusion of benefits.</em> Open weights are how capability reaches
+hospitals, poor countries, and researchers without frontier budgets.</p></aside>
+<p>Notice that the two cases largely talk past each other: restraint arguments
+are about <em>tail risks of future models</em>; openness arguments are about
+<em>present, systemic harms of concentration</em>. Both can be right, which is why
+serious policy work — the NTIA process, the EU AI Act’s general-purpose-AI
+tiers, labs’ responsible scaling policies — converges on
+capability-conditional positions: openness by default, flipping at defined
+evaluation thresholds. Where those thresholds should sit is the live debate,
+and this book flags it as unresolved.</p>
+<h2 id="distillation-learning-from-the-frontier-at-a-discount">Distillation: learning from the frontier at a discount</h2>
+<p>One economic force deserves its own section, because it quietly couples the
+open and closed worlds: <strong>distillation</strong> — training a smaller or cheaper
+model to imitate a stronger one.</p>
+<aside class="box box-intuition" data-box="intuition"><div class="box-title"><span class="box-icon" aria-hidden="true">💡</span>Intuition</div><p>A frontier model’s outputs are a compressed export of its training
+investment. If a strong teacher writes out 800,000 worked solutions, a
+student model that trains on them inherits much of the <em>behavior</em> without
+paying for the <em>search</em> — the billions of dollars of pretraining and
+reinforcement learning that discovered how to produce those solutions. The
+expensive thing was never the tokens; it was finding the distribution the
+tokens are drawn from. Distillation lets a follower buy that distribution at
+the price of inference.</p></aside>
+<aside class="box box-math" data-box="math"><div class="box-title"><span class="box-icon" aria-hidden="true">∑</span>The math</div><p>Classic distillation
+(<a href="https://arxiv.org/abs/1503.02531">Hinton et al., 2015</a>) trains the student
+to match the teacher’s full output <em>distribution</em>, rather than only its top
+answer.
+For a context <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi></mrow><annotation encoding="application/x-tex">x</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">x</span></span></span></span>, let the teacher’s next-token distribution be <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo stretchy="false">(</mo><mo>⋅</mo><mtext> </mtext><mi mathvariant="normal">∣</mi><mtext> </mtext><mi>x</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">p(\cdot\,|\,x)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord">⋅</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">∣</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">x</span><span class="mclose">)</span></span></span></span>
+and the student’s be <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>q</mi><mi>θ</mi></msub><mo stretchy="false">(</mo><mo>⋅</mo><mtext> </mtext><mi mathvariant="normal">∣</mi><mtext> </mtext><mi>x</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">q_\theta(\cdot\,|\,x)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">q</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0278em;">θ</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord">⋅</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">∣</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">x</span><span class="mclose">)</span></span></span></span>, where <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>θ</mi></mrow><annotation encoding="application/x-tex">\theta</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">θ</span></span></span></span> are the student’s
+parameters. The loss is the
+<a href="/groundup/book/information-theory/">Kullback–Leibler divergence</a> from teacher to
+student, averaged over contexts:</p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi mathvariant="script">L</mi><mo stretchy="false">(</mo><mi>θ</mi><mo stretchy="false">)</mo><mtext>  </mtext><mo>=</mo><mtext>  </mtext><msub><mi mathvariant="double-struck">E</mi><mi>x</mi></msub><mtext> ⁣</mtext><mrow><mo fence="true">[</mo><mtext> </mtext><msub><mi>D</mi><mrow><mi mathvariant="normal">K</mi><mi mathvariant="normal">L</mi></mrow></msub><mtext> ⁣</mtext><mrow><mo fence="true">(</mo><mi>p</mi><mo stretchy="false">(</mo><mo>⋅</mo><mtext> </mtext><mi mathvariant="normal">∣</mi><mtext> </mtext><mi>x</mi><mo stretchy="false">)</mo><mtext> </mtext><mi mathvariant="normal">∥</mi><mtext> </mtext><msub><mi>q</mi><mi>θ</mi></msub><mo stretchy="false">(</mo><mo>⋅</mo><mtext> </mtext><mi mathvariant="normal">∣</mi><mtext> </mtext><mi>x</mi><mo stretchy="false">)</mo><mo fence="true">)</mo></mrow><mo fence="true">]</mo></mrow><mtext>  </mtext><mo>=</mo><mtext>  </mtext><msub><mi mathvariant="double-struck">E</mi><mi>x</mi></msub><mtext> ⁣</mtext><mrow><mo fence="true">[</mo><mtext> </mtext><munder><mo>∑</mo><mrow><mi>t</mi><mo>∈</mo><mi>V</mi></mrow></munder><mi>p</mi><mo stretchy="false">(</mo><mi>t</mi><mtext> </mtext><mi mathvariant="normal">∣</mi><mtext> </mtext><mi>x</mi><mo stretchy="false">)</mo><mtext> </mtext><mi>log</mi><mo>⁡</mo><mfrac><mrow><mi>p</mi><mo stretchy="false">(</mo><mi>t</mi><mtext> </mtext><mi mathvariant="normal">∣</mi><mtext> </mtext><mi>x</mi><mo stretchy="false">)</mo></mrow><mrow><msub><mi>q</mi><mi>θ</mi></msub><mo stretchy="false">(</mo><mi>t</mi><mtext> </mtext><mi mathvariant="normal">∣</mi><mtext> </mtext><mi>x</mi><mo stretchy="false">)</mo></mrow></mfrac><mo fence="true">]</mo></mrow><mo separator="true">,</mo></mrow><annotation encoding="application/x-tex">\mathcal{L}(\theta) \;=\; \E_{x}\!\left[\, \KL\!\left(p(\cdot\,|\,x)\,\|\,q_\theta(\cdot\,|\,x)\right) \right]
+\;=\; \E_{x}\!\left[\, \sum_{t \in V} p(t\,|\,x)\,\log \frac{p(t\,|\,x)}{q_\theta(t\,|\,x)} \right],</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathcal">L</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0278em;">θ</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathbb">E</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">x</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:-0.1667em;"></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;">[</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0278em;">D</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathrm mtight">KL</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:-0.1667em;"></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;">(</span><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord">⋅</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">∣</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">x</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">∥</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">q</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0278em;">θ</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord">⋅</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">∣</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">x</span><span class="mclose">)</span><span class="mclose delimcenter" style="top:0em;">)</span></span><span class="mclose delimcenter" style="top:0em;">]</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:3.0717em;vertical-align:-1.3217em;"></span><span class="mord"><span class="mord mathbb">E</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">x</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:-0.1667em;"></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size4">[</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.05em;"><span style="top:-1.8557em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">t</span><span class="mrel mtight">∈</span><span class="mord mathnormal mtight" style="margin-right:0.2222em;">V</span></span></span></span><span style="top:-3.05em;"><span class="pstrut" style="height:3.05em;"></span><span><span class="mop op-symbol large-op">∑</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.3217em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">∣</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">x</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.427em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">q</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0278em;">θ</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">∣</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">x</span><span class="mclose">)</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">∣</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">x</span><span class="mclose">)</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.936em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mclose delimcenter" style="top:0em;"><span class="delimsizing size4">]</span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mpunct">,</span></span></span></span></span><p>where <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi></mrow><annotation encoding="application/x-tex">V</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.2222em;">V</span></span></span></span> is the vocabulary. The soft targets <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo stretchy="false">(</mo><mi>t</mi><mtext> </mtext><mi mathvariant="normal">∣</mi><mtext> </mtext><mi>x</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">p(t\,|\,x)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">∣</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">x</span><span class="mclose">)</span></span></span></span> carry far more
+information per example than a single correct token — the teacher’s <em>ranking
+of alternatives</em> is part of the signal. When only API access to the teacher
+exists, its full distribution is unavailable, so modern LLM “distillation” is
+usually <strong>sequence-level</strong>: sample whole outputs <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>y</mi><mo>∼</mo><mi>p</mi><mo stretchy="false">(</mo><mo>⋅</mo><mtext> </mtext><mi mathvariant="normal">∣</mi><mtext> </mtext><mi>x</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">y \sim p(\cdot\,|\,x)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∼</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord">⋅</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">∣</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">x</span><span class="mclose">)</span></span></span></span> from
+the teacher, then run ordinary supervised fine-tuning — cross-entropy on the
+teacher’s tokens — which approximates the same objective with hard samples
+instead of soft targets.</p></aside>
+<aside class="box box-example" data-box="example"><div class="box-title"><span class="box-icon" aria-hidden="true">✏️</span>Worked example</div><p>A toy KL computation, to make “matching the distribution” concrete. Vocabulary
+of 3 tokens; teacher says <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo>=</mo><mo stretchy="false">[</mo><mn>0.7</mn><mo separator="true">,</mo><mn>0.2</mn><mo separator="true">,</mo><mn>0.1</mn><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">p = [0.7, 0.2, 0.1]</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">p</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord">0.7</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">0.2</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">0.1</span><span class="mclose">]</span></span></span></span>, student currently says
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>q</mi><mo>=</mo><mo stretchy="false">[</mo><mn>0.5</mn><mo separator="true">,</mo><mn>0.3</mn><mo separator="true">,</mo><mn>0.2</mn><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">q = [0.5, 0.3, 0.2]</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">q</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord">0.5</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">0.3</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">0.2</span><span class="mclose">]</span></span></span></span>. Then</p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>D</mi><mrow><mi mathvariant="normal">K</mi><mi mathvariant="normal">L</mi></mrow></msub><mo stretchy="false">(</mo><mi>p</mi><mtext> </mtext><mi mathvariant="normal">∥</mi><mtext> </mtext><mi>q</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0.7</mn><mi>ln</mi><mo>⁡</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>0.7</mn><mn>0.5</mn></mfrac></mstyle><mo>+</mo><mn>0.2</mn><mi>ln</mi><mo>⁡</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>0.2</mn><mn>0.3</mn></mfrac></mstyle><mo>+</mo><mn>0.1</mn><mi>ln</mi><mo>⁡</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>0.1</mn><mn>0.2</mn></mfrac></mstyle><mo>=</mo><mn>0.2355</mn><mo>−</mo><mn>0.0811</mn><mo>−</mo><mn>0.0693</mn><mo>≈</mo><mn>0.085</mn><mtext> nats</mtext><mi mathvariant="normal">.</mi></mrow><annotation encoding="application/x-tex">\KL(p\,\|\,q) = 0.7\ln\tfrac{0.7}{0.5} + 0.2\ln\tfrac{0.2}{0.3} + 0.1\ln\tfrac{0.1}{0.2}
+= 0.2355 - 0.0811 - 0.0693 \approx 0.085 \text{ nats}.</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0278em;">D</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathrm mtight">KL</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">p</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">∥</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">q</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.1901em;vertical-align:-0.345em;"></span><span class="mord">0.7</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop">ln</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">0.5</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">0.7</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1.1901em;vertical-align:-0.345em;"></span><span class="mord">0.2</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop">ln</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">0.3</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">0.2</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1.1901em;vertical-align:-0.345em;"></span><span class="mord">0.1</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop">ln</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">0.2</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">0.1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">0.2355</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">0.0811</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0.0693</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0.085</span><span class="mord text"><span class="mord"> nats</span></span><span class="mord">.</span></span></span></span></span><p>Note the asymmetry doing its job: the biggest positive term comes from the
+token the teacher likes most and the student underweights. Gradient descent
+on this loss pushes <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>q</mi></mrow><annotation encoding="application/x-tex">q</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">q</span></span></span></span> toward <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">[</mo><mn>0.7</mn><mo separator="true">,</mo><mn>0.2</mn><mo separator="true">,</mo><mn>0.1</mn><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">[0.7, 0.2, 0.1]</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord">0.7</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">0.2</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">0.1</span><span class="mclose">]</span></span></span></span> — including the teacher’s
+<em>relative</em> preference between the two wrong answers, which a hard label
+(“token 1 is correct”) would never convey.</p></aside>
+<p>The precedent that made distillation a headline economic issue is in the
+<a href="https://arxiv.org/abs/2501.12948">R1 paper</a> itself: DeepSeek generated
+800K samples with R1 (600K reasoning, 200K general) and fine-tuned off-the-shelf
+Qwen and Llama checkpoints on them. The resulting “R1-Distill” models —
+spanning 1.5B to 70B parameters — inherited a large share of R1’s reasoning ability
+with <em>no reinforcement learning at all</em>, and several outperformed much larger
+non-reasoning models. Anyone with a few thousand dollars of compute could now
+fine-tune a capable reasoner. That is the distillation economy in
+one release.</p>
+<p>The tension: closed providers’ terms of service (ToS) prohibit exactly this —
+using their outputs to build competing models — and in early 2025 OpenAI
+publicly suggested DeepSeek had trained on OpenAI-generated data (DeepSeek
+did not confirm this; the evidence offered was indirect, and this book takes
+no position on the specific claim). Structurally, though, ToS restrictions
+are hard to enforce across borders, hard to prove (output-fingerprint “model
+DNA” detection is an active research area), and awkward to litigate for
+companies whose own pretraining corpora are the subject of copyright suits.
+And every frontier output that lands on the public web becomes next year’s
+<a href="/groundup/book/pretraining-data/">pretraining data</a> for everyone. Frontier capability
+<em>leaks downward by default</em>; the durable moat is not the last generation’s
+behavior but the pipeline that produces the next one.</p>
+<h2 id="choosing-in-practice">Choosing in practice</h2>
+<p>Strip away the ideology and the build-vs-buy decision comes down to four
+factors, roughly in the order teams weigh them in 2026:</p>
+<p><strong>Data sensitivity and compliance.</strong> If prompts contain health records,
+privileged legal material, classified data, or anything a regulator cares
+about, self-hosted open weights (or a single-tenant cloud
+deployment of a closed model — the expensive middle option) may be the only
+acceptable architecture. This factor is binary and trumps the others when it
+applies.</p>
+<p><strong>Capability requirements.</strong> Be specific about the <em>hardest</em> task in your
+workload, and test it (see <a href="/groundup/book/benchmarks-and-evaluation/">Chapter 46</a> for
+how to do that without fooling yourself). If your product needs
+frontier-grade agentic reasoning, the honest answer in most months is a
+closed API. If your workload is classification, extraction, summarization,
+retrieval-augmented generation (RAG) over your documents
+(<a href="/groundup/book/retrieval-augmented-generation/">Chapter 45</a>),
+or a well-scoped domain task, a fine-tuned open model at 8–70B parameters
+frequently matches or beats a frontier generalist on <em>your</em> distribution — at
+a fraction of the cost.</p>
+<p><strong>The cost curve.</strong> Run the utilization arithmetic from the example box above
+with your real volumes. High and steady favors self-hosting; spiky and
+exploratory favors APIs; low volume always favors APIs.</p>
+<p><strong>Fine-tunability and control.</strong> If your differentiation <em>is</em> a model adapted
+to proprietary data — or you need guaranteed model stability (no silent
+version changes), offline operation, or sub-100ms latency at the edge — you
+need weights.</p>
+<aside class="box box-practice" data-box="practice"><div class="box-title"><span class="box-icon" aria-hidden="true">⚙️</span>In practice</div><p>What teams deploy in 2026 is rarely one or the other: the standard
+pattern is a <strong>cascade</strong>. A cheap open model (often 4–8B, quantized, sometimes
+on-device) handles the high-volume easy tier; mid-size fine-tuned open models
+handle the domain tier; a closed frontier API handles the hard tail and
+anything agentic — with routing logic deciding per request. Open-weight
+releases are also permanent price anchors: closed-API price cuts of
+2024–2026 repeatedly tracked the arrival of comparable open models. Even teams that
+never deploy open weights benefit from their existence at the negotiating
+table.</p></aside>
+<h2 id="where-this-leaves-us">Where this leaves us</h2>
+<ul>
+<li>“Open source model” is usually a misnomer: the working taxonomy is <strong>closed
+API → open-weight with restrictive license → open-weight permissive →
+open source proper</strong> (weights + code + data + recipe, per the OSI
+definition), and nearly all famous “open” models are open-weight only.</li>
+<li>Licenses are the substance: MIT/Apache (DeepSeek, Qwen, gpt-oss, Mistral’s
+Apache line) permit almost everything; Llama’s community license is
+business-friendly but conditional; research-only weights and API terms of
+service forbid the things that matter commercially.</li>
+<li>The capability lag from closed to open collapsed from roughly 16 months
+(GPT-4 era) to a few months (R1 era); closed retains the frontier ceiling,
+multimodal polish, and product reliability, while open wins on cost,
+privacy, fine-tunability, and research access.</li>
+<li>Each lab’s stance is strategy, not ideology: commoditize-your-complement
+(Meta), diffusion-and-standards (DeepSeek, Qwen), recoup-the-frontier
+(OpenAI, Anthropic, Google) — with gpt-oss showing that the real unit of
+decision is the capability tier, not the lab.</li>
+<li>The safety debate has two strong cases — irreversibility and safeguard
+removal versus concentration of power and auditability — and serious
+policy now conditions openness on evaluated capability thresholds rather
+than picking a side outright.</li>
+<li>Distillation transfers frontier behavior downward cheaply (you can now
+compute the KL objective it approximates), which is why capability leaks
+from closed to open by default.</li>
+<li>You can run the build-on-what decision as arithmetic plus four factors:
+data sensitivity, hardest-task capability, utilization-adjusted cost, and
+need for control.</li>
+</ul>
+<p>The strongest argument for open weights in this book’s own view of the field
+is the one you are about to spend ten chapters inside: you cannot look into a
+model you cannot touch. <a href="/groundup/book/why-interpretability/">Next: Why Interpretability</a>.</p> <div class="papers-card" id="papers-card"> <div class="pc-title">Key papers &amp; readings in this chapter</div> <ul> <li> <div> <a href="https://arxiv.org/abs/2302.13971" target="_blank" rel="noopener">LLaMA: Open and Efficient Foundation Language Models</a> <span class="p-meta"> — Touvron et al., 2023</span> <span class="p-note">The release (and leak) that started the modern open-weight era.</span> </div> </li><li> <div> <a href="https://arxiv.org/abs/2501.12948" target="_blank" rel="noopener">DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning</a> <span class="p-meta"> — DeepSeek-AI, 2025</span> <span class="p-note">The inflection point of the capability-gap story; Section 4 covers the distilled models.</span> </div> </li><li> <div> <a href="https://arxiv.org/abs/2412.19437" target="_blank" rel="noopener">DeepSeek-V3 Technical Report</a> <span class="p-meta"> — DeepSeek-AI, 2024</span> <span class="p-note">Source of the famous 5.6-million-dollar pretraining-compute figure (Table 1) — read what it does and does not include.</span> </div> </li><li> <div> <a href="https://arxiv.org/abs/2310.06825" target="_blank" rel="noopener">Mistral 7B</a> <span class="p-meta"> — Jiang et al., 2023</span> <span class="p-note">The Apache-2.0 release that proved small permissive models could beat larger restricted ones.</span> </div> </li><li> <div> <a href="https://arxiv.org/abs/1503.02531" target="_blank" rel="noopener">Distilling the Knowledge in a Neural Network</a> <span class="p-meta"> — Hinton, Vinyals, Dean, 2015</span> <span class="p-note">The original distillation paper — the math behind the open ecosystem&#39;s favorite shortcut.</span> </div> </li><li> <div> <a href="https://opensource.org/ai" target="_blank" rel="noopener">The Open Source AI Definition</a> <span class="p-meta"> — Open Source Initiative, 2024</span> <span class="p-note">The contested attempt to pin down what &quot;open source&quot; should mean for models.</span> </div> </li><li> <div> <a href="https://openai.com/index/introducing-gpt-oss/" target="_blank" rel="noopener">Introducing gpt-oss</a> <span class="p-meta"> — OpenAI, 2025</span> <span class="p-note">OpenAI&#39;s first open-weight language models since GPT-2 — the strategic middle move.</span> </div> </li><li> <div> <a href="https://arxiv.org/abs/2403.07918" target="_blank" rel="noopener">On the Societal Impact of Open Foundation Models</a> <span class="p-meta"> — Kapoor et al., 2024</span> <span class="p-note">The &quot;marginal risk&quot; framework that most serious openness-policy debates now use.</span> </div> </li> </ul> </div> <nav class="chapter-nav"> <a href="/groundup/book/benchmarks-and-evaluation/" class="prev"> <span class="dir">← Previous</span> <span class="t">Benchmarks and How to Read Them</span> </a> <a href="/groundup/book/why-interpretability/" class="next"> <span class="dir">Next →</span> <span class="t">Why Interpretability</span> </a> </nav> <div class="chapter-foot"> <span>Last updated 2026-08-24</span> <a href="https://github.com/joewilbert/aisite/edit/main/src/content/book/47-open-vs-closed.md" target="_blank" rel="noopener">Edit this chapter</a> <a href="https://github.com/joewilbert/aisite/issues/new" target="_blank" rel="noopener">Report an issue</a> </div> </article> </div>  </main> </div> <!-- Right panel: papers / tutor / notes --> <aside class="panel-host" id="panel" aria-label="Side panel"> <div class="panel-resizer" id="panel-resizer"></div> <div class="panel-tabs"> <button class="panel-tab" data-tab="paper">Paper</button> <button class="panel-tab" data-tab="tutor">AI tutor</button> <button class="panel-tab" data-tab="notes">Notes</button> <button class="hbtn panel-close" id="panel-close" aria-label="Close panel"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg> </button> </div> <div class="panel-body"> <div class="panel-view" data-view="paper" id="view-paper"></div> <div class="panel-view" data-view="tutor" id="view-tutor"></div> <div class="panel-view" data-view="notes" id="view-notes"></div> </div> </aside> <!-- Selection toolbar --> <div class="sel-toolbar" id="sel-toolbar"> <div class="swatches"> <button class="sw" data-color="yellow" style="background:var(--hl-yellow)" aria-label="Highlight yellow"></button> <button class="sw" data-color="green" style="background:var(--hl-green)" aria-label="Highlight green"></button> <button class="sw" data-color="blue" style="background:var(--hl-blue)" aria-label="Highlight blue"></button> <button class="sw" data-color="pink" style="background:var(--hl-pink)" aria-label="Highlight pink"></button> </div> <div class="divider"></div> <button id="sel-note">✎ Note</button> <button id="sel-explain">✦ Explain</button> <button id="sel-remove" style="display:none">✕ Remove</button> </div> <!-- Settings modal --> <div class="modal-scrim" id="settings-scrim"> <div class="modal" role="dialog" aria-label="Settings" id="settings-modal"></div> </div> <!-- Search modal --> <div class="modal-scrim" id="search-scrim"> <div class="modal search-modal" role="dialog" aria-label="Search"> <input class="q" id="search-input" type="text" placeholder="Search the book…" autocomplete="off"> <div class="search-results" id="search-results"></div> </div> </div> <script>(function(){const base = "/groundup";
+const slug = "open-vs-closed";
+const pageTitle = "Open vs Closed Models · Ground Up";
+
+      window.__GU__ = { base, slug, pageTitle };
+    })();</script> <script type="module" src="/groundup/_astro/Base.astro_astro_type_script_index_0_lang.65xM_WgJ.js"></script>  </body></html>

@@ -1,0 +1,874 @@
+<!DOCTYPE html><html lang="en"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Tokenization · Ground Up</title><meta name="description" content="Why models read tokens instead of letters: byte-pair encoding trained by hand, WordPiece and Unigram, vocabulary economics, and the pathologies from strawberry to SolidGoldMagikarp."><meta name="theme-color" content="#faf9f6"><meta property="og:title" content="Tokenization · Ground Up"><meta property="og:description" content="Why models read tokens instead of letters: byte-pair encoding trained by hand, WordPiece and Unigram, vocabulary economics, and the pathologies from strawberry to SolidGoldMagikarp."><meta property="og:type" content="article"><meta property="og:site_name" content="Ground Up"><link rel="icon" href="/groundup/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="/groundup/apple-touch-icon.png"><link rel="manifest" href="/groundup/manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Ground Up"><script>
+      (function () {
+        try {
+          var t = localStorage.getItem('gu:theme');
+          var dark = t ? t === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+          if (dark) document.documentElement.classList.add('dark');
+          var fs = localStorage.getItem('gu:fontScale');
+          if (fs) document.documentElement.style.setProperty('--font-scale', fs);
+        } catch (e) {}
+      })();
+    </script><link rel="stylesheet" href="/groundup/_astro/_slug_.BCpHWCuJ.css"></head> <body> <header class="site-header"> <button class="hbtn" id="btn-toc" aria-label="Table of contents" title="Contents"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"></path></svg> </button> <a class="brand" href="/groundup/"> <span class="logo">G</span> <span class="brand-name">Ground&nbsp;Up</span> </a> <span class="header-crumb">Part III · Language Modeling · Chapter 19</span> <div class="header-actions"> <button class="hbtn" id="btn-search" aria-label="Search" title="Search (/)"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg> </button> <button class="hbtn" id="btn-notes" aria-label="My notes" title="My notes & highlights"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg> </button> <button class="hbtn" id="btn-tutor" aria-label="AI tutor" title="AI tutor"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 1 1-4-6.9"></path><path d="M21 3v6h-6"></path><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"></circle><circle cx="8.5" cy="12" r="1.2" fill="currentColor" stroke="none"></circle><circle cx="15.5" cy="12" r="1.2" fill="currentColor" stroke="none"></circle></svg> </button> <button class="hbtn" id="btn-theme" aria-label="Toggle theme" title="Light / dark"> <svg class="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.5"></circle><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M19.4 4.6l-1.8 1.8M6.4 17.6l-1.8 1.8"></path></svg> </button> <button class="hbtn" id="btn-settings" aria-label="Settings" title="Settings"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.01a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.01a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.01a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"></path></svg> </button> </div> </header> <div class="shell"> <nav class="toc-rail" id="toc-rail" aria-label="Table of contents">  <div class="toc-part">Start here</div> <a class="toc-link" data-slug="how-to-read-this-book" href="/groundup/book/how-to-read-this-book/"> <span class="n">·</span> <span>How to Read This Book</span> </a><a class="toc-link" data-slug="the-whole-machine" href="/groundup/book/the-whole-machine/"> <span class="n">·</span> <span>Frontier AI In One Sitting</span> </a> <div class="toc-part">Part I · Mathematical Foundations</div> <a class="toc-link" data-slug="vectors-and-spaces" href="/groundup/book/vectors-and-spaces/"> <span class="n">1</span> <span>Vectors and Spaces</span> </a><a class="toc-link" data-slug="matrices-as-transformations" href="/groundup/book/matrices-as-transformations/"> <span class="n">2</span> <span>Matrices as Transformations</span> </a><a class="toc-link" data-slug="high-dimensional-geometry" href="/groundup/book/high-dimensional-geometry/"> <span class="n">3</span> <span>High-Dimensional Geometry</span> </a><a class="toc-link" data-slug="derivatives-and-gradients" href="/groundup/book/derivatives-and-gradients/"> <span class="n">4</span> <span>Derivatives and Gradients</span> </a><a class="toc-link" data-slug="chain-rule-and-jacobians" href="/groundup/book/chain-rule-and-jacobians/"> <span class="n">5</span> <span>The Chain Rule, Jacobians, and Curvature</span> </a><a class="toc-link" data-slug="probability" href="/groundup/book/probability/"> <span class="n">6</span> <span>Probability for Deep Learning</span> </a><a class="toc-link" data-slug="information-theory" href="/groundup/book/information-theory/"> <span class="n">7</span> <span>Information Theory: Surprise, Entropy, and KL</span> </a> <div class="toc-part">Part II · Deep Learning Foundations</div> <a class="toc-link" data-slug="neurons-and-mlps" href="/groundup/book/neurons-and-mlps/"> <span class="n">8</span> <span>Neurons, Layers, and MLPs</span> </a><a class="toc-link" data-slug="loss-functions" href="/groundup/book/loss-functions/"> <span class="n">9</span> <span>Loss Functions</span> </a><a class="toc-link" data-slug="gradient-descent-and-backprop" href="/groundup/book/gradient-descent-and-backprop/"> <span class="n">10</span> <span>Gradient Descent and Backpropagation</span> </a><a class="toc-link" data-slug="optimizers" href="/groundup/book/optimizers/"> <span class="n">11</span> <span>Optimizers: From SGD to AdamW and Muon</span> </a><a class="toc-link" data-slug="initialization-and-stability" href="/groundup/book/initialization-and-stability/"> <span class="n">12</span> <span>Initialization and Gradient Pathologies</span> </a><a class="toc-link" data-slug="regularization-and-generalization" href="/groundup/book/regularization-and-generalization/"> <span class="n">13</span> <span>Regularization and Generalization</span> </a><a class="toc-link" data-slug="normalization" href="/groundup/book/normalization/"> <span class="n">14</span> <span>Normalization: BatchNorm to RMSNorm</span> </a><a class="toc-link" data-slug="activation-functions" href="/groundup/book/activation-functions/"> <span class="n">15</span> <span>Activation Functions</span> </a><a class="toc-link" data-slug="residual-connections" href="/groundup/book/residual-connections/"> <span class="n">16</span> <span>Residual Connections and the Residual Stream</span> </a><a class="toc-link" data-slug="cnns-and-rnns" href="/groundup/book/cnns-and-rnns/"> <span class="n">17</span> <span>CNNs and RNNs: The World Before Transformers</span> </a> <div class="toc-part">Part III · Language Modeling</div> <a class="toc-link" data-slug="what-is-a-language-model" href="/groundup/book/what-is-a-language-model/"> <span class="n">18</span> <span>What a Language Model Is</span> </a><a class="toc-link active" data-slug="tokenization" href="/groundup/book/tokenization/"> <span class="n">19</span> <span>Tokenization</span> </a><a class="toc-link" data-slug="embeddings" href="/groundup/book/embeddings/"> <span class="n">20</span> <span>Embeddings</span> </a><a class="toc-link" data-slug="evaluating-language-models" href="/groundup/book/evaluating-language-models/"> <span class="n">21</span> <span>Evaluating Language Models</span> </a> <div class="toc-part">Part IV · Attention &amp; Transformers</div> <a class="toc-link" data-slug="seq2seq-and-attention" href="/groundup/book/seq2seq-and-attention/"> <span class="n">22</span> <span>From seq2seq to Attention</span> </a><a class="toc-link" data-slug="scaled-dot-product-attention" href="/groundup/book/scaled-dot-product-attention/"> <span class="n">23</span> <span>Scaled Dot-Product Attention</span> </a><a class="toc-link" data-slug="multi-head-attention" href="/groundup/book/multi-head-attention/"> <span class="n">24</span> <span>Multi-Head Attention</span> </a><a class="toc-link" data-slug="transformer-architecture" href="/groundup/book/transformer-architecture/"> <span class="n">25</span> <span>The Transformer, Piece by Piece</span> </a><a class="toc-link" data-slug="positional-encodings" href="/groundup/book/positional-encodings/"> <span class="n">26</span> <span>Positional Information and RoPE</span> </a><a class="toc-link" data-slug="architecture-families" href="/groundup/book/architecture-families/"> <span class="n">27</span> <span>Architecture Families: BERT to Decoder-Only</span> </a><a class="toc-link" data-slug="kv-cache-and-efficient-attention" href="/groundup/book/kv-cache-and-efficient-attention/"> <span class="n">28</span> <span>The KV Cache and Efficient Attention</span> </a><a class="toc-link" data-slug="mixture-of-experts" href="/groundup/book/mixture-of-experts/"> <span class="n">29</span> <span>Mixture-of-Experts</span> </a><a class="toc-link" data-slug="state-space-models" href="/groundup/book/state-space-models/"> <span class="n">30</span> <span>State-Space Models and Hybrids</span> </a> <div class="toc-part">Part V · Training LLMs in Practice</div> <a class="toc-link" data-slug="pretraining-data" href="/groundup/book/pretraining-data/"> <span class="n">31</span> <span>Pretraining Data</span> </a><a class="toc-link" data-slug="scaling-laws" href="/groundup/book/scaling-laws/"> <span class="n">32</span> <span>Scaling Laws</span> </a><a class="toc-link" data-slug="compute-and-parallelism" href="/groundup/book/compute-and-parallelism/"> <span class="n">33</span> <span>Compute: GPUs, Precision, and Parallelism</span> </a><a class="toc-link" data-slug="the-training-run" href="/groundup/book/the-training-run/"> <span class="n">34</span> <span>The Training Run</span> </a><a class="toc-link" data-slug="sft-and-rlhf" href="/groundup/book/sft-and-rlhf/"> <span class="n">35</span> <span>Post-Training I: SFT, Reward Models, RLHF</span> </a><a class="toc-link" data-slug="dpo-and-friends" href="/groundup/book/dpo-and-friends/"> <span class="n">36</span> <span>Post-Training II: DPO and Its Family</span> </a><a class="toc-link" data-slug="reasoning-models" href="/groundup/book/reasoning-models/"> <span class="n">37</span> <span>Reasoning Training: RLVR, GRPO, and the o1/R1 Era</span> </a><a class="toc-link" data-slug="fine-tuning" href="/groundup/book/fine-tuning/"> <span class="n">38</span> <span>Fine-Tuning You Can Actually Do: LoRA and Friends</span> </a><a class="toc-link" data-slug="inference-and-serving" href="/groundup/book/inference-and-serving/"> <span class="n">39</span> <span>Inference: Sampling, Quantization, Serving</span> </a> <div class="toc-part">Part VI · The Modern AI Landscape</div> <a class="toc-link" data-slug="the-frontier" href="/groundup/book/the-frontier/"> <span class="n">40</span> <span>The Frontier Landscape (2023–2026)</span> </a><a class="toc-link" data-slug="multimodal-models" href="/groundup/book/multimodal-models/"> <span class="n">41</span> <span>Multimodal Models</span> </a><a class="toc-link" data-slug="diffusion-models" href="/groundup/book/diffusion-models/"> <span class="n">42</span> <span>Diffusion and Image/Video Generation</span> </a><a class="toc-link" data-slug="long-context" href="/groundup/book/long-context/"> <span class="n">43</span> <span>Long Context</span> </a><a class="toc-link" data-slug="agents-and-tools" href="/groundup/book/agents-and-tools/"> <span class="n">44</span> <span>Agents, Tool Use, and MCP</span> </a><a class="toc-link" data-slug="retrieval-augmented-generation" href="/groundup/book/retrieval-augmented-generation/"> <span class="n">45</span> <span>Retrieval-Augmented Generation</span> </a><a class="toc-link" data-slug="benchmarks-and-evaluation" href="/groundup/book/benchmarks-and-evaluation/"> <span class="n">46</span> <span>Benchmarks and How to Read Them</span> </a><a class="toc-link" data-slug="open-vs-closed" href="/groundup/book/open-vs-closed/"> <span class="n">47</span> <span>Open vs Closed Models</span> </a> <div class="toc-part">Part VII · Interpretability</div> <a class="toc-link" data-slug="why-interpretability" href="/groundup/book/why-interpretability/"> <span class="n">48</span> <span>Why Interpretability</span> </a><a class="toc-link" data-slug="features-and-probes" href="/groundup/book/features-and-probes/"> <span class="n">49</span> <span>Features, Directions, and Probes</span> </a><a class="toc-link" data-slug="superposition" href="/groundup/book/superposition/"> <span class="n">50</span> <span>Superposition and Polysemanticity</span> </a><a class="toc-link" data-slug="sparse-autoencoders" href="/groundup/book/sparse-autoencoders/"> <span class="n">51</span> <span>Sparse Autoencoders</span> </a><a class="toc-link" data-slug="circuits" href="/groundup/book/circuits/"> <span class="n">52</span> <span>Circuits: Induction Heads to Attribution Graphs</span> </a><a class="toc-link" data-slug="causal-methods" href="/groundup/book/causal-methods/"> <span class="n">53</span> <span>Causal Methods: Patching, Ablation, and Lenses</span> </a><a class="toc-link" data-slug="steering-and-editing" href="/groundup/book/steering-and-editing/"> <span class="n">54</span> <span>Steering and Model Editing</span> </a><a class="toc-link" data-slug="cot-faithfulness" href="/groundup/book/cot-faithfulness/"> <span class="n">55</span> <span>Chain-of-Thought Faithfulness</span> </a><a class="toc-link" data-slug="frontier-interpretability" href="/groundup/book/frontier-interpretability/"> <span class="n">56</span> <span>Interpretability at the Frontier</span> </a> <div class="toc-part">Part VIII · Reference</div> <a class="toc-link" data-slug="where-to-go-next" href="/groundup/book/where-to-go-next/"> <span class="n">57</span> <span>Where to Go Next</span> </a><a class="toc-link" data-slug="glossary" href="/groundup/book/glossary/"> <span class="n">58</span> <span>Glossary</span> </a><a class="toc-link" data-slug="notation" href="/groundup/book/notation/"> <span class="n">59</span> <span>Notation Reference</span> </a> </nav> <div class="scrim" id="toc-scrim"></div> <main class="main-col">  <div class="article-wrap"> <article class="chapter" id="article" data-slug="tokenization" data-title="Tokenization" data-file="19-tokenization.md" data-pagefind-body> <div class="chapter-kicker">Part III · Language Modeling · Chapter 19</div> <h1>Tokenization</h1> <p class="chapter-desc">Why models read tokens instead of letters: byte-pair encoding trained by hand, WordPiece and Unigram, vocabulary economics, and the pathologies from strawberry to SolidGoldMagikarp.</p> <details class="section-nav"> <summary>In this chapter</summary> <ol> <li><a href="#why-tokenize-at-all">Why tokenize at all</a></li><li><a href="#bytes-characters-and-unicode">Bytes, characters, and Unicode</a></li><li><a href="#byte-pair-encoding-trained-by-hand">Byte-pair encoding, trained by hand</a></li><li><a href="#the-other-two-families-wordpiece-and-unigram">The other two families: WordPiece and Unigram</a></li><li><a href="#special-tokens-and-where-system-comes-from">Special tokens, and where “system” comes from</a></li><li><a href="#vocabulary-size-the-economics">Vocabulary size: the economics</a></li><li><a href="#when-tokenization-bites-a-field-guide-to-pathologies">When tokenization bites: a field guide to pathologies</a></li><li><a href="#the-tokenizer-free-dream">The tokenizer-free dream</a></li><li><a href="#where-this-leaves-us">Where this leaves us</a></li> </ol> </details> <p>In <a href="/groundup/book/what-is-a-language-model/">the last chapter</a> we said a language model
+assigns probabilities to sequences of tokens, and we waved a hand at what a
+“token” is. Time to stop waving. Before a single matrix multiplication
+happens, every model you have ever used performs a strange, mostly invisible
+act of translation: it chops your text into pieces from a fixed menu of tens of
+thousands of fragments — <code>The</code>, <code> capital</code>, <code> of</code>, <code> France</code> — and replaces each
+piece with an integer. The model never sees letters. It never sees words. It
+sees a sequence of IDs pointing into a lookup table, and everything it will
+ever know about spelling, numbers, code, and the world’s languages is filtered
+through how that chopping was done.</p>
+<p>This matters more than it sounds like it should. Tokenization decides how long
+your document is from the model’s point of view (and therefore what it costs
+and how much fits in context). It decides whether “unhappiness” is one unit of
+meaning or three. It quietly makes some languages three times more expensive
+than others. And it produces a whole bestiary of famous failures — models that
+cannot count the r’s in “strawberry”, models that break when a prompt ends
+with a space, and one token, <code> SolidGoldMagikarp</code>, that GPT-3 could not repeat
+back when politely asked — it said “distribute” instead.</p>
+<p>The chapter’s centerpiece is byte-pair encoding (BPE), the algorithm behind
+nearly every frontier tokenizer, which we will train entirely by hand on a toy
+corpus — every count, every merge, every table — and then use to encode a word
+it has never seen. After that we tour the two rival algorithms (WordPiece and
+Unigram), work out the economics of vocabulary size, catalogue the pathologies
+with their mechanisms, and end with the research dream of getting rid of
+tokenizers altogether — which in 2024 finally produced a serious contender.</p>
+<h2 id="why-tokenize-at-all">Why tokenize at all</h2>
+<p>A language model ends in a softmax over a menu of possible next symbols — you
+saw this in <a href="/groundup/book/what-is-a-language-model/">Chapter 18</a>. That menu, the
+<strong>vocabulary</strong>, must be finite and fixed before training begins, because the
+output layer needs one row of weights per menu item and the input layer needs
+one <a href="/groundup/book/embeddings/">embedding</a> per item. So the very first design decision
+is: what are the symbols?</p>
+<p>Two obvious answers bracket the design space, and both fail in instructive
+ways.</p>
+<p><strong>Option one: words.</strong> Split on whitespace, give every word an ID. Sequences
+are short and each symbol is meaningful. But the vocabulary explodes: natural
+text keeps producing new word types forever — new names, typos, inflections,
+compounds, hashtags, code identifiers. (This is an empirical regularity called
+Heaps’ law: the number of distinct words grows without bound as the corpus
+grows, roughly as a power law.) A billion-word English corpus contains
+millions of distinct types. Cap the vocabulary at the 100,000 most frequent
+and everything else becomes a single <code>[UNK]</code> (“unknown”) token — the model is
+<em>constitutionally incapable</em> of reading or writing “Wilbert”, “grok”, or
+“наука”. This is the <strong>out-of-vocabulary (OOV)</strong> problem, and for a system
+that must handle arbitrary user input, it is fatal.</p>
+<p><strong>Option two: characters.</strong> A vocabulary of a few hundred symbols covers all
+English text; nothing is ever out of vocabulary. But now every word is a long
+sequence, and the model must spend capacity relearning, from letters upward,
+facts that word-level models get for free (“t-h-e is extremely common and
+signals a noun is coming”). Worse, sequences get several times longer, and as
+you will see when we reach <a href="/groundup/book/scaled-dot-product-attention/">attention</a>,
+the dominant architecture pays a cost <em>quadratic</em> in sequence length.</p>
+<aside class="box box-example" data-box="example"><div class="box-title"><span class="box-icon" aria-hidden="true">✏️</span>Worked example</div><p>Let’s quantify the bracket with a 1,000-word English passage. English words
+average about 4.7 letters, call it ~5.7 characters per word once you include
+the space — roughly <strong>5,700 characters</strong>.</p><ul>
+<li><em>Character-level:</em> vocabulary ≈ 100–500 symbols, sequence length <strong>5,700</strong>.</li>
+<li><em>Word-level:</em> sequence length <strong>1,000</strong>, but vocabulary in the hundreds of
+thousands, plus an <code>[UNK]</code> failure mode.</li>
+<li><em>Subword (BPE, the compromise):</em> modern tokenizers average ≈ 1.3 tokens per
+English word — sequence length <strong>≈ 1,300</strong> with a vocabulary of 50k–200k
+and <em>no</em> unknown token.</li>
+</ul><p>The character model’s sequences are <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>5700</mn><mi mathvariant="normal">/</mi><mn>1300</mn><mo>≈</mo><mn>4.4</mn><mo>×</mo></mrow><annotation encoding="application/x-tex">5700/1300 \approx 4.4\times</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">5700/1300</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">4.4</span><span class="mord">×</span></span></span></span> longer than
+the subword model’s, so the attention layers pay roughly <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>4.4</mn><mn>2</mn></msup><mo>≈</mo><mn>19</mn><mo>×</mo></mrow><annotation encoding="application/x-tex">4.4^2 \approx 19\times</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord">4.</span><span class="mord"><span class="mord">4</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">19</span><span class="mord">×</span></span></span></span>
+more compute for the same passage, and a “128k context” would hold about as
+much actual text as 29k subword tokens. That factor-of-twenty is why nobody
+ships character-level frontier models.</p></aside>
+<aside class="box box-intuition" data-box="intuition"><div class="box-title"><span class="box-icon" aria-hidden="true">💡</span>Intuition</div><p>Tokenization is <strong>compression you do before learning</strong>. A tokenizer is a small,
+dumb, frozen model of text statistics: it memorizes which fragments recur
+(“the”, “ing”, ” Barack”, ”().”) and spends one vocabulary slot on each, so
+that the expensive, smart model downstream reads a short sequence of dense,
+information-rich symbols instead of a long trickle of letters. Every design
+choice in this chapter is a point on one tradeoff curve: bigger vocabulary →
+shorter sequences → cheaper attention, but a bigger embedding table and rarer,
+less-well-trained symbols.</p></aside>
+<p>The compromise the whole field converged on is <strong>subword tokenization</strong>: keep
+whole common words as single tokens, but let rare words decompose into
+frequent fragments — <code>unhappiness</code> might become <code>un</code> + <code>happiness</code>, and a
+novel string falls all the way back to characters or bytes. Frequent
+things get short codes, rare things get long codes. If that sounds like the
+source-coding idea from <a href="/groundup/book/information-theory/">Chapter 7</a>, it should:
+a good tokenizer is doing crude entropy coding, and we will make that
+connection precise below.</p>
+<p>One more consequence worth naming now, because it shapes everything
+downstream: <strong>the model’s world is made of token IDs, not text</strong>. Two strings
+that tokenize identically are indistinguishable to the model; two strings
+that differ by one merge boundary are, from the model’s point of view,
+different sequences that merely happen to look alike to you.</p>
+<h2 id="bytes-characters-and-unicode">Bytes, characters, and Unicode</h2>
+<p>Before we can train a tokenizer we have to answer an annoyingly deep question:
+what is the <em>base alphabet</em> — the atoms that exist before any merging? “The
+characters” turns out to be a trap, and understanding why requires two
+paragraphs on how computers store text.</p>
+<p><strong>Unicode</strong> is the universal registry of characters: it assigns every
+character in every writing system a number called a <strong>code point</strong>, written
+<code>U+</code> followed by hexadecimal digits. The letter <code>A</code> is U+0041 (decimal 65),
+<code>é</code> is U+00E9, the Chinese character 猫 (“cat”) is U+732B, and the llama emoji
+🦙 is U+1F999. The registry currently holds around 160,000 characters
+(growing with each annual revision), spanning Latin, Cyrillic, Han, Arabic,
+Devanagari, emoji, and a very long tail. If your base alphabet were “all
+Unicode characters”, it would already be larger than most models’ entire
+vocabularies before a single merge — and still not future-proof.</p>
+<p><strong>UTF-8</strong> is the encoding that turns code points into actual stored bytes,
+and it is rigged so that each code point becomes <strong>one to four bytes</strong>,
+where a byte is a number from 0 to 255. ASCII characters (English letters,
+digits, common punctuation) keep their old one-byte codes, so plain English
+text is unchanged; <code>é</code> becomes the two bytes <code>C3 A9</code>; 猫 becomes three bytes,
+<code>E7 8C AB</code>; 🦙 becomes four, <code>F0 9F A6 99</code>. The magic fact for our purposes:
+<em>there are only 256 possible byte values, and every text in every language —
+plus every binary file, typo, and corrupted string — is a sequence of them.</em></p>
+<p>So a <strong>byte-level base alphabet</strong> of exactly 256 symbols can represent any
+input whatsoever. Nothing is ever out of vocabulary; the <code>[UNK]</code> token is
+abolished by construction. The worst case is graceful degradation: a string
+of Burmese or a hash like <code>x7f3ab9</code> that the tokenizer has never seen simply
+falls back to several bytes-per-character instead of one token. This is the
+move GPT-2 made in 2019 — byte-level BPE, described in
+<a href="https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf">Radford et al.</a>
+Section 2.2 — and nearly every frontier tokenizer since (GPT-4’s and
+GPT-5-class <code>tiktoken</code> vocabularies, Llama 3, Qwen, DeepSeek) starts from
+those same 256 bytes.</p>
+<figure class="fig">
+  <svg viewBox="0 0 720 356" role="img" aria-label="Pipeline from raw text through Unicode code points and UTF-8 bytes to merged tokens and embedding rows">
+    <defs>
+      <marker id="tokarr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M 0 1 L 8 5 L 0 9" fill="none" stroke="currentColor" stroke-width="1.6"></path>
+      </marker>
+    </defs>
+    <!-- Row 1: raw text -->
+    <text x="30" y="45" font-family="Inter Variable, sans-serif" font-size="14" fill="currentColor" opacity="0.55">raw text</text>
+    <rect x="210" y="22" width="480" height="38" rx="8" fill="none" stroke="currentColor" opacity="0.35"></rect>
+    <text x="230" y="47" font-family="monospace" font-size="16" fill="currentColor">naïve</text>
+    <line x1="450" y1="60" x2="450" y2="86" stroke="currentColor" opacity="0.35" marker-end="url(#tokarr)"></line>
+    <!-- Row 2: code points -->
+    <text x="30" y="115" font-family="Inter Variable, sans-serif" font-size="14" fill="currentColor" opacity="0.55">Unicode code points</text>
+    <rect x="210" y="92" width="480" height="38" rx="8" fill="none" stroke="currentColor" opacity="0.35"></rect>
+    <text x="230" y="117" font-family="monospace" font-size="14" fill="currentColor">U+006E U+0061 <tspan fill="#f59e0b">U+00EF</tspan> U+0076 U+0065</text>
+    <line x1="450" y1="130" x2="450" y2="156" stroke="currentColor" opacity="0.35" marker-end="url(#tokarr)"></line>
+    <!-- Row 3: UTF-8 bytes -->
+    <text x="30" y="185" font-family="Inter Variable, sans-serif" font-size="14" fill="currentColor" opacity="0.55">UTF-8 bytes</text>
+    <rect x="210" y="162" width="480" height="38" rx="8" fill="none" stroke="currentColor" opacity="0.35"></rect>
+    <rect x="228" y="169" width="40" height="24" rx="4" fill="currentColor" fill-opacity="0.06" stroke="currentColor" opacity="0.9" stroke-opacity="0.25"></rect>
+    <text x="236" y="186" font-family="monospace" font-size="13" fill="currentColor">6E</text>
+    <rect x="274" y="169" width="40" height="24" rx="4" fill="currentColor" fill-opacity="0.06" stroke="currentColor" opacity="0.9" stroke-opacity="0.25"></rect>
+    <text x="282" y="186" font-family="monospace" font-size="13" fill="currentColor">61</text>
+    <rect x="320" y="169" width="40" height="24" rx="4" fill="#f59e0b" fill-opacity="0.15" stroke="#f59e0b"></rect>
+    <text x="328" y="186" font-family="monospace" font-size="13" fill="currentColor">C3</text>
+    <rect x="366" y="169" width="40" height="24" rx="4" fill="#f59e0b" fill-opacity="0.15" stroke="#f59e0b"></rect>
+    <text x="374" y="186" font-family="monospace" font-size="13" fill="currentColor">AF</text>
+    <rect x="412" y="169" width="40" height="24" rx="4" fill="currentColor" fill-opacity="0.06" stroke="currentColor" opacity="0.9" stroke-opacity="0.25"></rect>
+    <text x="420" y="186" font-family="monospace" font-size="13" fill="currentColor">76</text>
+    <rect x="458" y="169" width="40" height="24" rx="4" fill="currentColor" fill-opacity="0.06" stroke="currentColor" opacity="0.9" stroke-opacity="0.25"></rect>
+    <text x="466" y="186" font-family="monospace" font-size="13" fill="currentColor">65</text>
+    <text x="516" y="186" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55">ï = two bytes</text>
+    <line x1="450" y1="200" x2="450" y2="226" stroke="currentColor" opacity="0.35" marker-end="url(#tokarr)"></line>
+    <!-- Row 4: after merges -->
+    <text x="30" y="255" font-family="Inter Variable, sans-serif" font-size="14" fill="currentColor" opacity="0.55">after learned BPE merges</text>
+    <rect x="210" y="232" width="480" height="38" rx="8" fill="none" stroke="currentColor" opacity="0.35"></rect>
+    <rect x="228" y="239" width="56" height="24" rx="4" fill="#14b8a6" fill-opacity="0.15" stroke="#14b8a6"></rect>
+    <text x="242" y="256" font-family="monospace" font-size="13" fill="currentColor">na</text>
+    <rect x="292" y="239" width="66" height="24" rx="4" fill="#14b8a6" fill-opacity="0.15" stroke="#14b8a6"></rect>
+    <text x="304" y="256" font-family="monospace" font-size="13" fill="currentColor">ïve</text>
+    <text x="376" y="256" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55">2 tokens (boundaries are learned, illustrative)</text>
+    <line x1="450" y1="270" x2="450" y2="296" stroke="currentColor" opacity="0.35" marker-end="url(#tokarr)"></line>
+    <!-- Row 5: IDs -->
+    <text x="30" y="325" font-family="Inter Variable, sans-serif" font-size="14" fill="currentColor" opacity="0.55">token IDs → embedding rows</text>
+    <rect x="210" y="302" width="480" height="38" rx="8" fill="none" stroke="currentColor" opacity="0.35"></rect>
+    <text x="230" y="327" font-family="monospace" font-size="14" fill="#818cf8">4907</text>
+    <text x="288" y="327" font-family="monospace" font-size="14" fill="#818cf8">28530</text>
+    <text x="366" y="327" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55">each ID selects one row of the embedding matrix</text>
+  </svg>
+  <figcaption><strong>Figure:</strong> the tokenization pipeline for the word "naïve". Text becomes Unicode code points, code points become UTF-8 bytes (note ï occupies two), learned merges fuse frequent byte runs into tokens, and each token's ID selects a row of the embedding matrix. The token boundaries and IDs shown are illustrative.</figcaption>
+</figure>
+<aside class="box box-note" data-box="note"><div class="box-title"><span class="box-icon" aria-hidden="true">✎</span>Note</div><p>If you ever inspect a GPT-style tokenizer’s vocabulary you will see oddities
+like <code>Ġcapital</code>. That <code>Ġ</code> is not a real character in the data — it is GPT-2’s
+printable stand-in for a leading space byte (raw bytes are remapped to
+printable characters so vocabulary files stay human-readable). <code> capital</code>
+with a leading space and <code>capital</code> without one are <em>different tokens</em> with
+different IDs and different learned embeddings — a fact that will come back
+to bite us in the pathologies section.</p></aside>
+<h2 id="byte-pair-encoding-trained-by-hand">Byte-pair encoding, trained by hand</h2>
+<p>Byte-pair encoding began life as a 1994 data-compression trick (Philip Gage’s
+algorithm for shrinking files by replacing common byte pairs) and was imported
+into machine translation by
+<a href="https://arxiv.org/abs/1508.07909">Sennrich, Haddow &#x26; Birch in 2015–16</a>
+to solve exactly the OOV problem above. The algorithm is short enough to state
+in four lines, and — rare among the algorithms in this book — you can run it
+entirely with a pencil:</p>
+<ol>
+<li>Split every word in the training corpus into base symbols (characters here,
+bytes in production), with a special end-of-word marker.</li>
+<li>Count every <em>adjacent pair</em> of symbols across the whole corpus.</li>
+<li>Merge the most frequent pair everywhere it occurs, and add the fused pair
+to the vocabulary as a new symbol.</li>
+<li>Repeat from step 2 until you reach the vocabulary size you want. The
+ordered list of merges <em>is</em> the tokenizer.</li>
+</ol>
+<p>Let’s do it. Our toy corpus has four distinct words with counts
+(imagine we counted them in a tiny text): <strong>low</strong> ×5, <strong>lower</strong> ×2,
+<strong>newest</strong> ×6, <strong>widest</strong> ×3. We write <code>_</code> for the end-of-word marker, so the
+starting state is:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>word</th><th>symbols</th><th>count</th></tr></thead><tbody><tr><td>low</td><td><code>l o w _</code></td><td>5</td></tr><tr><td>lower</td><td><code>l o w e r _</code></td><td>2</td></tr><tr><td>newest</td><td><code>n e w e s t _</code></td><td>6</td></tr><tr><td>widest</td><td><code>w i d e s t _</code></td><td>3</td></tr></tbody></table>
+<p>The base vocabulary is the 11 symbols <code>_ d e i l n o r s t w</code>.</p>
+<p><strong>Round 1.</strong> Count every adjacent pair. <code>(e,s)</code> appears in <em>newest</em> (×6) and
+<em>widest</em> (×3): 9 total. <code>(s,t)</code> and <code>(t,_)</code> likewise appear 9 times. <code>(w,e)</code>
+appears in <em>lower</em> (×2) and <em>newest</em> (×6): 8. <code>(l,o)</code> and <code>(o,w)</code> appear 7
+times each, and so on down. The top of the table:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>pair</th><th>count</th><th></th><th>pair</th><th>count</th></tr></thead><tbody><tr><td><code>(e, s)</code></td><td><strong>9</strong></td><td></td><td><code>(l, o)</code></td><td>7</td></tr><tr><td><code>(s, t)</code></td><td>9</td><td></td><td><code>(o, w)</code></td><td>7</td></tr><tr><td><code>(t, _)</code></td><td>9</td><td></td><td><code>(n, e)</code></td><td>6</td></tr><tr><td><code>(w, e)</code></td><td>8</td><td></td><td><code>(e, w)</code></td><td>6</td></tr></tbody></table>
+<p>Three pairs tie at 9; we break ties arbitrarily (real implementations take
+whichever they scanned first) and merge <code>(e, s)</code> into the new symbol <code>es</code>.
+Every <code>e s</code> in the corpus fuses:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>word</th><th>symbols</th><th>count</th></tr></thead><tbody><tr><td>low</td><td><code>l o w _</code></td><td>5</td></tr><tr><td>lower</td><td><code>l o w e r _</code></td><td>2</td></tr><tr><td>newest</td><td><code>n e w es t _</code></td><td>6</td></tr><tr><td>widest</td><td><code>w i d es t _</code></td><td>3</td></tr></tbody></table>
+<p><strong>Round 2.</strong> Recount — and notice the counts <em>shift</em> because merging changed
+the neighbourhoods. <code>(w,e)</code> collapsed from 8 to 2: in <em>newest</em> the <code>e</code> is now
+locked inside <code>es</code>, so only <em>lower</em> still contains a <code>w e</code>. Meanwhile the new
+symbol <code>es</code> forms pairs of its own:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>pair</th><th>count</th><th></th><th>pair</th><th>count</th></tr></thead><tbody><tr><td><code>(es, t)</code></td><td><strong>9</strong></td><td></td><td><code>(o, w)</code></td><td>7</td></tr><tr><td><code>(t, _)</code></td><td>9</td><td></td><td><code>(w, es)</code></td><td>6</td></tr><tr><td><code>(l, o)</code></td><td>7</td><td></td><td><code>(w, e)</code></td><td>2 ↓</td></tr></tbody></table>
+<p>Merge <code>(es, t)</code> → <code>est</code>. Now <em>newest</em> is <code>n e w est _</code> and <em>widest</em> is
+<code>w i d est _</code>.</p>
+<p><strong>Round 3.</strong> The pair <code>(est, _)</code> appears 9 times — merge it into <code>est_</code>, a
+full suffix-plus-word-boundary. <em>newest</em> is now <code>n e w est_</code> (4 symbols),
+<em>widest</em> is <code>w i d est_</code>.</p>
+<p><strong>Round 4.</strong> The 9-count pairs are exhausted. Top of the table: <code>(l, o)</code> at 7
+(from <em>low</em> ×5 and <em>lower</em> ×2), tied with <code>(o, w)</code> at 7. Merge <code>(l, o)</code> →
+<code>lo</code>. <em>low</em> becomes <code>lo w _</code>, <em>lower</em> becomes <code>lo w e r _</code>.</p>
+<p><strong>Round 5.</strong> <code>(lo, w)</code> now appears 7 times — merge it into <code>low</code>. Final state:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>word</th><th>symbols</th><th>count</th></tr></thead><tbody><tr><td>low</td><td><code>low _</code></td><td>5</td></tr><tr><td>lower</td><td><code>low e r _</code></td><td>2</td></tr><tr><td>newest</td><td><code>n e w est_</code></td><td>6</td></tr><tr><td>widest</td><td><code>w i d est_</code></td><td>3</td></tr></tbody></table>
+<p>After five rounds our learned artifacts are the <strong>merge list</strong>, <em>in order</em>:</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mo stretchy="false">(</mo><mi>e</mi><mo separator="true">,</mo><mi>s</mi><mo stretchy="false">)</mo><mo>→</mo><mtext mathvariant="monospace">es</mtext><mspace width="1em"></mspace><mo stretchy="false">(</mo><mi>e</mi><mi>s</mi><mo separator="true">,</mo><mi>t</mi><mo stretchy="false">)</mo><mo>→</mo><mtext mathvariant="monospace">est</mtext><mspace width="1em"></mspace><mo stretchy="false">(</mo><mi>e</mi><mi>s</mi><mi>t</mi><mo separator="true">,</mo><mi mathvariant="normal">_</mi><mo stretchy="false">)</mo><mo>→</mo><mtext mathvariant="monospace">est_</mtext><mspace width="1em"></mspace><mo stretchy="false">(</mo><mi>l</mi><mo separator="true">,</mo><mi>o</mi><mo stretchy="false">)</mo><mo>→</mo><mtext mathvariant="monospace">lo</mtext><mspace width="1em"></mspace><mo stretchy="false">(</mo><mi>l</mi><mi>o</mi><mo separator="true">,</mo><mi>w</mi><mo stretchy="false">)</mo><mo>→</mo><mtext mathvariant="monospace">low</mtext></mrow><annotation encoding="application/x-tex">(e,s) \to \texttt{es} \quad (es,t) \to \texttt{est} \quad (est,\_) \to \texttt{est\_} \quad (l,o) \to \texttt{lo} \quad (lo,w) \to \texttt{low}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal">e</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">s</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord text"><span class="mord texttt">es</span></span><span class="mspace" style="margin-right:1em;"></span><span class="mopen">(</span><span class="mord mathnormal">es</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">t</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.06em;vertical-align:-0.31em;"></span><span class="mord text"><span class="mord texttt">est</span></span><span class="mspace" style="margin-right:1em;"></span><span class="mopen">(</span><span class="mord mathnormal">es</span><span class="mord mathnormal">t</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord" style="margin-right:0.0278em;">_</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord text"><span class="mord texttt">est_</span></span><span class="mspace" style="margin-right:1em;"></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">o</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord text"><span class="mord texttt">lo</span></span><span class="mspace" style="margin-right:1em;"></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span><span class="mord mathnormal">o</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0269em;">w</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6111em;"></span><span class="mord text"><span class="mord texttt">low</span></span></span></span></span></span>
+<p>and a vocabulary of 11 base symbols + 5 merged symbols = 16 tokens. Notice
+what the statistics discovered without being told anything about English: a
+morphological suffix (<code>est_</code>, “the superlative ending, at the end of a word”)
+and a word stem (<code>low</code>). Frequency alone recovered structure a linguist would
+recognize.</p>
+<p><strong>Encoding a new word.</strong> Here is the payoff. To tokenize text at inference
+time, you split into base symbols and replay the merge list <em>in training
+order</em> wherever each merge applies. Take <strong>lowest</strong> — a word the corpus never
+contained:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>step</th><th>applies?</th><th>result</th></tr></thead><tbody><tr><td>start</td><td>—</td><td><code>l o w e s t _</code></td></tr><tr><td>merge 1 <code>(e,s)</code></td><td>yes</td><td><code>l o w es t _</code></td></tr><tr><td>merge 2 <code>(es,t)</code></td><td>yes</td><td><code>l o w est _</code></td></tr><tr><td>merge 3 <code>(est,_)</code></td><td>yes</td><td><code>l o w est_</code></td></tr><tr><td>merge 4 <code>(l,o)</code></td><td>yes</td><td><code>lo w est_</code></td></tr><tr><td>merge 5 <code>(lo,w)</code></td><td>yes</td><td><code>low est_</code></td></tr></tbody></table>
+<p>Result: <code>low</code> + <code>est_</code> — two tokens, both meaningful, for a word the
+tokenizer never saw. Compare <strong>widow</strong>: none of the five merges applies
+(there is no <code>e s</code>, no <code>l o</code>), so it stays as six base symbols
+<code>w i d o w _</code>. Nothing fails; the rare word is expressible, only at a higher
+cost in sequence length. That is subword tokenization’s whole contract:
+<strong>common → short, rare → long, impossible → never.</strong></p>
+<figure class="fig">
+  <svg viewBox="0 0 720 344" role="img" aria-label="Left: BPE training fuses the most frequent pair in the word newest over three rounds. Right: encoding the unseen word lowest by replaying the merges.">
+    <!-- Left panel: training -->
+    <text x="24" y="30" font-family="Inter Variable, sans-serif" font-size="15" font-weight="600" fill="currentColor">Training: fuse the top pair</text>
+    <text x="24" y="66" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55">round 0 — characters</text>
+    <g font-family="monospace" font-size="14">
+      <rect x="24" y="74" width="28" height="30" rx="4" fill="none" stroke="currentColor" opacity="0.35"></rect><text x="34" y="94" fill="currentColor">n</text>
+      <rect x="56" y="74" width="28" height="30" rx="4" fill="none" stroke="currentColor" opacity="0.35"></rect><text x="66" y="94" fill="currentColor">e</text>
+      <rect x="88" y="74" width="28" height="30" rx="4" fill="none" stroke="currentColor" opacity="0.35"></rect><text x="98" y="94" fill="currentColor">w</text>
+      <rect x="120" y="74" width="28" height="30" rx="4" fill="none" stroke="currentColor" opacity="0.35"></rect><text x="130" y="94" fill="currentColor">e</text>
+      <rect x="152" y="74" width="28" height="30" rx="4" fill="none" stroke="currentColor" opacity="0.35"></rect><text x="162" y="94" fill="currentColor">s</text>
+      <rect x="184" y="74" width="28" height="30" rx="4" fill="none" stroke="currentColor" opacity="0.35"></rect><text x="194" y="94" fill="currentColor">t</text>
+      <rect x="216" y="74" width="28" height="30" rx="4" fill="none" stroke="currentColor" opacity="0.35"></rect><text x="226" y="94" fill="currentColor">_</text>
+    </g>
+    <text x="24" y="132" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55">after merge 1: (e,s) → es</text>
+    <g font-family="monospace" font-size="14">
+      <rect x="24" y="140" width="28" height="30" rx="4" fill="none" stroke="currentColor" opacity="0.35"></rect><text x="34" y="160" fill="currentColor">n</text>
+      <rect x="56" y="140" width="28" height="30" rx="4" fill="none" stroke="currentColor" opacity="0.35"></rect><text x="66" y="160" fill="currentColor">e</text>
+      <rect x="88" y="140" width="28" height="30" rx="4" fill="none" stroke="currentColor" opacity="0.35"></rect><text x="98" y="160" fill="currentColor">w</text>
+      <rect x="120" y="140" width="46" height="30" rx="4" fill="#14b8a6" fill-opacity="0.15" stroke="#14b8a6"></rect><text x="130" y="160" fill="currentColor">es</text>
+      <rect x="170" y="140" width="28" height="30" rx="4" fill="none" stroke="currentColor" opacity="0.35"></rect><text x="180" y="160" fill="currentColor">t</text>
+      <rect x="202" y="140" width="28" height="30" rx="4" fill="none" stroke="currentColor" opacity="0.35"></rect><text x="212" y="160" fill="currentColor">_</text>
+    </g>
+    <text x="24" y="198" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55">after merge 2: (es,t) → est</text>
+    <g font-family="monospace" font-size="14">
+      <rect x="24" y="206" width="28" height="30" rx="4" fill="none" stroke="currentColor" opacity="0.35"></rect><text x="34" y="226" fill="currentColor">n</text>
+      <rect x="56" y="206" width="28" height="30" rx="4" fill="none" stroke="currentColor" opacity="0.35"></rect><text x="66" y="226" fill="currentColor">e</text>
+      <rect x="88" y="206" width="28" height="30" rx="4" fill="none" stroke="currentColor" opacity="0.35"></rect><text x="98" y="226" fill="currentColor">w</text>
+      <rect x="120" y="206" width="60" height="30" rx="4" fill="#14b8a6" fill-opacity="0.15" stroke="#14b8a6"></rect><text x="130" y="226" fill="currentColor">est</text>
+      <rect x="184" y="206" width="28" height="30" rx="4" fill="none" stroke="currentColor" opacity="0.35"></rect><text x="194" y="226" fill="currentColor">_</text>
+    </g>
+    <text x="24" y="264" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55">after merge 3: (est,_) → est_</text>
+    <g font-family="monospace" font-size="14">
+      <rect x="24" y="272" width="28" height="30" rx="4" fill="none" stroke="currentColor" opacity="0.35"></rect><text x="34" y="292" fill="currentColor">n</text>
+      <rect x="56" y="272" width="28" height="30" rx="4" fill="none" stroke="currentColor" opacity="0.35"></rect><text x="66" y="292" fill="currentColor">e</text>
+      <rect x="88" y="272" width="28" height="30" rx="4" fill="none" stroke="currentColor" opacity="0.35"></rect><text x="98" y="292" fill="currentColor">w</text>
+      <rect x="120" y="272" width="74" height="30" rx="4" fill="#14b8a6" fill-opacity="0.15" stroke="#14b8a6"></rect><text x="130" y="292" fill="currentColor">est_</text>
+    </g>
+    <text x="24" y="330" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55">"newest" ×6 drove the suffix merges</text>
+    <!-- divider -->
+    <line x1="368" y1="20" x2="368" y2="330" stroke="currentColor" opacity="0.15"></line>
+    <!-- Right panel: encoding -->
+    <text x="400" y="30" font-family="Inter Variable, sans-serif" font-size="15" font-weight="600" fill="currentColor">Encoding the unseen "lowest"</text>
+    <text x="400" y="66" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55">start — characters</text>
+    <g font-family="monospace" font-size="14">
+      <rect x="400" y="74" width="28" height="30" rx="4" fill="none" stroke="currentColor" opacity="0.35"></rect><text x="410" y="94" fill="currentColor">l</text>
+      <rect x="432" y="74" width="28" height="30" rx="4" fill="none" stroke="currentColor" opacity="0.35"></rect><text x="442" y="94" fill="currentColor">o</text>
+      <rect x="464" y="74" width="28" height="30" rx="4" fill="none" stroke="currentColor" opacity="0.35"></rect><text x="474" y="94" fill="currentColor">w</text>
+      <rect x="496" y="74" width="28" height="30" rx="4" fill="none" stroke="currentColor" opacity="0.35"></rect><text x="506" y="94" fill="currentColor">e</text>
+      <rect x="528" y="74" width="28" height="30" rx="4" fill="none" stroke="currentColor" opacity="0.35"></rect><text x="538" y="94" fill="currentColor">s</text>
+      <rect x="560" y="74" width="28" height="30" rx="4" fill="none" stroke="currentColor" opacity="0.35"></rect><text x="570" y="94" fill="currentColor">t</text>
+      <rect x="592" y="74" width="28" height="30" rx="4" fill="none" stroke="currentColor" opacity="0.35"></rect><text x="602" y="94" fill="currentColor">_</text>
+    </g>
+    <text x="400" y="132" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55">after merges 1–3 (es, est, est_)</text>
+    <g font-family="monospace" font-size="14">
+      <rect x="400" y="140" width="28" height="30" rx="4" fill="none" stroke="currentColor" opacity="0.35"></rect><text x="410" y="160" fill="currentColor">l</text>
+      <rect x="432" y="140" width="28" height="30" rx="4" fill="none" stroke="currentColor" opacity="0.35"></rect><text x="442" y="160" fill="currentColor">o</text>
+      <rect x="464" y="140" width="28" height="30" rx="4" fill="none" stroke="currentColor" opacity="0.35"></rect><text x="474" y="160" fill="currentColor">w</text>
+      <rect x="496" y="140" width="74" height="30" rx="4" fill="#14b8a6" fill-opacity="0.15" stroke="#14b8a6"></rect><text x="506" y="160" fill="currentColor">est_</text>
+    </g>
+    <text x="400" y="198" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55">after merges 4–5 (lo, low)</text>
+    <g font-family="monospace" font-size="14">
+      <rect x="400" y="206" width="74" height="30" rx="4" fill="#818cf8" fill-opacity="0.15" stroke="#818cf8"></rect><text x="410" y="226" fill="currentColor">low</text>
+      <rect x="478" y="206" width="74" height="30" rx="4" fill="#14b8a6" fill-opacity="0.15" stroke="#14b8a6"></rect><text x="488" y="226" fill="currentColor">est_</text>
+    </g>
+    <text x="400" y="272" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor">Two tokens — stem + suffix —</text>
+    <text x="400" y="292" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor">for a word absent from training.</text>
+    <text x="400" y="322" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55">"widow": no merge applies → 6 base symbols</text>
+  </svg>
+  <figcaption><strong>Figure:</strong> the two halves of BPE. Left: during training, the most frequent adjacent pair fuses each round, shown for "newest". Right: at encoding time the learned merges are replayed in order on the unseen word "lowest", yielding <code>low</code> + <code>est_</code>. (Corpus after Sennrich et al., 2016 — redrawn.)</figcaption>
+</figure>
+<p>Now train one yourself. The widget below runs exactly this algorithm live:
+type or paste any small corpus, step through merges one at a time, and watch
+the pair-count table and vocabulary evolve — then switch to encode mode and
+see how your learned merges chop a new sentence. Try a corpus of related words
+(“play played playing player replay”) and watch morphology fall out; then try
+adding one word of German and see what happens to your merge budget.</p>
+<div class="widget" data-widget="bpe-trainer">Interactive widget loading… (requires JavaScript)</div>
+<aside class="box box-math" data-box="math"><div class="box-title"><span class="box-icon" aria-hidden="true">∑</span>The math</div><p>Why does greedy pair-merging compress well? Each merge adds one symbol to the
+vocabulary and removes <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>c</mi></mrow><annotation encoding="application/x-tex">c</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">c</span></span></span></span> symbol occurrences from the corpus, where <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>c</mi></mrow><annotation encoding="application/x-tex">c</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">c</span></span></span></span> is
+the pair’s count — the greedy rule “merge the most frequent pair” is exactly
+“maximize the immediate drop in total sequence length per vocabulary slot
+spent.” This connects to <a href="/groundup/book/information-theory/">Chapter 7</a>: a corpus with
+entropy rate <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>H</mi></mrow><annotation encoding="application/x-tex">H</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0813em;">H</span></span></span></span> bits per character cannot be represented in fewer than
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>H</mi><mo>⋅</mo><msub><mi>N</mi><mtext>chars</mtext></msub></mrow><annotation encoding="application/x-tex">H \cdot N_{\text{chars}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0813em;">H</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">chars</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> bits, and a tokenizer with vocabulary <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi></mrow><annotation encoding="application/x-tex">V</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.2222em;">V</span></span></span></span> spends
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mrow><mi>log</mi><mo>⁡</mo></mrow><mn>2</mn></msub><mi>V</mi></mrow><annotation encoding="application/x-tex">\log_2 V</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9386em;vertical-align:-0.2441em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.2222em;">V</span></span></span></span> bits per token, so the token sequence length is bounded below by</p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>N</mi><mtext>tokens</mtext></msub><mtext>  </mtext><mo>≥</mo><mtext>  </mtext><mfrac><mrow><mi>H</mi><mo>⋅</mo><msub><mi>N</mi><mtext>chars</mtext></msub></mrow><mrow><msub><mrow><mi>log</mi><mo>⁡</mo></mrow><mn>2</mn></msub><mi>V</mi></mrow></mfrac><mi mathvariant="normal">.</mi></mrow><annotation encoding="application/x-tex">N_{\text{tokens}} \;\ge\; \frac{H \cdot N_{\text{chars}}}{\log_2 V}.</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">tokens</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≥</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.2905em;vertical-align:-0.9301em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.2222em;">V</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0813em;">H</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">chars</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.9301em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mord">.</span></span></span></span></span><p>BPE is a greedy, suboptimal entropy coder — it makes no claim of optimality,
+and indeed slightly different corpora yield different merge lists. But it has
+two properties the optimal coders of Chapter 7 lack and language models need:
+its segmentation is <em>deterministic</em> and its symbols are <em>contiguous substrings</em>
+that tend to align with meaningful units.</p></aside>
+<aside class="box box-warning" data-box="warning"><div class="box-title"><span class="box-icon" aria-hidden="true">⚠️</span>Careful</div><p>A tokenizer and a model are a <strong>matched pair</strong>. The merge list determines
+which ID means what; the model’s embedding matrix and output layer are
+indexed by those IDs and nothing else. Run text through the wrong tokenizer —
+even a slightly different version — and the model receives a valid-looking
+sequence of integers that means something entirely different: instant
+gibberish, no error message. This is also why you cannot “just add tokens” to
+a trained model: a new token’s embedding row is untrained (the glitch-token
+section below shows what that looks like), and every serious vocabulary
+change means at least a fine-tune.</p></aside>
+<h2 id="the-other-two-families-wordpiece-and-unigram">The other two families: WordPiece and Unigram</h2>
+<p>BPE won the frontier, but two rival algorithms matter — one historically, one
+because it embodies the opposite philosophy and still ships in real systems.</p>
+<p><strong>WordPiece</strong> (Google; it powered BERT and originated in a 2012 Japanese/Korean
+voice-search system by Schuster &#x26; Nakajima) is BPE with a smarter merge
+criterion. Instead of merging the most <em>frequent</em> pair, it merges the pair
+that most increases the likelihood of the corpus under a unigram language
+model — which works out to choosing the pair maximizing</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mtext>score</mtext><mo stretchy="false">(</mo><mi>a</mi><mo separator="true">,</mo><mi>b</mi><mo stretchy="false">)</mo><mtext>  </mtext><mo>=</mo><mtext>  </mtext><mfrac><mrow><mi mathvariant="normal">count</mi><mo>⁡</mo><mo stretchy="false">(</mo><mi>a</mi><mi>b</mi><mo stretchy="false">)</mo></mrow><mrow><mi mathvariant="normal">count</mi><mo>⁡</mo><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo><mtext> </mtext><mi mathvariant="normal">count</mi><mo>⁡</mo><mo stretchy="false">(</mo><mi>b</mi><mo stretchy="false">)</mo></mrow></mfrac><mi mathvariant="normal">.</mi></mrow><annotation encoding="application/x-tex">\text{score}(a,b) \;=\; \frac{\operatorname{count}(ab)}{\operatorname{count}(a)\,\operatorname{count}(b)}.</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord text"><span class="mord">score</span></span><span class="mopen">(</span><span class="mord mathnormal">a</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">b</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.363em;vertical-align:-0.936em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.427em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mop"><span class="mord mathrm">count</span></span><span class="mopen">(</span><span class="mord mathnormal">a</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop"><span class="mord mathrm">count</span></span><span class="mopen">(</span><span class="mord mathnormal">b</span><span class="mclose">)</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mop"><span class="mord mathrm">count</span></span><span class="mopen">(</span><span class="mord mathnormal">ab</span><span class="mclose">)</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.936em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mord">.</span></span></span></span></span>
+<p>Read that as pointwise mutual information (PMI): not “do <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi></mrow><annotation encoding="application/x-tex">a</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">a</span></span></span></span> and <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>b</mi></mrow><annotation encoding="application/x-tex">b</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">b</span></span></span></span> co-occur a
+lot?” but “do they co-occur <em>more than their individual frequencies predict</em>?”
+Raw frequency would love to merge <code>e</code> + <code>the-space-after-it</code> because both are
+everywhere; the ratio test instead favors pairs that are glued together
+specifically, like <code>q</code> + <code>u</code>. WordPiece’s other visible signature is the <code>##</code>
+prefix on word-internal fragments — BERT tokenizes “unhappiness” as
+<code>un ##happi ##ness</code> — which plays the same bookkeeping role as our <code>_</code> marker.</p>
+<p><strong>Unigram</strong> (<a href="https://arxiv.org/abs/1804.10959">Kudo, 2018</a>) inverts the whole
+construction — this is the reversed philosophy the section title promised.
+BPE and WordPiece are <em>bottom-up</em>: start with atoms, grow the vocabulary by
+merging. Unigram is <em>top-down</em>: start with a huge candidate vocabulary (every
+frequent substring, perhaps a million candidates) and repeatedly <em>prune</em> it.
+The model assumes each token is drawn independently with probability <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">p(t)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord mathnormal">t</span><span class="mclose">)</span></span></span></span>,
+so a segmentation <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>t</mi><mn>1</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>t</mi><mi>m</mi></msub></mrow><annotation encoding="application/x-tex">t_1, \dots, t_m</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8095em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner">…</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">m</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> of a string has probability
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mo>∏</mo><mi>i</mi></msub><mi>p</mi><mo stretchy="false">(</mo><msub><mi>t</mi><mi>i</mi></msub><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\prod_i p(t_i)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0497em;vertical-align:-0.2997em;"></span><span class="mop"><span class="mop op-symbol small-op" style="position:relative;top:0em;">∏</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.162em;"><span style="top:-2.4003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2997em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span>; an expectation-maximization loop fits the <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">p(t)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord mathnormal">t</span><span class="mclose">)</span></span></span></span> values,
+and each round removes the tokens (say, the bottom 20%) whose deletion hurts
+total corpus likelihood least, until the target size remains. Encoding picks
+the highest-probability segmentation with a Viterbi dynamic program — as in
+<a href="/groundup/book/probability/">Chapter 6</a>, “most probable path” beats “greedy local
+rule”. A bonus BPE cannot offer: because Unigram scores <em>all</em> segmentations,
+you can sample suboptimal ones during training (“subword regularization”),
+exposing the model to <code>un-happi-ness</code> one epoch and <code>unhap-piness</code> the next,
+which measurably improves robustness in small-data regimes.</p>
+<p><strong>SentencePiece</strong> (<a href="https://arxiv.org/abs/1808.06226">Kudo &#x26; Richardson, 2018</a>)
+is not a fourth algorithm but the library that made the previous two portable:
+it implements both BPE and Unigram, and its key design decision is treating
+input as a raw character stream <em>including spaces</em> (rendered as the <code>▁</code>
+metasymbol), so it needs no language-specific pre-splitting — essential for
+Chinese, Japanese, and Thai, which do not put spaces between words.</p>
+<aside class="box box-practice" data-box="practice"><div class="box-title"><span class="box-icon" aria-hidden="true">⚙️</span>In practice</div><p>Who uses what, as of 2026: byte-level BPE dominates the frontier — the GPT
+line (GPT-2’s 50k vocabulary, GPT-4’s <code>cl100k_base</code>, the ~200k <code>o200k_base</code>
+family used since GPT-4o, all via the open-source <code>tiktoken</code> library), Llama 3
+(a 128k tiktoken-style vocabulary, dropping Llama 2’s 32k SentencePiece
+tokenizer), Qwen, DeepSeek, and — per public statements — Claude-class models.
+WordPiece survives wherever BERT descendants run (still billions of
+inferences a day in search and embedding pipelines). SentencePiece-Unigram
+powers the T5 family and remains the default choice for many multilingual and
+low-resource research models. If you train a tokenizer yourself, Hugging Face
+<code>tokenizers</code> gives you all three in a few lines.</p></aside>
+<h2 id="special-tokens-and-where-system-comes-from">Special tokens, and where “system” comes from</h2>
+<p>Every real vocabulary reserves a handful of IDs for tokens that never emerge
+from merges — control symbols with jobs:</p>
+<ul>
+<li><strong>Beginning/end of sequence</strong> (<code>BOS</code>/<code>EOS</code>, or GPT’s <code>&#x3C;|endoftext|></code>): mark
+document boundaries during training so the model learns where texts start
+and stop, and give generation a “stop” symbol to emit.</li>
+<li><strong>Padding</strong> (<code>PAD</code>): fills short sequences so a batch forms a rectangular
+tensor; masked out of loss and attention.</li>
+<li><strong>Chat-template tokens</strong>: the modern additions. When you send a “system
+prompt” and “user message” to a chat model, no special channel exists —
+your structured conversation is <em>flattened into one token sequence</em> using
+reserved markers. In the widely-copied ChatML convention that means literal
+tokens like <code>&#x3C;|im_start|></code> and <code>&#x3C;|im_end|></code> wrapping each turn with a role
+name; Llama 3 uses its own set (<code>&#x3C;|begin_of_text|></code>, <code>&#x3C;|start_header_id|></code>,
+<code>&#x3C;|eot_id|></code>, and friends). The “roles” you use in every chat API are,
+at bottom, tokenizer entries plus training conventions — nothing more.</li>
+</ul>
+<aside class="box box-warning" data-box="warning"><div class="box-title"><span class="box-icon" aria-hidden="true">⚠️</span>Careful</div><p>Special tokens are a security boundary. The tokenizer must guarantee that
+<em>user-supplied text can never encode into a special token</em> — otherwise a
+document containing the literal string <code>&#x3C;|im_start|>system</code> could impersonate
+a system message (“token smuggling”). Production tokenizers therefore encode
+special tokens only when the calling code explicitly allows it, and treat the
+same characters arriving in user text as ordinary bytes to be split. Several
+real-world prompt-injection bugs have come down to libraries getting this
+switch wrong, and you will meet the downstream consequences in
+<a href="/groundup/book/agents-and-tools/">the agents chapter</a>.</p></aside>
+<h2 id="vocabulary-size-the-economics">Vocabulary size: the economics</h2>
+<p>How big should the menu be? The trend line answers loudly: GPT-2 (2019) used
+<strong>50,257</strong> tokens (256 bytes + 50,000 merges + 1 special); GPT-4’s
+<code>cl100k_base</code> about <strong>100k</strong>; Llama 3 (2024) <strong>128,256</strong>; Qwen’s family
+roughly <strong>152k</strong>; the <code>o200k</code> family and Gemma about <strong>200k–256k</strong>. (Exact
+counts vary by release; treat these as a snapshot.) Vocabularies grew 4–5×
+in five years. Why — and why stop there?</p>
+<p>The benefit of a bigger vocabulary is compression: more stored fragments
+means more text per token, especially for code, rare words, and non-English
+languages. Llama 3’s jump from 32k to 128k cut its tokens-per-text by up
+to 15% (Meta’s reported figure), with larger gains on underserved languages — every
+percentage point is 1% more effective context length, 1% fewer forward
+passes per document, 1% lower serving cost. The cost of a bigger vocabulary
+is parameters at the model’s edges, and it is worth computing honestly.</p>
+<aside class="box box-example" data-box="example"><div class="box-title"><span class="box-icon" aria-hidden="true">✏️</span>Worked example</div><p>The embedding table has one row of dimension <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi></mrow><annotation encoding="application/x-tex">d</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">d</span></span></span></span> per vocabulary entry. For a
+Llama-3-class model with <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi><mo>=</mo><mn>128,256</mn></mrow><annotation encoding="application/x-tex">V = 128{,}256</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.2222em;">V</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">128</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">256</span></span></span></span> and <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi><mo>=</mo><mn>4096</mn></mrow><annotation encoding="application/x-tex">d = 4096</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">d</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">4096</span></span></span></span>:</p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mn>128,256</mn><mo>×</mo><mn>4096</mn><mtext>  </mtext><mo>=</mo><mtext>  </mtext><mn>525,336,576</mn><mtext>  </mtext><mo>≈</mo><mtext>  </mtext><mn>525</mn><mtext>M parameters.</mtext></mrow><annotation encoding="application/x-tex">128{,}256 \times 4096 \;=\; 525{,}336{,}576 \;\approx\; 525\text{M parameters.}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">128</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">256</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">4096</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">525</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">336</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">576</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord">525</span><span class="mord text"><span class="mord">M parameters.</span></span></span></span></span></span><p>The output layer needs a <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi><mo>×</mo><mi>V</mi></mrow><annotation encoding="application/x-tex">d \times V</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7778em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">d</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.2222em;">V</span></span></span></span> matrix of the same size, and Llama-3-8B
+does <em>not</em> share (“tie”) the two, so vocabulary machinery costs about
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1.05</mn></mrow><annotation encoding="application/x-tex">1.05</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1.05</span></span></span></span>B parameters — roughly <strong>13% of an 8-billion-parameter model</strong> spent
+before any actual thinking occurs. Small models often tie input and output
+matrices to halve this. For a 400B-parameter model the same 1.05B is 0.3% —
+which is why bigger models can afford bigger vocabularies, a scaling
+observation made quantitative in <a href="/groundup/book/scaling-laws/">Chapter 32</a>.</p></aside>
+<p>There is a subtler cost, too: each new token appears <em>less often</em> in a
+fixed corpus (the long tail thins out), so its embedding gets fewer gradient
+updates and is learned less well. Push vocabulary size far enough and you
+are minting tokens whose training signal approaches zero — which is the
+nursery where glitch tokens are born, as we will see shortly. The optimum,
+therefore, moves with model and data scale, and 100k–256k is simply where
+frontier labs’ curves currently cross (128k-class remains the most common
+choice in open models as of 2026).</p>
+<aside class="box box-math" data-box="math"><div class="box-title"><span class="box-icon" aria-hidden="true">∑</span>The math</div><p>Tokenizer choice also breaks naive model comparisons, which is why
+<a href="/groundup/book/evaluating-language-models/">Chapter 21</a> will insist on
+tokenizer-independent units. If model A’s tokenizer yields <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mi>A</mi></msub></mrow><annotation encoding="application/x-tex">N_A</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">A</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> tokens for a
+document and model B’s yields <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mi>B</mi></msub><mo mathvariant="normal">≠</mo><msub><mi>N</mi><mi>A</mi></msub></mrow><annotation encoding="application/x-tex">N_B \ne N_A</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0502em;">B</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel"><span class="mrel"><span class="mord vbox"><span class="thinbox"><span class="rlap"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="inner"><span class="mord"><span class="mrel"></span></span></span><span class="fix"></span></span></span></span></span><span class="mspace nobreak"></span><span class="mrel">=</span></span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">A</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>, their per-token cross-entropies
+are incomparable — model A can “improve” its per-token loss by tokenizing
+more coarsely. The fix is to normalize by something both share: the bytes of
+the underlying text. With cross-entropy <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">ℓ</mi></mrow><annotation encoding="application/x-tex">\ell</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord">ℓ</span></span></span></span> in nats per token, tokens <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi></mrow><annotation encoding="application/x-tex">N</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">N</span></span></span></span>,
+and bytes <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>B</mi></mrow><annotation encoding="application/x-tex">B</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span></span></span></span>,</p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mtext>bits-per-byte</mtext><mtext>  </mtext><mo>=</mo><mtext>  </mtext><mfrac><mi>N</mi><mi>B</mi></mfrac><mo>⋅</mo><mfrac><mi mathvariant="normal">ℓ</mi><mrow><mi>ln</mi><mo>⁡</mo><mn>2</mn></mrow></mfrac><mo separator="true">,</mo></mrow><annotation encoding="application/x-tex">\text{bits-per-byte} \;=\; \frac{N}{B} \cdot \frac{\ell}{\ln 2},</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord text"><span class="mord">bits-per-byte</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.0463em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0502em;">B</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:2.0574em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3714em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mop">ln</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">2</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">ℓ</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mpunct">,</span></span></span></span></span><p>where <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mi mathvariant="normal">/</mi><mi>B</mi></mrow><annotation encoding="application/x-tex">N/B</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="mord">/</span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span></span></span></span> is tokens-per-byte (the inverse of compression) and <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ln</mi><mo>⁡</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">\ln 2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mop">ln</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">2</span></span></span></span>
+converts nats to bits. Two models with different tokenizers can be compared
+on bits-per-byte because both are ultimately predicting the same bytes.</p></aside>
+<h2 id="when-tokenization-bites-a-field-guide-to-pathologies">When tokenization bites: a field guide to pathologies</h2>
+<p>Everything strange in this section follows from one sentence: <em>the model sees
+token IDs, not characters.</em> Hold onto that and each pathology becomes a
+mechanism instead of a mystery.</p>
+<p><strong>Counting the r’s in strawberry.</strong> Ask a 2023–24-era model how many r’s are
+in “strawberry” and it would confidently answer two. The mechanism: the model
+receives <code> strawberry</code> as one or two token IDs — opaque atoms. It has no
+perceptual access to the letters inside a token, any more than you can count
+the strokes in a Chinese character you cannot read. Everything a model knows
+about spelling is <em>memorized side information</em> absorbed from training text
+(spelling bees, dictionaries, rhymes, typo corrections) and imperfectly
+attached to each token’s embedding. The information usually survives — models
+can often spell words letter-by-letter when asked — but <em>operating</em> on that
+recalled spelling (counting, reversing) chains two fragile steps, and errors
+compound. Post-2024 frontier models mostly pass, partly through
+<a href="/groundup/book/reasoning-models/">reasoning training</a> that teaches them to spell the
+word out into separate letter tokens first — converting a perception problem
+into a sequence problem they can do.</p>
+<p><strong>Numbers and arithmetic.</strong> GPT-2’s frequency-driven merges carved numbers
+arbitrarily: <code>1000</code> one token, <code>1001</code> two (<code>100</code> + <code>1</code>), forcing the model to
+learn separate arithmetic facts for overlapping chunkings. Modern tokenizers
+impose sanity by rule rather than statistics: the GPT-4-family and Llama 3
+tokenizers cap number runs at three digits per token, and DeepSeek goes
+further, splitting every number into single digits — trading sequence length
+for the clean place-value structure that makes digit-by-digit algorithms
+learnable. Grouping <em>direction</em> matters too: three-digit tokens grouped
+right-to-left align with how positional arithmetic carries, and
+researchers have measured real accuracy differences from this choice alone.
+Tokenization is one honest reason “how much is 7,377 × 8,591” was, for
+years, a harder question for a language model than “explain the Krebs cycle”.</p>
+<p><strong>Multilingual inequity.</strong> A tokenizer’s merges are elected by its training
+corpus. Train on mostly-English web text and English gets luxuriously short
+encodings while other scripts — especially non-Latin scripts underrepresented
+in the data — fall back toward bytes. Recall that UTF-8 already charges Thai,
+Hindi, or Burmese three bytes per character before the tokenizer even votes.
+The result, documented across commercial tokenizers
+(<a href="https://arxiv.org/abs/2305.15425">Petrov et al., 2023</a>),
+is that the <em>same content</em> can cost a few times more tokens in Hindi or
+Burmese than in English — with older English-centric tokenizers, an order of
+magnitude more. This is not cosmetic: tokens are the unit of API billing, of
+context capacity, and of the compute budget per thought. A Burmese speaker
+pays more per sentence, fits less history in context, and gets fewer
+effective “steps of computation” per idea. Larger multilingual vocabularies
+(Llama 3’s 128k, the ~200k+ vocabularies of GPT-4o-era and Gemma tokenizers)
+have narrowed but not closed the gap.</p>
+<figure class="fig">
+  <svg viewBox="0 0 720 312" role="img" aria-label="Illustrative horizontal bar chart of relative token counts for the same content in six languages, from 1x for English to about 3.4x for Burmese">
+    <text x="24" y="30" font-family="Inter Variable, sans-serif" font-size="15" font-weight="600" fill="currentColor">Tokens to encode the same content (illustrative)</text>
+    <g font-family="Inter Variable, sans-serif" font-size="13">
+      <text x="128" y="72" fill="currentColor" text-anchor="end">English</text>
+      <rect x="140" y="56" width="150" height="24" rx="4" fill="#14b8a6" fill-opacity="0.35" stroke="#14b8a6"></rect>
+      <text x="298" y="72" fill="currentColor" opacity="0.7">1.0×</text>
+      <text x="128" y="112" fill="currentColor" text-anchor="end">Spanish</text>
+      <rect x="140" y="96" width="195" height="24" rx="4" fill="#38bdf8" fill-opacity="0.35" stroke="#38bdf8"></rect>
+      <text x="343" y="112" fill="currentColor" opacity="0.7">1.3×</text>
+      <text x="128" y="152" fill="currentColor" text-anchor="end">Vietnamese</text>
+      <rect x="140" y="136" width="255" height="24" rx="4" fill="#38bdf8" fill-opacity="0.35" stroke="#38bdf8"></rect>
+      <text x="403" y="152" fill="currentColor" opacity="0.7">1.7×</text>
+      <text x="128" y="192" fill="currentColor" text-anchor="end">Hindi</text>
+      <rect x="140" y="176" width="360" height="24" rx="4" fill="#38bdf8" fill-opacity="0.35" stroke="#38bdf8"></rect>
+      <text x="508" y="192" fill="currentColor" opacity="0.7">2.4×</text>
+      <text x="128" y="232" fill="currentColor" text-anchor="end">Thai</text>
+      <rect x="140" y="216" width="435" height="24" rx="4" fill="#38bdf8" fill-opacity="0.35" stroke="#38bdf8"></rect>
+      <text x="583" y="232" fill="currentColor" opacity="0.7">2.9×</text>
+      <text x="128" y="272" fill="currentColor" text-anchor="end">Burmese</text>
+      <rect x="140" y="256" width="510" height="24" rx="4" fill="#fb7185" fill-opacity="0.35" stroke="#fb7185"></rect>
+      <text x="658" y="272" fill="currentColor" opacity="0.7">3.4×</text>
+    </g>
+    <text x="24" y="302" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55">relative to English, for a modern ~128k multilingual tokenizer — magnitudes are illustrative and tokenizer-dependent</text>
+  </svg>
+  <figcaption><strong>Figure:</strong> the same passage costs different token counts in different languages — and tokens are the unit of cost, context, and compute. Bars show plausible magnitudes for a modern multilingual tokenizer; exact ratios vary widely by tokenizer and text, and older English-centric tokenizers showed gaps of 10× and more. Illustrative, not measured data.</figcaption>
+</figure>
+<p><strong>Glitch tokens: the SolidGoldMagikarp story.</strong> In early 2023, Jessica
+Rumbelow and Matthew Watkins
+<a href="https://www.lesswrong.com/posts/aPeJE8bSo6rAFoLqg/solidgoldmagikarp-plus-prompt-generation">went looking</a>
+for tokens near the centroid of GPT’s embedding space and found a cluster of
+bizarre entries — <code> SolidGoldMagikarp</code>, <code> petertodd</code>, <code>cloneembedreportprint</code> —
+that made GPT-3 models behave <em>deranged</em>: asked to repeat
+” SolidGoldMagikarp”, models would evade or hallucinate a different word
+(“distribute”), and sibling glitch tokens drew outright insults — <code>StreamerBot</code>
+reliably got back “You’re a jerk.” The mechanism is a supply
+chain bug between two training runs. The <em>tokenizer</em> was trained on one
+corpus — which happened to include masses of Reddit r/counting logs, where
+user <code>SolidGoldMagikarp</code> was a prolific counter — so the string earned its own
+token. The <em>model</em> was then trained on a differently-filtered corpus where
+those logs were largely absent. Result: a vocabulary entry whose embedding
+row received almost no gradient updates, left near its random initialization.
+Feeding that ID to the model injects an out-of-distribution vector into layer
+one — formally valid, semantically nonsense, like a word from a language that
+does not exist. Downstream layers do <em>something</em>, and that something is
+undefined behavior. Later tokenizers and better tokenizer/corpus alignment
+have mostly (not entirely) eliminated the species; the deeper lesson —
+vocabulary entries are only as meaningful as their training signal — is
+permanent, and glitch tokens remain a favorite probe in
+<a href="/groundup/book/features-and-probes/">interpretability work</a>.</p>
+<p><strong>Prompt-boundary sensitivity.</strong> Because <code> Paris</code> (with leading space) and
+<code>Paris</code> are different tokens, the <em>end</em> of your prompt interacts with
+tokenization in ways users never suspect. Complete “The capital of France
+is” and the model happily continues with the common token <code> Paris</code>. Add a
+trailing space — “The capital of France is ” — and now producing <code> Paris</code>
+would double the space; the model must instead emit the space-less <code>Paris</code>,
+a token that almost never begins a continuation in training data, and
+quality measurably degrades. The same boundary effect means a word split
+mid-token at the prompt’s edge (“The capital of France is Par”) asks the
+model to complete from a token boundary it has rarely seen. Serving stacks
+patch this with <strong>token healing</strong>: back up over the prompt’s final partial
+token and constrain generation to continuations consistent with the
+characters typed. It works, and the fact that it must exist is the
+indictment: the interface between “text you typed” and “sequence the model
+sees” leaks.</p>
+<aside class="box box-intuition" data-box="intuition"><div class="box-title"><span class="box-icon" aria-hidden="true">💡</span>Intuition</div><p>Every pathology above is the same pathology. Tokenization is a lossy,
+frozen, statistics-driven lens bolted onto the model’s eye before training
+ever starts. Where the lens is aligned with the task (common English prose),
+you forget it exists. Where it is misaligned — characters inside tokens,
+digits across token boundaries, languages the lens barely saw, IDs the model
+never trained on, boundaries mid-word — the model is not being stupid; it is
+being asked about a world it literally cannot see.</p></aside>
+<h2 id="the-tokenizer-free-dream">The tokenizer-free dream</h2>
+<p>Given that catalogue, the obvious question: why not delete the tokenizer and
+feed the model raw bytes? The vocabulary shrinks to 256, every pathology
+above dissolves by construction — no hidden letters, no digit chunking, no
+language lens, no glitch IDs, no boundaries. The blocker is the arithmetic
+from the start of this chapter: byte sequences are ~4–5× longer, attention
+is quadratic, and every byte gets the same full-model forward pass whether it
+is the predictable second half of “the” or the uncertain first
+letter of a new sentence. Early attempts (ByT5, CANINE in 2021; MegaByte’s
+fixed-size byte patches in 2023) confirmed both the appeal and the cost:
+byte models were more robust to typos and spelling tasks but paid too much
+compute to match subword models at equal budgets.</p>
+<p>The <a href="https://arxiv.org/abs/2412.09871">Byte Latent Transformer (BLT)</a>
+(Meta, December 2024) is the first result that makes the dream look
+practical, and its central idea is lovely: <strong>spend compute where the bytes
+are hard</strong>. A small byte-level model estimates the entropy of each next byte
+— exactly the “surprise” of <a href="/groundup/book/information-theory/">Chapter 7</a> — and
+patch boundaries are drawn where entropy spikes (word starts, odd names,
+code identifiers), grouping predictable runs into long patches. A large
+<em>latent</em> transformer then operates over these variable-length patches —
+dynamic, learned tokens — with lightweight byte-level encoder/decoder models
+on either side. Where BPE allocates its budget by frequency, frozen forever
+at tokenizer-training time, BLT allocates compute by <em>information content,
+per input, at runtime</em>.</p>
+<p>The honest scorecard, per the paper: at 8B parameters trained on 4T bytes,
+BLT matches Llama 3’s benchmark performance at equal training compute
+(flop-controlled), with better robustness to character noise, stronger
+spelling/character-level manipulation, and gains on low-resource
+translation; the authors also report the first flop-controlled scaling study
+of byte models to that scale, with trends favoring patches as models grow.
+The caveats are equally real: 8B is a generation behind frontier scale, the
+entropy-model machinery complicates training and serving pipelines that a
+decade of tooling has optimized around fixed tokenizers, and inference-time
+batching of variable patch boundaries is unsolved engineering. As of 2026 no
+frontier production model has shipped tokenizer-free, and every model you
+can rent today still speaks BPE — but for the first time the field’s answer
+to “could we delete the tokenizer?” is “at 8B scale, verifiably yes,” and
+several labs’ research groups are pulling the thread. Watch
+<a href="/groundup/book/the-frontier/">the frontier chapter</a> for updates.</p>
+<aside class="box box-history" data-box="history"><div class="box-title"><span class="box-icon" aria-hidden="true">🕰</span>History</div><p>The arc in one paragraph: Gage (1994) invents BPE to compress files;
+Schuster &#x26; Nakajima (2012) build WordPiece for Japanese/Korean voice search;
+Sennrich, Haddow &#x26; Birch (<a href="https://arxiv.org/abs/1508.07909">2015–16</a>) import
+BPE to neural machine translation and end the unknown-word era; Kudo
+(<a href="https://arxiv.org/abs/1804.10959">2018</a>) inverts it with Unigram and ships
+<a href="https://arxiv.org/abs/1808.06226">SentencePiece</a>; GPT-2 (2019) goes
+byte-level and sets the frontier default; 2019–2024 is quiet consolidation —
+vocabularies grow 50k → 100k → 128k → 200k+ and digit rules get sane — and
+then BLT (<a href="https://arxiv.org/abs/2412.09871">2024</a>) makes tokenizer-free
+credible again. Thirty years, one loop: compression trick → linguistic tool
+→ infrastructure → suspected bottleneck.</p></aside>
+<h2 id="where-this-leaves-us">Where this leaves us</h2>
+<ul>
+<li>You can state <em>why</em> tokenization exists: a finite output menu is
+structurally required, and subwords are the compromise between word-level
+OOV failure and character-level sequence explosion (~19× attention compute
+in our worked example).</li>
+<li>You can explain Unicode vs UTF-8 in two sentences, and why a 256-byte base
+alphabet makes the unknown token impossible by construction.</li>
+<li>You can train a BPE tokenizer by hand — count pairs, merge the max, repeat
+— and encode unseen words by replaying merges in order (<code>lowest</code> →
+<code>low</code> + <code>est_</code>).</li>
+<li>You can contrast the three families: BPE merges by frequency, WordPiece
+merges by likelihood gain (the PMI-style ratio), Unigram starts huge and
+prunes by likelihood — bottom-up versus top-down.</li>
+<li>You know what special tokens do, where chat “roles” physically live, and
+why user text must never encode into a special token.</li>
+<li>You can compute what a vocabulary costs (<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>128</mn><mtext>k</mtext><mo>×</mo><mn>4096</mn><mo>≈</mo><mn>525</mn><mtext>M</mtext></mrow><annotation encoding="application/x-tex">128\text{k} \times 4096 \approx 525\text{M}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7778em;vertical-align:-0.0833em;"></span><span class="mord">128</span><span class="mord text"><span class="mord">k</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">4096</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord">525</span><span class="mord text"><span class="mord">M</span></span></span></span></span>
+embedding parameters, ~13% of an 8B model with untied output) and
+what it buys (compression, context, cost), and why the optimum grows with
+model scale.</li>
+<li>You can give the <em>mechanism</em>, not just the meme, for strawberry-counting,
+digit chunking, multilingual token inequity, glitch tokens, and
+trailing-space degradation — and you know bits-per-byte is the
+tokenizer-independent yardstick, formalized in
+<a href="/groundup/book/evaluating-language-models/">Chapter 21</a>.</li>
+<li>You know where tokenizer-free stands: BLT’s entropy-based patches match
+BPE at 8B scale, and the frontier hasn’t switched — yet.</li>
+</ul>
+<p>Each token ID now needs to become something a neural network can
+compute with: a vector, positioned in a space where geometry is meaning.
+That lookup table we kept mentioning is the subject of the next chapter:
+<a href="/groundup/book/embeddings/">Next: Embeddings</a>.</p> <div class="papers-card" id="papers-card"> <div class="pc-title">Key papers &amp; readings in this chapter</div> <ul> <li> <div> <a href="https://arxiv.org/abs/1508.07909" target="_blank" rel="noopener">Neural Machine Translation of Rare Words with Subword Units</a> <span class="p-meta"> — Sennrich, Haddow &amp; Birch, 2016</span> <span class="p-note">The paper that brought byte-pair encoding to NLP — Section 3.2 contains the merge algorithm this chapter works by hand.</span> </div> </li><li> <div> <a href="https://arxiv.org/abs/1808.06226" target="_blank" rel="noopener">SentencePiece: A simple and language independent subword tokenizer</a> <span class="p-meta"> — Kudo &amp; Richardson, 2018</span> <span class="p-note">The library behind many open-model tokenizers; treats text as a raw stream, spaces included.</span> </div> </li><li> <div> <a href="https://arxiv.org/abs/1804.10959" target="_blank" rel="noopener">Subword Regularization</a> <span class="p-meta"> — Kudo, 2018</span> <span class="p-note">Introduces the Unigram tokenizer — the prune-down-from-big philosophy, opposite of BPE.</span> </div> </li><li> <div> <a href="https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf" target="_blank" rel="noopener">Language Models are Unsupervised Multitask Learners (GPT-2)</a> <span class="p-meta"> — Radford et al., 2019</span> <span class="p-note">Section 2.2 introduces byte-level BPE — the 256-byte base alphabet that killed the unknown token.</span> </div> </li><li> <div> <a href="https://arxiv.org/abs/2412.09871" target="_blank" rel="noopener">Byte Latent Transformer: Patches Scale Better Than Tokens</a> <span class="p-meta"> — Pagnoni et al., 2024</span> <span class="p-note">The strongest tokenizer-free result to date: entropy-based byte patches matching Llama 3 at 8B scale.</span> </div> </li><li> <div> <a href="https://www.lesswrong.com/posts/aPeJE8bSo6rAFoLqg/solidgoldmagikarp-plus-prompt-generation" target="_blank" rel="noopener">SolidGoldMagikarp (plus, prompt generation)</a> <span class="p-meta"> — Rumbelow &amp; Watkins, 2023</span> <span class="p-note">The glitch-token investigation — what happens when a token exists in the vocabulary but not in the training data.</span> </div> </li> </ul> </div> <nav class="chapter-nav"> <a href="/groundup/book/what-is-a-language-model/" class="prev"> <span class="dir">← Previous</span> <span class="t">What a Language Model Is</span> </a> <a href="/groundup/book/embeddings/" class="next"> <span class="dir">Next →</span> <span class="t">Embeddings</span> </a> </nav> <div class="chapter-foot"> <span>Last updated 2026-08-24</span> <a href="https://github.com/joewilbert/aisite/edit/main/src/content/book/19-tokenization.md" target="_blank" rel="noopener">Edit this chapter</a> <a href="https://github.com/joewilbert/aisite/issues/new" target="_blank" rel="noopener">Report an issue</a> </div> </article> </div>  </main> </div> <!-- Right panel: papers / tutor / notes --> <aside class="panel-host" id="panel" aria-label="Side panel"> <div class="panel-resizer" id="panel-resizer"></div> <div class="panel-tabs"> <button class="panel-tab" data-tab="paper">Paper</button> <button class="panel-tab" data-tab="tutor">AI tutor</button> <button class="panel-tab" data-tab="notes">Notes</button> <button class="hbtn panel-close" id="panel-close" aria-label="Close panel"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg> </button> </div> <div class="panel-body"> <div class="panel-view" data-view="paper" id="view-paper"></div> <div class="panel-view" data-view="tutor" id="view-tutor"></div> <div class="panel-view" data-view="notes" id="view-notes"></div> </div> </aside> <!-- Selection toolbar --> <div class="sel-toolbar" id="sel-toolbar"> <div class="swatches"> <button class="sw" data-color="yellow" style="background:var(--hl-yellow)" aria-label="Highlight yellow"></button> <button class="sw" data-color="green" style="background:var(--hl-green)" aria-label="Highlight green"></button> <button class="sw" data-color="blue" style="background:var(--hl-blue)" aria-label="Highlight blue"></button> <button class="sw" data-color="pink" style="background:var(--hl-pink)" aria-label="Highlight pink"></button> </div> <div class="divider"></div> <button id="sel-note">✎ Note</button> <button id="sel-explain">✦ Explain</button> <button id="sel-remove" style="display:none">✕ Remove</button> </div> <!-- Settings modal --> <div class="modal-scrim" id="settings-scrim"> <div class="modal" role="dialog" aria-label="Settings" id="settings-modal"></div> </div> <!-- Search modal --> <div class="modal-scrim" id="search-scrim"> <div class="modal search-modal" role="dialog" aria-label="Search"> <input class="q" id="search-input" type="text" placeholder="Search the book…" autocomplete="off"> <div class="search-results" id="search-results"></div> </div> </div> <script>(function(){const base = "/groundup";
+const slug = "tokenization";
+const pageTitle = "Tokenization · Ground Up";
+
+      window.__GU__ = { base, slug, pageTitle };
+    })();</script> <script type="module" src="/groundup/_astro/Base.astro_astro_type_script_index_0_lang.65xM_WgJ.js"></script>  </body></html>

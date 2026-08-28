@@ -1,0 +1,566 @@
+<!DOCTYPE html><html lang="en"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Architecture Families: BERT to Decoder-Only · Ground Up</title><meta name="description" content="The three ways to wire a transformer — encoder-only, encoder-decoder, decoder-only — what each objective trains, and why next-token prediction won."><meta name="theme-color" content="#faf9f6"><meta property="og:title" content="Architecture Families: BERT to Decoder-Only · Ground Up"><meta property="og:description" content="The three ways to wire a transformer — encoder-only, encoder-decoder, decoder-only — what each objective trains, and why next-token prediction won."><meta property="og:type" content="article"><meta property="og:site_name" content="Ground Up"><link rel="icon" href="/groundup/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="/groundup/apple-touch-icon.png"><link rel="manifest" href="/groundup/manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Ground Up"><script>
+      (function () {
+        try {
+          var t = localStorage.getItem('gu:theme');
+          var dark = t ? t === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+          if (dark) document.documentElement.classList.add('dark');
+          var fs = localStorage.getItem('gu:fontScale');
+          if (fs) document.documentElement.style.setProperty('--font-scale', fs);
+        } catch (e) {}
+      })();
+    </script><link rel="stylesheet" href="/groundup/_astro/_slug_.BCpHWCuJ.css"></head> <body> <header class="site-header"> <button class="hbtn" id="btn-toc" aria-label="Table of contents" title="Contents"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"></path></svg> </button> <a class="brand" href="/groundup/"> <span class="logo">G</span> <span class="brand-name">Ground&nbsp;Up</span> </a> <span class="header-crumb">Part IV · Attention &amp; Transformers · Chapter 27</span> <div class="header-actions"> <button class="hbtn" id="btn-search" aria-label="Search" title="Search (/)"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg> </button> <button class="hbtn" id="btn-notes" aria-label="My notes" title="My notes & highlights"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg> </button> <button class="hbtn" id="btn-tutor" aria-label="AI tutor" title="AI tutor"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 1 1-4-6.9"></path><path d="M21 3v6h-6"></path><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"></circle><circle cx="8.5" cy="12" r="1.2" fill="currentColor" stroke="none"></circle><circle cx="15.5" cy="12" r="1.2" fill="currentColor" stroke="none"></circle></svg> </button> <button class="hbtn" id="btn-theme" aria-label="Toggle theme" title="Light / dark"> <svg class="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.5"></circle><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M19.4 4.6l-1.8 1.8M6.4 17.6l-1.8 1.8"></path></svg> </button> <button class="hbtn" id="btn-settings" aria-label="Settings" title="Settings"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.01a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.01a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.01a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"></path></svg> </button> </div> </header> <div class="shell"> <nav class="toc-rail" id="toc-rail" aria-label="Table of contents">  <div class="toc-part">Start here</div> <a class="toc-link" data-slug="how-to-read-this-book" href="/groundup/book/how-to-read-this-book/"> <span class="n">·</span> <span>How to Read This Book</span> </a><a class="toc-link" data-slug="the-whole-machine" href="/groundup/book/the-whole-machine/"> <span class="n">·</span> <span>Frontier AI In One Sitting</span> </a> <div class="toc-part">Part I · Mathematical Foundations</div> <a class="toc-link" data-slug="vectors-and-spaces" href="/groundup/book/vectors-and-spaces/"> <span class="n">1</span> <span>Vectors and Spaces</span> </a><a class="toc-link" data-slug="matrices-as-transformations" href="/groundup/book/matrices-as-transformations/"> <span class="n">2</span> <span>Matrices as Transformations</span> </a><a class="toc-link" data-slug="high-dimensional-geometry" href="/groundup/book/high-dimensional-geometry/"> <span class="n">3</span> <span>High-Dimensional Geometry</span> </a><a class="toc-link" data-slug="derivatives-and-gradients" href="/groundup/book/derivatives-and-gradients/"> <span class="n">4</span> <span>Derivatives and Gradients</span> </a><a class="toc-link" data-slug="chain-rule-and-jacobians" href="/groundup/book/chain-rule-and-jacobians/"> <span class="n">5</span> <span>The Chain Rule, Jacobians, and Curvature</span> </a><a class="toc-link" data-slug="probability" href="/groundup/book/probability/"> <span class="n">6</span> <span>Probability for Deep Learning</span> </a><a class="toc-link" data-slug="information-theory" href="/groundup/book/information-theory/"> <span class="n">7</span> <span>Information Theory: Surprise, Entropy, and KL</span> </a> <div class="toc-part">Part II · Deep Learning Foundations</div> <a class="toc-link" data-slug="neurons-and-mlps" href="/groundup/book/neurons-and-mlps/"> <span class="n">8</span> <span>Neurons, Layers, and MLPs</span> </a><a class="toc-link" data-slug="loss-functions" href="/groundup/book/loss-functions/"> <span class="n">9</span> <span>Loss Functions</span> </a><a class="toc-link" data-slug="gradient-descent-and-backprop" href="/groundup/book/gradient-descent-and-backprop/"> <span class="n">10</span> <span>Gradient Descent and Backpropagation</span> </a><a class="toc-link" data-slug="optimizers" href="/groundup/book/optimizers/"> <span class="n">11</span> <span>Optimizers: From SGD to AdamW and Muon</span> </a><a class="toc-link" data-slug="initialization-and-stability" href="/groundup/book/initialization-and-stability/"> <span class="n">12</span> <span>Initialization and Gradient Pathologies</span> </a><a class="toc-link" data-slug="regularization-and-generalization" href="/groundup/book/regularization-and-generalization/"> <span class="n">13</span> <span>Regularization and Generalization</span> </a><a class="toc-link" data-slug="normalization" href="/groundup/book/normalization/"> <span class="n">14</span> <span>Normalization: BatchNorm to RMSNorm</span> </a><a class="toc-link" data-slug="activation-functions" href="/groundup/book/activation-functions/"> <span class="n">15</span> <span>Activation Functions</span> </a><a class="toc-link" data-slug="residual-connections" href="/groundup/book/residual-connections/"> <span class="n">16</span> <span>Residual Connections and the Residual Stream</span> </a><a class="toc-link" data-slug="cnns-and-rnns" href="/groundup/book/cnns-and-rnns/"> <span class="n">17</span> <span>CNNs and RNNs: The World Before Transformers</span> </a> <div class="toc-part">Part III · Language Modeling</div> <a class="toc-link" data-slug="what-is-a-language-model" href="/groundup/book/what-is-a-language-model/"> <span class="n">18</span> <span>What a Language Model Is</span> </a><a class="toc-link" data-slug="tokenization" href="/groundup/book/tokenization/"> <span class="n">19</span> <span>Tokenization</span> </a><a class="toc-link" data-slug="embeddings" href="/groundup/book/embeddings/"> <span class="n">20</span> <span>Embeddings</span> </a><a class="toc-link" data-slug="evaluating-language-models" href="/groundup/book/evaluating-language-models/"> <span class="n">21</span> <span>Evaluating Language Models</span> </a> <div class="toc-part">Part IV · Attention &amp; Transformers</div> <a class="toc-link" data-slug="seq2seq-and-attention" href="/groundup/book/seq2seq-and-attention/"> <span class="n">22</span> <span>From seq2seq to Attention</span> </a><a class="toc-link" data-slug="scaled-dot-product-attention" href="/groundup/book/scaled-dot-product-attention/"> <span class="n">23</span> <span>Scaled Dot-Product Attention</span> </a><a class="toc-link" data-slug="multi-head-attention" href="/groundup/book/multi-head-attention/"> <span class="n">24</span> <span>Multi-Head Attention</span> </a><a class="toc-link" data-slug="transformer-architecture" href="/groundup/book/transformer-architecture/"> <span class="n">25</span> <span>The Transformer, Piece by Piece</span> </a><a class="toc-link" data-slug="positional-encodings" href="/groundup/book/positional-encodings/"> <span class="n">26</span> <span>Positional Information and RoPE</span> </a><a class="toc-link active" data-slug="architecture-families" href="/groundup/book/architecture-families/"> <span class="n">27</span> <span>Architecture Families: BERT to Decoder-Only</span> </a><a class="toc-link" data-slug="kv-cache-and-efficient-attention" href="/groundup/book/kv-cache-and-efficient-attention/"> <span class="n">28</span> <span>The KV Cache and Efficient Attention</span> </a><a class="toc-link" data-slug="mixture-of-experts" href="/groundup/book/mixture-of-experts/"> <span class="n">29</span> <span>Mixture-of-Experts</span> </a><a class="toc-link" data-slug="state-space-models" href="/groundup/book/state-space-models/"> <span class="n">30</span> <span>State-Space Models and Hybrids</span> </a> <div class="toc-part">Part V · Training LLMs in Practice</div> <a class="toc-link" data-slug="pretraining-data" href="/groundup/book/pretraining-data/"> <span class="n">31</span> <span>Pretraining Data</span> </a><a class="toc-link" data-slug="scaling-laws" href="/groundup/book/scaling-laws/"> <span class="n">32</span> <span>Scaling Laws</span> </a><a class="toc-link" data-slug="compute-and-parallelism" href="/groundup/book/compute-and-parallelism/"> <span class="n">33</span> <span>Compute: GPUs, Precision, and Parallelism</span> </a><a class="toc-link" data-slug="the-training-run" href="/groundup/book/the-training-run/"> <span class="n">34</span> <span>The Training Run</span> </a><a class="toc-link" data-slug="sft-and-rlhf" href="/groundup/book/sft-and-rlhf/"> <span class="n">35</span> <span>Post-Training I: SFT, Reward Models, RLHF</span> </a><a class="toc-link" data-slug="dpo-and-friends" href="/groundup/book/dpo-and-friends/"> <span class="n">36</span> <span>Post-Training II: DPO and Its Family</span> </a><a class="toc-link" data-slug="reasoning-models" href="/groundup/book/reasoning-models/"> <span class="n">37</span> <span>Reasoning Training: RLVR, GRPO, and the o1/R1 Era</span> </a><a class="toc-link" data-slug="fine-tuning" href="/groundup/book/fine-tuning/"> <span class="n">38</span> <span>Fine-Tuning You Can Actually Do: LoRA and Friends</span> </a><a class="toc-link" data-slug="inference-and-serving" href="/groundup/book/inference-and-serving/"> <span class="n">39</span> <span>Inference: Sampling, Quantization, Serving</span> </a> <div class="toc-part">Part VI · The Modern AI Landscape</div> <a class="toc-link" data-slug="the-frontier" href="/groundup/book/the-frontier/"> <span class="n">40</span> <span>The Frontier Landscape (2023–2026)</span> </a><a class="toc-link" data-slug="multimodal-models" href="/groundup/book/multimodal-models/"> <span class="n">41</span> <span>Multimodal Models</span> </a><a class="toc-link" data-slug="diffusion-models" href="/groundup/book/diffusion-models/"> <span class="n">42</span> <span>Diffusion and Image/Video Generation</span> </a><a class="toc-link" data-slug="long-context" href="/groundup/book/long-context/"> <span class="n">43</span> <span>Long Context</span> </a><a class="toc-link" data-slug="agents-and-tools" href="/groundup/book/agents-and-tools/"> <span class="n">44</span> <span>Agents, Tool Use, and MCP</span> </a><a class="toc-link" data-slug="retrieval-augmented-generation" href="/groundup/book/retrieval-augmented-generation/"> <span class="n">45</span> <span>Retrieval-Augmented Generation</span> </a><a class="toc-link" data-slug="benchmarks-and-evaluation" href="/groundup/book/benchmarks-and-evaluation/"> <span class="n">46</span> <span>Benchmarks and How to Read Them</span> </a><a class="toc-link" data-slug="open-vs-closed" href="/groundup/book/open-vs-closed/"> <span class="n">47</span> <span>Open vs Closed Models</span> </a> <div class="toc-part">Part VII · Interpretability</div> <a class="toc-link" data-slug="why-interpretability" href="/groundup/book/why-interpretability/"> <span class="n">48</span> <span>Why Interpretability</span> </a><a class="toc-link" data-slug="features-and-probes" href="/groundup/book/features-and-probes/"> <span class="n">49</span> <span>Features, Directions, and Probes</span> </a><a class="toc-link" data-slug="superposition" href="/groundup/book/superposition/"> <span class="n">50</span> <span>Superposition and Polysemanticity</span> </a><a class="toc-link" data-slug="sparse-autoencoders" href="/groundup/book/sparse-autoencoders/"> <span class="n">51</span> <span>Sparse Autoencoders</span> </a><a class="toc-link" data-slug="circuits" href="/groundup/book/circuits/"> <span class="n">52</span> <span>Circuits: Induction Heads to Attribution Graphs</span> </a><a class="toc-link" data-slug="causal-methods" href="/groundup/book/causal-methods/"> <span class="n">53</span> <span>Causal Methods: Patching, Ablation, and Lenses</span> </a><a class="toc-link" data-slug="steering-and-editing" href="/groundup/book/steering-and-editing/"> <span class="n">54</span> <span>Steering and Model Editing</span> </a><a class="toc-link" data-slug="cot-faithfulness" href="/groundup/book/cot-faithfulness/"> <span class="n">55</span> <span>Chain-of-Thought Faithfulness</span> </a><a class="toc-link" data-slug="frontier-interpretability" href="/groundup/book/frontier-interpretability/"> <span class="n">56</span> <span>Interpretability at the Frontier</span> </a> <div class="toc-part">Part VIII · Reference</div> <a class="toc-link" data-slug="where-to-go-next" href="/groundup/book/where-to-go-next/"> <span class="n">57</span> <span>Where to Go Next</span> </a><a class="toc-link" data-slug="glossary" href="/groundup/book/glossary/"> <span class="n">58</span> <span>Glossary</span> </a><a class="toc-link" data-slug="notation" href="/groundup/book/notation/"> <span class="n">59</span> <span>Notation Reference</span> </a> </nav> <div class="scrim" id="toc-scrim"></div> <main class="main-col">  <div class="article-wrap"> <article class="chapter" id="article" data-slug="architecture-families" data-title="Architecture Families: BERT to Decoder-Only" data-file="27-architecture-families.md" data-pagefind-body> <div class="chapter-kicker">Part IV · Attention &amp; Transformers · Chapter 27</div> <h1>Architecture Families: BERT to Decoder-Only</h1> <p class="chapter-desc">The three ways to wire a transformer — encoder-only, encoder-decoder, decoder-only — what each objective trains, and why next-token prediction won.</p> <details class="section-nav"> <summary>In this chapter</summary> <ol> <li><a href="#three-ways-to-wire-the-same-blocks">Three ways to wire the same blocks</a></li><li><a href="#encoder-only-bert-and-the-art-of-filling-in-blanks">Encoder-only: BERT and the art of filling in blanks</a></li><li><a href="#encoder-decoder-the-original-recipe-and-where-it-survives">Encoder-decoder: the original recipe, and where it survives</a></li><li><a href="#decoder-only-why-it-won">Decoder-only: why it won</a></li><li><a href="#prefix-lm-the-middle-ground">Prefix-LM: the middle ground</a></li><li><a href="#the-three-objectives-side-by-side">The three objectives, side by side</a></li><li><a href="#what-decoder-only-hides">What “decoder-only” hides</a></li><li><a href="#where-this-leaves-us">Where this leaves us</a></li> </ol> </details> <p>The <a href="/groundup/book/transformer-architecture/">previous chapters</a> assembled a transformer
+out of attention, feed-forward blocks, normalization, and residual connections.
+What they quietly postponed is a decision every transformer-based system has to
+make before training begins: <strong>which tokens are allowed to see which other
+tokens, and what is the model asked to predict?</strong> Those two choices — the
+attention mask and the training objective — split the transformer world into
+three families. The 2017 original was an <em>encoder-decoder</em>, built for
+translation. BERT, the model that dominated 2018–2020, kept only the encoder.
+And nearly every model you interact with today — GPT-5, Claude, Gemini, Llama,
+DeepSeek — keeps only the decoder.</p>
+<p>This is worth a chapter for two reasons. First, the losing families are not
+dead: encoder-only models still run billions of times a day inside search
+engines, rerankers, and embedding pipelines, and encoder-decoders still power
+Whisper and most production translation. If you build with AI, you will touch
+all three. Second, <em>why</em> decoder-only won is one of the most instructive
+stories in the field — it is not that bidirectional attention is worse at
+understanding language (it is arguably better), but that next-token prediction
+turned out to be denser as a training signal, simpler to scale, cheaper to
+serve, and, almost by accident, a universal interface for every task.</p>
+<p>By the end of this chapter you will be able to look at any transformer’s
+attention mask and objective and predict what it will be good at, follow the
+arithmetic of why a causal model extracts roughly <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>6.7</mn><mo>×</mo></mrow><annotation encoding="application/x-tex">6.7\times</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">6.7</span><span class="mord">×</span></span></span></span> more supervised
+predictions per token of data than BERT does, and understand exactly what the
+rest of this book means when it says — as it will, from here on — “the model”
+and silently assumes decoder-only.</p>
+<h2 id="three-ways-to-wire-the-same-blocks">Three ways to wire the same blocks</h2>
+<p>All three families use the identical ingredients from
+<a href="/groundup/book/transformer-architecture/">Chapter 25</a>: embeddings in, a stack of
+attention + multi-layer perceptron (MLP) blocks, unembedding out. What differs
+is the <strong>attention mask</strong> — the pattern of which positions may attend to which
+— and, downstream of that, what objective the model can be trained on.</p>
+<figure class="fig">
+  <svg viewBox="0 0 720 320" role="img" aria-label="Attention mask patterns for encoder-only, decoder-only, and encoder-decoder transformers, shown as grids of allowed query-key pairs">
+    <text x="126" y="40" text-anchor="middle" font-family="Inter Variable, sans-serif" font-size="14" fill="currentColor">Encoder-only (BERT)</text>
+    <rect x="60" y="72" width="132" height="132" fill="#14b8a6" fill-opacity="0.4" stroke="#14b8a6" stroke-width="1"></rect>
+    <g stroke="currentColor" stroke-opacity="0.25" stroke-width="1">
+      <line x1="82" y1="72" x2="82" y2="204"></line><line x1="104" y1="72" x2="104" y2="204"></line><line x1="126" y1="72" x2="126" y2="204"></line><line x1="148" y1="72" x2="148" y2="204"></line><line x1="170" y1="72" x2="170" y2="204"></line>
+      <line x1="60" y1="94" x2="192" y2="94"></line><line x1="60" y1="116" x2="192" y2="116"></line><line x1="60" y1="138" x2="192" y2="138"></line><line x1="60" y1="160" x2="192" y2="160"></line><line x1="60" y1="182" x2="192" y2="182"></line>
+    </g>
+    <text x="126" y="228" text-anchor="middle" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.7">every token sees every token</text>
+    <text x="360" y="40" text-anchor="middle" font-family="Inter Variable, sans-serif" font-size="14" fill="currentColor">Decoder-only (GPT)</text>
+    <polygon points="294,72 316,72 316,94 338,94 338,116 360,116 360,138 382,138 382,160 404,160 404,182 426,182 426,204 294,204" fill="#818cf8" fill-opacity="0.4" stroke="#818cf8" stroke-width="1"></polygon>
+    <rect x="294" y="72" width="132" height="132" fill="none" stroke="currentColor" stroke-opacity="0.3" stroke-width="1"></rect>
+    <g stroke="currentColor" stroke-opacity="0.25" stroke-width="1">
+      <line x1="316" y1="72" x2="316" y2="204"></line><line x1="338" y1="72" x2="338" y2="204"></line><line x1="360" y1="72" x2="360" y2="204"></line><line x1="382" y1="72" x2="382" y2="204"></line><line x1="404" y1="72" x2="404" y2="204"></line>
+      <line x1="294" y1="94" x2="426" y2="94"></line><line x1="294" y1="116" x2="426" y2="116"></line><line x1="294" y1="138" x2="426" y2="138"></line><line x1="294" y1="160" x2="426" y2="160"></line><line x1="294" y1="182" x2="426" y2="182"></line>
+    </g>
+    <text x="360" y="228" text-anchor="middle" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.7">each token sees only the past</text>
+    <text x="596" y="40" text-anchor="middle" font-family="Inter Variable, sans-serif" font-size="14" fill="currentColor">Encoder-decoder (T5)</text>
+    <rect x="528" y="72" width="68" height="68" fill="#14b8a6" fill-opacity="0.4" stroke="#14b8a6" stroke-width="1"></rect>
+    <rect x="528" y="140" width="68" height="68" fill="#f59e0b" fill-opacity="0.4" stroke="#f59e0b" stroke-width="1"></rect>
+    <polygon points="596,140 613,140 613,157 630,157 630,174 647,174 647,191 664,191 664,208 596,208" fill="#818cf8" fill-opacity="0.4" stroke="#818cf8" stroke-width="1"></polygon>
+    <rect x="528" y="72" width="136" height="136" fill="none" stroke="currentColor" stroke-opacity="0.3" stroke-width="1"></rect>
+    <text x="630" y="110" text-anchor="middle" font-family="Inter Variable, sans-serif" font-size="11" fill="currentColor" opacity="0.45">blocked</text>
+    <text x="562" y="224" text-anchor="middle" font-family="Inter Variable, sans-serif" font-size="11" fill="currentColor" opacity="0.7">source</text>
+    <text x="630" y="224" text-anchor="middle" font-family="Inter Variable, sans-serif" font-size="11" fill="currentColor" opacity="0.7">target</text>
+    <text x="520" y="110" text-anchor="end" font-family="Inter Variable, sans-serif" font-size="11" fill="currentColor" opacity="0.7">source</text>
+    <text x="520" y="178" text-anchor="end" font-family="Inter Variable, sans-serif" font-size="11" fill="currentColor" opacity="0.7">target</text>
+    <rect x="60" y="256" width="14" height="14" fill="#14b8a6" fill-opacity="0.4" stroke="#14b8a6"></rect>
+    <text x="82" y="267" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor">bidirectional self-attention</text>
+    <rect x="300" y="256" width="14" height="14" fill="#818cf8" fill-opacity="0.4" stroke="#818cf8"></rect>
+    <text x="322" y="267" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor">causal self-attention</text>
+    <rect x="490" y="256" width="14" height="14" fill="#f59e0b" fill-opacity="0.4" stroke="#f59e0b"></rect>
+    <text x="512" y="267" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor">cross-attention</text>
+    <text x="360" y="300" text-anchor="middle" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.6">rows = the token doing the attending  ·  columns = the token being attended to</text>
+  </svg>
+  <figcaption><strong>Figure:</strong> the three families as attention masks. Encoder-only: a full square — every position attends to every position. Decoder-only: a lower triangle — position <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>t</mi></mrow><annotation encoding="application/x-tex">t</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6151em;"></span><span class="mord mathnormal">t</span></span></span></span> attends only to positions <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mo>…</mo><mi>t</mi></mrow><annotation encoding="application/x-tex">1 \dots t</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner">…</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">t</span></span></span></span>. Encoder-decoder: a full square over the source, a causal triangle over the target, plus a cross-attention rectangle letting every target token see the entire source; the source never sees the target.</figcaption>
+</figure>
+<aside class="box box-intuition" data-box="intuition"><div class="box-title"><span class="box-icon" aria-hidden="true">💡</span>Intuition</div><p>Think of the mask as a policy about <em>cheating</em>. An encoder is allowed to look
+at the whole sentence at once, so you can never ask it to predict the next word
+— it has already read it. Instead you must damage the input (hide words) and
+ask it to repair the damage. A decoder is forbidden from looking ahead, so you
+<em>can</em> ask it to predict every next word, honestly, at every position
+simultaneously during training. Almost everything else in this chapter —
+what each family is good at, what it costs to train, why one won — falls out
+of this single difference.</p></aside>
+<p>Each mask pairs naturally with an objective:</p>
+<ul>
+<li><strong>Encoder-only</strong> → <em>masked language modeling</em> (MLM): hide some tokens,
+predict them from both sides.</li>
+<li><strong>Decoder-only</strong> → <em>causal language modeling</em> (CLM): predict token <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>t</mi><mo lspace="0em" rspace="0em">+</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">t{+}1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">t</span><span class="mord"><span class="mord">+</span></span><span class="mord">1</span></span></span></span>
+from tokens <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mo>…</mo><mi>t</mi></mrow><annotation encoding="application/x-tex">1 \dots t</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner">…</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">t</span></span></span></span>, at every position. This is exactly the
+chain-rule factorization of sequence probability from
+<a href="/groundup/book/what-is-a-language-model/">Chapter 18</a>.</li>
+<li><strong>Encoder-decoder</strong> → <em>sequence-to-sequence</em> objectives: read a full input
+bidirectionally, generate an output causally, with
+<a href="/groundup/book/seq2seq-and-attention/">cross-attention</a> as the bridge.</li>
+</ul>
+<p>There is also a fourth pattern, the <strong>prefix language model</strong> (prefix-LM),
+which splits a single stack down the middle: bidirectional attention over a
+prefix, causal generation after it. We will come back to it — it is the
+mask that quietly runs inside many multimodal models today.</p>
+<h2 id="encoder-only-bert-and-the-art-of-filling-in-blanks">Encoder-only: BERT and the art of filling in blanks</h2>
+<p>BERT — Bidirectional Encoder Representations from Transformers,
+<a href="https://arxiv.org/abs/1810.04805">Devlin et al., 2018</a> — took the encoder half
+of the original transformer and asked a question with a frustrating circularity
+to it: language modeling means predicting words, but if every token can attend
+to every other token, the model can see the answer. Predicting the next word is
+off the table. BERT’s solution was to corrupt the input and train the model to
+undo the corruption.</p>
+<aside class="box box-math" data-box="math"><div class="box-title"><span class="box-icon" aria-hidden="true">∑</span>The math</div><p>Given a token sequence <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi><mo>=</mo><mo stretchy="false">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>x</mi><mi>T</mi></msub><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">x = (x_1, \dots, x_T)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner">…</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.1389em;">T</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span>, choose a random subset
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi><mo>⊂</mo><mo stretchy="false">{</mo><mn>1</mn><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><mi>T</mi><mo stretchy="false">}</mo></mrow><annotation encoding="application/x-tex">M \subset \{1, \dots, T\}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7224em;vertical-align:-0.0391em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⊂</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">{</span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner">…</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mclose">}</span></span></span></span> of positions (about 15% of them) and build a
+corrupted sequence <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>x</mi><mo>~</mo></mover></mrow><annotation encoding="application/x-tex">\tilde{x}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6679em;"></span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6679em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">x</span></span><span style="top:-3.35em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2222em;"><span class="mord">~</span></span></span></span></span></span></span></span></span></span> by replacing the chosen tokens. The masked
+language modeling loss is the average cross-entropy (from
+<a href="/groundup/book/loss-functions/">Chapter 9</a>) over <em>only the chosen positions</em>:</p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi mathvariant="script">L</mi><mtext>MLM</mtext></msub><mtext>  </mtext><mo>=</mo><mtext>  </mtext><mo>−</mo><mfrac><mn>1</mn><mrow><mi mathvariant="normal">∣</mi><mi>M</mi><mi mathvariant="normal">∣</mi></mrow></mfrac><munder><mo>∑</mo><mrow><mi>i</mi><mo>∈</mo><mi>M</mi></mrow></munder><mi>log</mi><mo>⁡</mo><msub><mi>p</mi><mi>θ</mi></msub><mtext> ⁣</mtext><mrow><mo fence="true">(</mo><msub><mi>x</mi><mi>i</mi></msub><mo>∣</mo><mover accent="true"><mi>x</mi><mo>~</mo></mover><mo fence="true">)</mo></mrow><mo separator="true">,</mo></mrow><annotation encoding="application/x-tex">\mathcal{L}_{\text{MLM}} \;=\; -\frac{1}{|M|} \sum_{i \in M} \log p_\theta\!\left(x_i \mid \tilde{x}\right),</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathcal">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">MLM</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.6431em;vertical-align:-1.3217em;"></span><span class="mord">−</span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">∣</span><span class="mord mathnormal" style="margin-right:0.109em;">M</span><span class="mord">∣</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.936em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.05em;"><span style="top:-1.8557em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mrel mtight">∈</span><span class="mord mathnormal mtight" style="margin-right:0.109em;">M</span></span></span></span><span style="top:-3.05em;"><span class="pstrut" style="height:3.05em;"></span><span><span class="mop op-symbol large-op">∑</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.3217em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0278em;">θ</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:-0.1667em;"></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;">(</span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∣</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6679em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">x</span></span><span style="top:-3.35em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2222em;"><span class="mord">~</span></span></span></span></span></span></span><span class="mclose delimcenter" style="top:0em;">)</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mpunct">,</span></span></span></span></span><p>where <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>p</mi><mi>θ</mi></msub><mo stretchy="false">(</mo><msub><mi>x</mi><mi>i</mi></msub><mo>∣</mo><mover accent="true"><mi>x</mi><mo>~</mo></mover><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">p_\theta(x_i \mid \tilde{x})</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0278em;">θ</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∣</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6679em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">x</span></span><span style="top:-3.35em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2222em;"><span class="mord">~</span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span> is the model’s softmax distribution over
+the vocabulary at position <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi></mrow><annotation encoding="application/x-tex">i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6595em;"></span><span class="mord mathnormal">i</span></span></span></span>, computed with full bidirectional attention over
+the corrupted sequence, and <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>θ</mi></mrow><annotation encoding="application/x-tex">\theta</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">θ</span></span></span></span> is the model’s parameters. Note what is
+<em>not</em> here: no ordering, no chain rule, no probability assigned to the whole
+sequence — each masked position is predicted independently given the same
+corrupted context.</p></aside>
+<p>The corruption itself uses BERT’s famous <strong>15% / 80-10-10 recipe</strong>. Fifteen
+percent of token positions are selected for prediction. Of those selected
+positions: 80% are replaced by a special <code>[MASK]</code> token, 10% are replaced by a
+<em>random</em> vocabulary token, and 10% are left unchanged. The loss is computed at
+all selected positions, whatever happened to them.</p>
+<p>Why the 10/10 complications? Because <code>[MASK]</code> is an artificial token that will
+never appear when the trained model is used on real text. If the model only
+ever made predictions at <code>[MASK]</code> positions, it could learn to do serious work
+only there and treat every real token as trustworthy. The 10% random
+replacement teaches it that any token might be wrong, so it must read
+context everywhere; the 10% unchanged slice teaches it that a token might also
+be <em>right</em>, keeping its per-token representations honest.</p>
+<figure class="fig">
+  <svg viewBox="0 0 720 260" role="img" aria-label="A nine-token sentence corrupted by BERT-style masking: one token kept, one replaced by MASK, one swapped for a random token, with loss computed at all three">
+    <defs>
+      <marker id="arr-mlm" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+        <path d="M1,1 L6,4 L1,7" fill="none" stroke="currentColor" stroke-width="1.4"></path>
+      </marker>
+    </defs>
+    <text x="48" y="54" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.6">original</text>
+    <g font-family="Inter Variable, sans-serif" font-size="13" text-anchor="middle">
+      <rect x="48" y="64" width="64" height="30" rx="4" fill="none" stroke="currentColor" stroke-opacity="0.35"></rect><text x="80" y="84" fill="currentColor">the</text>
+      <rect x="118" y="64" width="64" height="30" rx="4" fill="#14b8a6" fill-opacity="0.15" stroke="#14b8a6"></rect><text x="150" y="84" fill="currentColor">film</text>
+      <rect x="188" y="64" width="64" height="30" rx="4" fill="none" stroke="currentColor" stroke-opacity="0.35"></rect><text x="220" y="84" fill="currentColor">was</text>
+      <rect x="258" y="64" width="64" height="30" rx="4" fill="none" stroke="currentColor" stroke-opacity="0.35"></rect><text x="290" y="84" fill="currentColor">utterly</text>
+      <rect x="328" y="64" width="64" height="30" rx="4" fill="#f59e0b" fill-opacity="0.15" stroke="#f59e0b"></rect><text x="360" y="84" fill="currentColor">gripping</text>
+      <rect x="398" y="64" width="64" height="30" rx="4" fill="none" stroke="currentColor" stroke-opacity="0.35"></rect><text x="430" y="84" fill="currentColor">and</text>
+      <rect x="468" y="64" width="64" height="30" rx="4" fill="none" stroke="currentColor" stroke-opacity="0.35"></rect><text x="500" y="84" fill="currentColor">the</text>
+      <rect x="538" y="64" width="64" height="30" rx="4" fill="#fb7185" fill-opacity="0.15" stroke="#fb7185"></rect><text x="570" y="84" fill="currentColor">cast</text>
+      <rect x="608" y="64" width="64" height="30" rx="4" fill="none" stroke="currentColor" stroke-opacity="0.35"></rect><text x="640" y="84" fill="currentColor">shone</text>
+    </g>
+    <g stroke="currentColor" stroke-opacity="0.5" stroke-width="1.3">
+      <line x1="150" y1="98" x2="150" y2="146" marker-end="url(#arr-mlm)"></line>
+      <line x1="360" y1="98" x2="360" y2="146" marker-end="url(#arr-mlm)"></line>
+      <line x1="570" y1="98" x2="570" y2="146" marker-end="url(#arr-mlm)"></line>
+    </g>
+    <g font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.75">
+      <text x="158" y="126">kept unchanged (10%)</text>
+      <text x="368" y="126">replaced with [MASK] (80%)</text>
+      <text x="578" y="126">random token (10%)</text>
+    </g>
+    <text x="48" y="145" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.6">corrupted</text>
+    <g font-family="Inter Variable, sans-serif" font-size="13" text-anchor="middle">
+      <rect x="48" y="152" width="64" height="30" rx="4" fill="none" stroke="currentColor" stroke-opacity="0.35"></rect><text x="80" y="172" fill="currentColor">the</text>
+      <rect x="118" y="152" width="64" height="30" rx="4" fill="#14b8a6" fill-opacity="0.15" stroke="#14b8a6"></rect><text x="150" y="172" fill="currentColor">film</text>
+      <rect x="188" y="152" width="64" height="30" rx="4" fill="none" stroke="currentColor" stroke-opacity="0.35"></rect><text x="220" y="172" fill="currentColor">was</text>
+      <rect x="258" y="152" width="64" height="30" rx="4" fill="none" stroke="currentColor" stroke-opacity="0.35"></rect><text x="290" y="172" fill="currentColor">utterly</text>
+      <rect x="328" y="152" width="64" height="30" rx="4" fill="#f59e0b" fill-opacity="0.15" stroke="#f59e0b"></rect><text x="360" y="172" fill="currentColor">[MASK]</text>
+      <rect x="398" y="152" width="64" height="30" rx="4" fill="none" stroke="currentColor" stroke-opacity="0.35"></rect><text x="430" y="172" fill="currentColor">and</text>
+      <rect x="468" y="152" width="64" height="30" rx="4" fill="none" stroke="currentColor" stroke-opacity="0.35"></rect><text x="500" y="172" fill="currentColor">the</text>
+      <rect x="538" y="152" width="64" height="30" rx="4" fill="#fb7185" fill-opacity="0.15" stroke="#fb7185"></rect><text x="570" y="172" fill="currentColor">banana</text>
+      <rect x="608" y="152" width="64" height="30" rx="4" fill="none" stroke="currentColor" stroke-opacity="0.35"></rect><text x="640" y="172" fill="currentColor">shone</text>
+    </g>
+    <g font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" text-anchor="middle" opacity="0.85">
+      <text x="150" y="206">predict “film”</text>
+      <text x="360" y="206">predict “gripping”</text>
+      <text x="570" y="206">predict “cast”</text>
+    </g>
+    <text x="360" y="238" text-anchor="middle" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.6">loss at the 3 selected positions only — the other 6 supply context but no loss</text>
+  </svg>
+  <figcaption><strong>Figure:</strong> BERT-style corruption on a nine-token sequence. Three positions are selected (a 33% rate here so the picture is readable; the real recipe selects 15%): one becomes <code>[MASK]</code>, one becomes a random token, one is left alone. The model must recover the original token at all three, using context from both directions.</figcaption>
+</figure>
+<aside class="box box-example" data-box="example"><div class="box-title"><span class="box-icon" aria-hidden="true">✏️</span>Worked example</div><p>Run the recipe on a full BERT training sequence of 512 tokens.
+Selected positions: <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0.15</mn><mo>×</mo><mn>512</mn><mo>=</mo><mn>76.8</mn><mo>≈</mo><mn>77</mn></mrow><annotation encoding="application/x-tex">0.15 \times 512 = 76.8 \approx 77</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">0.15</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">512</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">76.8</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">77</span></span></span></span>. Of those:
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0.8</mn><mo>×</mo><mn>77</mn><mo>≈</mo><mn>61</mn></mrow><annotation encoding="application/x-tex">0.8 \times 77 \approx 61</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">0.8</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">77</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">61</span></span></span></span> become <code>[MASK]</code>, <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0.1</mn><mo>×</mo><mn>77</mn><mo>≈</mo><mn>8</mn></mrow><annotation encoding="application/x-tex">0.1 \times 77 \approx 8</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">0.1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">77</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">8</span></span></span></span> become a
+random vocabulary token, and <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>≈</mo><mn>8</mn></mrow><annotation encoding="application/x-tex">\approx 8</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4831em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">8</span></span></span></span> stay unchanged. The model produces a
+vocabulary distribution at all 512 positions, but cross-entropy is computed at
+only those 77 — the other 435 positions supply context but contribute no
+loss terms of their own. Hold onto that number; it is the hinge of this chapter.</p></aside>
+<p>BERT also trained a second task, <em>next sentence prediction</em> (classifying
+whether two segments were adjacent in the source text), but
+<a href="https://arxiv.org/abs/1907.11692">RoBERTa</a> showed a year later that dropping
+it and training longer on more data worked better — the MLM objective was
+doing nearly all the work.</p>
+<aside class="box box-history" data-box="history"><div class="box-title"><span class="box-icon" aria-hidden="true">🕰</span>History</div><p>BERT did not appear from nowhere. <a href="https://arxiv.org/abs/1802.05365">ELMo</a>
+(early 2018) had shown that pretraining bidirectional long short-term memory (LSTM) language models and
+reusing their internal states boosted many tasks, and OpenAI’s GPT-1 (mid-2018)
+had shown the same with a causal transformer. BERT combined the two insights —
+transformer + bidirectionality — and the effect was seismic: it swept the GLUE (General Language
+Understanding Evaluation) benchmark suite, and within a year “download a
+pretrained BERT and fine-tune it” replaced “design a task-specific
+architecture” as the default methodology of natural language processing (NLP). BERT-base had 110M parameters, BERT-large 340M,
+trained on roughly 3.3 billion words of books and Wikipedia — adorable numbers
+by current standards, and a useful reminder that the pretrain-then-adapt
+paradigm was proven at small scale before anyone scaled it.</p></aside>
+<h3 id="what-encoders-are-for--and-what-they-cannot-do">What encoders are for — and what they cannot do</h3>
+<p>A bidirectional encoder produces, for each input token, a vector summarizing
+that token <em>in the context of the entire input</em> — past and future. That is the
+ideal shape for tasks where the whole text exists up front and you want to
+<strong>understand</strong> rather than continue it:</p>
+<ul>
+<li><strong>Classification</strong>: sentiment, topic, toxicity, intent — read the whole
+thing, output a label.</li>
+<li><strong>Token-level labeling</strong>: named-entity recognition, extracting spans.</li>
+<li><strong>Embeddings</strong>: pool the token vectors into one vector per text, and you get
+the semantic-search representations of <a href="/groundup/book/embeddings/">Chapter 20</a> —
+the retrieval half of every
+<a href="/groundup/book/retrieval-augmented-generation/">retrieval-augmented generation</a>
+system.</li>
+<li><strong>Reranking</strong>: feed a query and a candidate document <em>together</em> through the
+encoder (a “cross-encoder”) so attention can compare them word by word, and
+output a relevance score. This remains one of the highest-value uses of
+encoders in 2026.</li>
+</ul>
+<p>What an encoder cannot do natively is <strong>generate</strong>.</p>
+<aside class="box box-warning" data-box="warning"><div class="box-title"><span class="box-icon" aria-hidden="true">⚠️</span>Careful</div><p>“Why can’t BERT write?” is worth answering precisely, because the reason is
+structural, not a matter of scale. Generation requires a way to assign
+probability to a <em>whole sequence</em> and extend it one piece at a time — the
+chain-rule factorization <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><msub><mo>∏</mo><mi>t</mi></msub><mi>p</mi><mo stretchy="false">(</mo><msub><mi>x</mi><mi>t</mi></msub><mo>∣</mo><msub><mi>x</mi><mrow><mo>&#x3C;</mo><mi>t</mi></mrow></msub><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">p(x) = \prod_t p(x_t \mid x_{\lt t})</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.0497em;vertical-align:-0.2997em;"></span><span class="mop"><span class="mop op-symbol small-op" style="position:relative;top:0em;">∏</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1308em;"><span style="top:-2.4003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2997em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∣</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mrel mtight">&#x3C;</span><span class="mord mathnormal mtight">t</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1774em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span> from
+<a href="/groundup/book/what-is-a-language-model/">Chapter 18</a>. MLM never learns that
+factorization. It learns isolated conditionals “token given both sides,” and if
+you mask several positions it predicts them <em>independently</em>, which is wrong
+whenever the answers need to agree with each other (mask two tokens of “New
+York City” and the independent guesses may be “Mexico” and “Jersey”). You can
+force generation out of a masked model by unmasking one token at a time and
+re-running the encoder — but that costs a full forward pass per token with no
+<a href="/groundup/book/kv-cache-and-efficient-attention/">key-value (KV) cache</a> to reuse, and the results
+were never competitive. BERT is a reader, not a writer, by construction.</p></aside>
+<aside class="box box-note" data-box="note"><div class="box-title"><span class="box-icon" aria-hidden="true">✎</span>Note</div><p>One honest wrinkle from the frontier: the idea of <em>generating by iterative
+unmasking</em> has returned in modern form as <strong>text diffusion models</strong> — LLaDA,
+Inception Labs’ Mercury, and Google DeepMind’s experimental Gemini Diffusion
+(2025) generate whole blocks in parallel through repeated denoising steps,
+trading the left-to-right bottleneck for parallelism. As of 2026 these are a
+promising minority approach, not the mainstream — but they show the MLM-style
+objective was never inherently a dead end for generation, merely uncompetitive
+in its 2019 form. More in the <a href="/groundup/book/diffusion-models/">diffusion chapter</a>.</p></aside>
+<aside class="box box-practice" data-box="practice"><div class="box-title"><span class="box-icon" aria-hidden="true">⚙️</span>In practice</div><p>The encoder family’s 2024–2026 descendants are thriving in exactly the niches
+above. <a href="https://arxiv.org/abs/2412.13663">ModernBERT</a> (Answer.AI/LightOn,
+December 2024) rebuilt BERT with everything this book’s Part IV covers — rotary (RoPE)
+<a href="/groundup/book/positional-encodings/">positional encodings</a>, gated activations,
+alternating global/local attention, an 8,192-token context, ~2T training
+tokens — at roughly 150M/400M parameters, and became a standard backbone for
+retrieval and classification where a 7B decoder would be absurd overkill.
+Embedding and reranker families (BGE, GTE, E5, Cohere and Voyage rerankers)
+still lean heavily on encoders, though the largest embedding models are now
+often adapted <em>decoders</em> (E5-Mistral, NV-Embed, Qwen3-Embedding) — even in
+BERT’s home territory, decoder-only checkpoints are encroaching because that is
+where the pretraining compute went. The practical rule in 2026: encoders where
+latency and cost dominate (running a reranker over 100 candidate documents per
+query), big decoders where quality dominates.</p></aside>
+<h2 id="encoder-decoder-the-original-recipe-and-where-it-survives">Encoder-decoder: the original recipe, and where it survives</h2>
+<p>The <a href="https://arxiv.org/abs/1706.03762">2017 transformer</a> was an
+encoder-decoder because machine translation demanded it: read a German
+sentence completely (encoder, bidirectional — word order differs across
+languages, so you want the whole source before committing to anything), then
+write English one token at a time (decoder, causal), consulting the source at
+every step through <strong>cross-attention</strong> — the decoder supplies queries, the
+encoder’s output supplies keys and values, exactly as covered in
+<a href="/groundup/book/seq2seq-and-attention/">Chapter 22</a> and
+<a href="/groundup/book/transformer-architecture/">Chapter 25</a>. The third panel of the mask
+figure above is this architecture as one picture: bidirectional square, causal
+triangle, cross-attention rectangle, and a blocked corner (the source is
+encoded once and never sees the target).</p>
+<p>The definitive study of this family is
+<a href="https://arxiv.org/abs/1910.10683">T5</a> (“Text-to-Text Transfer Transformer,”
+Raffel et al., 2019), which contributed two things. First, a unifying framing:
+<em>every</em> NLP task can be cast as text in → text out. Translation:
+<code>translate English to German: ...</code>. Classification: input the review, output
+the literal word <code>positive</code>. Summarization, question answering, even
+regression rendered as digits — one model, one interface, no task-specific
+heads. This framing looks obvious now precisely because it won; in 2019 it was
+a genuine reorganization of the field, and today’s “everything is a prompt”
+world is its direct descendant. Second, a massive controlled ablation of
+architectures and objectives, which landed on <strong>span corruption</strong> — an
+MLM-cousin where contiguous spans (average length 3, 15% of tokens) are each
+replaced by a single sentinel token, and the decoder learns to emit the missing
+spans in order. T5 scaled to 11B parameters and, with instruction-tuned
+descendants like Flan-T5, remained a workhorse for years.</p>
+<p>Where does encoder-decoder survive in 2026? Precisely where its shape matches
+the task — a complete, fixed input that deserves bidirectional reading, and an
+output in a different “language”:</p>
+<ul>
+<li><strong>Translation.</strong> Meta’s NLLB-200 and most production translation systems
+remain encoder-decoders; the task is the architecture’s home turf.</li>
+<li><strong>Speech.</strong> OpenAI’s <a href="https://arxiv.org/abs/2212.04356">Whisper</a> encodes
+audio spectrogram frames bidirectionally and decodes text causally — very
+likely the encoder-decoder you use most often without knowing it.</li>
+<li><strong>Multimodal bridges.</strong> Several vision-language designs graft a modality
+encoder onto a text decoder through cross-attention (Flamingo is the classic
+example), which is an encoder-decoder pattern even when the text side is
+described as decoder-only. The competing (and currently more common) design
+concatenates vision tokens directly into the decoder’s sequence — that is
+the prefix-LM pattern below.</li>
+</ul>
+<aside class="box box-note" data-box="note"><div class="box-title"><span class="box-icon" aria-hidden="true">✎</span>Note</div><p>You will occasionally see claims that particular frontier systems are secretly
+hybrids — Gemini in particular attracted rumors of encoder-decoder ancestry,
+plausible-sounding given Google’s T5 and PaLM lineage. Google’s published
+Gemini reports describe transformer <em>decoders</em> (with mixture-of-experts
+sparsity in some versions), and the rumors remain unconfirmed. Treat
+architecture claims about closed models with care throughout this book: labs
+disclose little, and “it’s a transformer decoder” is often the entirety of the
+public record.</p></aside>
+<h2 id="decoder-only-why-it-won">Decoder-only: why it won</h2>
+<p>A decoder-only model is the smallest possible answer to “how do I train a
+transformer on raw text”: one stack, a causal mask, and the objective from
+<a href="/groundup/book/what-is-a-language-model/">Chapter 18</a> —</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi mathvariant="script">L</mi><mtext>CLM</mtext></msub><mtext>  </mtext><mo>=</mo><mtext>  </mtext><mo>−</mo><mfrac><mn>1</mn><mi>T</mi></mfrac><munderover><mo>∑</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi>T</mi></munderover><mi>log</mi><mo>⁡</mo><msub><mi>p</mi><mi>θ</mi></msub><mtext> ⁣</mtext><mrow><mo fence="true">(</mo><msub><mi>x</mi><mi>t</mi></msub><mo>∣</mo><msub><mi>x</mi><mn>1</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>x</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub><mo fence="true">)</mo></mrow><mo separator="true">,</mo></mrow><annotation encoding="application/x-tex">\mathcal{L}_{\text{CLM}} \;=\; -\frac{1}{T}\sum_{t=1}^{T} \log p_\theta\!\left(x_t \mid x_1, \dots, x_{t-1}\right),</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathcal">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">CLM</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:3.0954em;vertical-align:-1.2671em;"></span><span class="mord">−</span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.8283em;"><span style="top:-1.8829em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">t</span><span class="mrel mtight">=</span><span class="mord mtight">1</span></span></span></span><span style="top:-3.05em;"><span class="pstrut" style="height:3.05em;"></span><span><span class="mop op-symbol large-op">∑</span></span></span><span style="top:-4.3em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.1389em;">T</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.2671em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0278em;">θ</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:-0.1667em;"></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;">(</span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∣</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner">…</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">t</span><span class="mbin mtight">−</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2083em;"><span></span></span></span></span></span></span><span class="mclose delimcenter" style="top:0em;">)</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mpunct">,</span></span></span></span></span>
+<p>next-token prediction at every position. GPT-1 committed to this shape in 2018
+and was promptly outshone by BERT on understanding benchmarks; GPT-2 (2019)
+and <a href="https://arxiv.org/abs/2005.14165">GPT-3</a> (2020) kept committing, scaled
+it, and by 2021 the argument was over. Six reasons, roughly in order of
+importance:</p>
+<p><strong>1. Objective density: every token supervises.</strong> The causal mask makes the
+model’s prediction at position <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>t</mi></mrow><annotation encoding="application/x-tex">t</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6151em;"></span><span class="mord mathnormal">t</span></span></span></span> honest — it cannot see <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mi>t</mi></msub></mrow><annotation encoding="application/x-tex">x_t</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> — so a single
+forward pass over a <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">T</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span></span></span></span>-token sequence yields <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">T</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span></span></span></span> genuine prediction problems
+and <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">T</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span></span></span></span> cross-entropy terms, each contributing gradient. MLM yields <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0.15</mn><mtext> </mtext><mi>T</mi></mrow><annotation encoding="application/x-tex">0.15\,T</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord">0.15</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span></span></span></span>.
+Per token of data ingested, the causal objective extracts about
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mi mathvariant="normal">/</mi><mn>0.15</mn><mo>≈</mo><mn>6.7</mn><mo>×</mo></mrow><annotation encoding="application/x-tex">1/0.15 \approx 6.7\times</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1/0.15</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">6.7</span><span class="mord">×</span></span></span></span> more supervised predictions.</p>
+<figure class="fig">
+  <svg viewBox="0 0 720 300" role="img" aria-label="Objective density comparison: causal LM computes a loss at all 16 positions, masked LM at about 2 of 16, prefix-LM at the 8 suffix positions">
+    <text x="150" y="44" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor">Causal LM (GPT): loss at every position</text>
+    <g>
+      <rect x="150" y="56" width="480" height="34" fill="#14b8a6" fill-opacity="0.45" stroke="#14b8a6"></rect>
+      <g stroke="currentColor" stroke-opacity="0.25"><line x1="180" y1="56" x2="180" y2="90"></line><line x1="210" y1="56" x2="210" y2="90"></line><line x1="240" y1="56" x2="240" y2="90"></line><line x1="270" y1="56" x2="270" y2="90"></line><line x1="300" y1="56" x2="300" y2="90"></line><line x1="330" y1="56" x2="330" y2="90"></line><line x1="360" y1="56" x2="360" y2="90"></line><line x1="390" y1="56" x2="390" y2="90"></line><line x1="420" y1="56" x2="420" y2="90"></line><line x1="450" y1="56" x2="450" y2="90"></line><line x1="480" y1="56" x2="480" y2="90"></line><line x1="510" y1="56" x2="510" y2="90"></line><line x1="540" y1="56" x2="540" y2="90"></line><line x1="570" y1="56" x2="570" y2="90"></line><line x1="600" y1="56" x2="600" y2="90"></line></g>
+      <text x="644" y="78" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor">16 / 16</text>
+    </g>
+    <text x="150" y="114" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor">Masked LM (BERT): loss at ~15% of positions</text>
+    <g>
+      <rect x="150" y="126" width="480" height="34" fill="none" stroke="currentColor" stroke-opacity="0.35"></rect>
+      <rect x="270" y="126" width="30" height="34" fill="#f59e0b" fill-opacity="0.5" stroke="#f59e0b"></rect>
+      <rect x="480" y="126" width="30" height="34" fill="#f59e0b" fill-opacity="0.5" stroke="#f59e0b"></rect>
+      <g stroke="currentColor" stroke-opacity="0.25"><line x1="180" y1="126" x2="180" y2="160"></line><line x1="210" y1="126" x2="210" y2="160"></line><line x1="240" y1="126" x2="240" y2="160"></line><line x1="270" y1="126" x2="270" y2="160"></line><line x1="300" y1="126" x2="300" y2="160"></line><line x1="330" y1="126" x2="330" y2="160"></line><line x1="360" y1="126" x2="360" y2="160"></line><line x1="390" y1="126" x2="390" y2="160"></line><line x1="420" y1="126" x2="420" y2="160"></line><line x1="450" y1="126" x2="450" y2="160"></line><line x1="480" y1="126" x2="480" y2="160"></line><line x1="510" y1="126" x2="510" y2="160"></line><line x1="540" y1="126" x2="540" y2="160"></line><line x1="570" y1="126" x2="570" y2="160"></line><line x1="600" y1="126" x2="600" y2="160"></line></g>
+      <text x="644" y="148" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor">≈2 / 16</text>
+    </g>
+    <text x="150" y="184" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor">Prefix-LM: loss on the continuation only</text>
+    <g>
+      <rect x="150" y="196" width="240" height="34" fill="#38bdf8" fill-opacity="0.12" stroke="currentColor" stroke-opacity="0.35"></rect>
+      <rect x="390" y="196" width="240" height="34" fill="#818cf8" fill-opacity="0.45" stroke="#818cf8"></rect>
+      <g stroke="currentColor" stroke-opacity="0.25"><line x1="180" y1="196" x2="180" y2="230"></line><line x1="210" y1="196" x2="210" y2="230"></line><line x1="240" y1="196" x2="240" y2="230"></line><line x1="270" y1="196" x2="270" y2="230"></line><line x1="300" y1="196" x2="300" y2="230"></line><line x1="330" y1="196" x2="330" y2="230"></line><line x1="360" y1="196" x2="360" y2="230"></line><line x1="420" y1="196" x2="420" y2="230"></line><line x1="450" y1="196" x2="450" y2="230"></line><line x1="480" y1="196" x2="480" y2="230"></line><line x1="510" y1="196" x2="510" y2="230"></line><line x1="540" y1="196" x2="540" y2="230"></line><line x1="570" y1="196" x2="570" y2="230"></line><line x1="600" y1="196" x2="600" y2="230"></line></g>
+      <text x="644" y="218" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor">8 / 16</text>
+      <text x="270" y="248" text-anchor="middle" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.6">prefix (bidirectional, no loss)</text>
+      <text x="510" y="248" text-anchor="middle" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.6">continuation (causal, loss)</text>
+    </g>
+    <text x="360" y="284" text-anchor="middle" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.75">Per 1,024-token document: 1,024 vs ≈154 vs ≈512 supervised predictions</text>
+  </svg>
+  <figcaption><strong>Figure:</strong> objective density on a 16-token sequence. A filled cell means a loss term is computed at that position. The causal objective supervises every position; masked language modeling supervises the ~15% it corrupted; a prefix-LM supervises only the continuation.</figcaption>
+</figure>
+<aside class="box box-example" data-box="example"><div class="box-title"><span class="box-icon" aria-hidden="true">✏️</span>Worked example</div><p>Concretely: a training run that streams 1 billion tokens through a causal model
+produces <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>≈</mo><msup><mn>10</mn><mn>9</mn></msup></mrow><annotation encoding="application/x-tex">\approx 10^9</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4831em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">9</span></span></span></span></span></span></span></span></span></span></span> supervised next-token predictions. The same billion
+tokens through BERT-style MLM produce <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>≈</mo><mn>1.5</mn><mo>×</mo><msup><mn>10</mn><mn>8</mn></msup></mrow><annotation encoding="application/x-tex">\approx 1.5 \times 10^8</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4831em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1.5</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">8</span></span></span></span></span></span></span></span></span></span></span>. To match the
+causal model’s count of prediction problems, the masked model must make
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>≈</mo><mn>6.7</mn></mrow><annotation encoding="application/x-tex">\approx 6.7</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4831em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">6.7</span></span></span></span> epochs over the data — paying full attention-and-MLP compute on
+every pass, including at the ~85% of positions that generate no gradient. This
+is not a decisive argument by itself (each MLM prediction sees richer,
+two-sided context, and empirically BERT was <em>more</em> sample-efficient than GPT-1
+on understanding tasks at 2018 scale) — but when the bottleneck became “how
+much signal per dollar of compute at trillion-token scale,” density started to
+matter enormously.</p></aside>
+<p><strong>2. Architectural simplicity.</strong> One stack, one mask, no cross-attention, no
+encoder-decoder length bookkeeping, no decisions about how to split parameters
+between two towers. Every engineering effort in
+<a href="/groundup/book/compute-and-parallelism/">Part V</a> — parallelism schemes, fused kernels,
+<a href="/groundup/book/scaling-laws/">scaling-law</a> sweeps — gets cheaper and less error-prone
+when there is exactly one block type repeated <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi></mrow><annotation encoding="application/x-tex">N</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">N</span></span></span></span> times. Simplicity compounds:
+the whole ecosystem’s tooling optimized one shape.</p>
+<p><strong>3. Clean scaling.</strong> The scaling-law literature — Kaplan et al., Chinchilla —
+was measured on decoder-only models, giving that family a trustworthy compute
+→ loss → capability map that made $100M training runs plannable. Nobody built
+an equally confident map for the other families, partly cause, partly effect.</p>
+<p><strong>4. In-context learning fell out for free.</strong> GPT-3’s headline result was that
+a large causal model, shown a few examples <em>inside its prompt</em>, performs the
+task on the next example — no gradient updates. In hindsight the training
+objective makes this less magical: predicting token <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>t</mi><mo lspace="0em" rspace="0em">+</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">t{+}1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">t</span><span class="mord"><span class="mord">+</span></span><span class="mord">1</span></span></span></span> on internet text
+constantly requires inferring “what pattern is this document following?” and
+continuing it. Few-shot prompting is that same skill, invoked deliberately. An
+MLM is never trained to continue a pattern, and fine-tuned-BERT had no
+comparable trick. In-context learning turned one frozen model into a universal
+tool — arguably <em>the</em> commercial unlock for the entire field.</p>
+<p><strong>5. Serving economics.</strong> Causal attention means each new token’s
+representation depends only on earlier tokens, so generation can reuse all
+previous keys and values — the <a href="/groundup/book/kv-cache-and-efficient-attention/">KV cache</a>
+of the next chapter — paying one incremental forward pass per token. A
+bidirectional model would need to recompute everything at every step. And
+because one decoder handles every task, providers can batch thousands of
+heterogeneous requests through a single deployed model, which is the economic
+foundation of the API era.</p>
+<p><strong>6. Every task is a continuation.</strong> T5 needed a text-to-text <em>framing</em>;
+a decoder gets it for free. Question answering is continuing “Q: … A:”.
+Chat is continuing a transcript. Instruction-following, after the
+<a href="/groundup/book/sft-and-rlhf/">post-training</a> of Part V, is continuing a conversation
+in which one participant happens to be the model. No heads, no task formats,
+no per-task checkpoints.</p>
+<aside class="box box-note" data-box="note"><div class="box-title"><span class="box-icon" aria-hidden="true">✎</span>Note</div><p>The careful controlled comparison —
+<a href="https://arxiv.org/abs/2204.05832">Wang et al., 2022</a>, “What Language Model
+Architecture and Pretraining Objective Work Best for Zero-Shot
+Generalization?” — is worth reading for its honesty. With pure self-supervised
+pretraining, the causal decoder was the clear zero-shot winner, but after
+multitask instruction finetuning, an encoder-decoder trained with masked-style
+objectives won their benchmarks. The field went decoder-only anyway: scale,
+in-context learning, serving economics, and ecosystem gravity outweighed a
+benchmark edge that itself faded as instruction tuning was applied to ever
+larger decoders. Architecture “winners” are decided by the whole system —
+training cost, inference cost, tooling, flexibility — not by accuracy tables
+alone.</p></aside>
+<h2 id="prefix-lm-the-middle-ground">Prefix-LM: the middle ground</h2>
+<p>Between “everything bidirectional” and “everything causal” sits a compromise
+so natural you may have already invented it while reading: when a task has a
+given input and a generated output but you want only one stack, let attention
+be <strong>bidirectional within the input</strong> (“prefix”) and <strong>causal after it</strong>, and
+compute the loss only on the continuation. The mask is the decoder triangle
+with its top-left corner filled into a square. That is a prefix language
+model.</p>
+<p>The idea threads through the PaLM-era literature: UniLM
+(<a href="https://arxiv.org/abs/1905.03197">Dong et al., 2019</a>) trained one
+transformer with interchangeable bidirectional/causal/prefix masks; GLM built
+its pretraining around autoregressive blank-filling; and
+<a href="https://arxiv.org/abs/2205.05131">UL2</a> (Tay et al., 2022) unified causal,
+prefix, and span-corruption denoising into a single “mixture-of-denoisers”
+recipe, arguing the objectives are points on one continuum rather than rival
+religions.</p>
+<p>As a pure-text pretraining objective, prefix-LM never displaced plain CLM —
+you sacrifice supervision on the prefix half (the figure above: 512 of 1,024
+positions) for a modest quality gain on input-grounded tasks, and at scale the
+density argument tends to win. Where the prefix pattern is alive in
+2026 is <strong>multimodal models</strong>: a vision-language model that consumes image
+tokens plus a text prompt and generates an answer has exactly the
+prefix-LM shape, and several open designs (Google’s PaliGemma states this
+explicitly) apply full bidirectional attention across the image tokens and
+prompt while decoding the answer causally. The image is a <em>given</em>, not a
+prediction target — masking it causally would only handicap the encoder-like
+reading it deserves. When you reach
+<a href="/groundup/book/multimodal-models/">multimodal models</a>, recognize the mask.</p>
+<h2 id="the-three-objectives-side-by-side">The three objectives, side by side</h2>
+<p>The table below is the chapter compressed. “Supervised fraction” is the share
+of ingested tokens that contribute a loss term — the gradients-per-token
+argument in one row. (Encoder-decoder does not appear as a column because it
+is an <em>architecture</em>, not an objective: T5-style systems typically train span
+corruption, whose supervision density lands near MLM’s, while translation-style
+systems supervise every target token.)</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th></th><th>Masked LM (encoder-only)</th><th>Causal LM (decoder-only)</th><th>Prefix-LM</th></tr></thead><tbody><tr><td>Attention mask</td><td>bidirectional everywhere</td><td>causal everywhere</td><td>bidirectional on prefix, causal after</td></tr><tr><td>Trained to predict</td><td>the ~15% of tokens that were corrupted, given both sides</td><td>every token, given all earlier tokens</td><td>continuation tokens, given the whole prefix</td></tr><tr><td>Supervised fraction</td><td>≈ 0.15</td><td>1.0</td><td>≈ 0.5 (depends on split)</td></tr><tr><td>Sees the future?</td><td>yes (that is the point)</td><td>never</td><td>only within the prefix</td></tr><tr><td>Generates text?</td><td>not natively</td><td>natively, one token at a time</td><td>natively, after the prefix</td></tr><tr><td>Canonical models</td><td>BERT, RoBERTa, ModernBERT</td><td>GPT family, Llama, Claude, Gemini, DeepSeek</td><td>UniLM, UL2 (in part), many vision-language decoders</td></tr><tr><td>2026 sweet spot</td><td>embeddings, rerankers, cheap classification</td><td>everything generative: chat, code, agents</td><td>grounded generation over a fixed input, multimodal prompts</td></tr></tbody></table>
+<aside class="box box-intuition" data-box="intuition"><div class="box-title"><span class="box-icon" aria-hidden="true">💡</span>Intuition</div><p>A compact way to remember the whole taxonomy: <strong>MLM reads, CLM writes,
+prefix-LM reads then writes.</strong> And the economics: CLM turns every single token
+of the internet into a labeled training example, which is why the family that
+writes is also, at scale, the family that learned the most.</p></aside>
+<h2 id="what-decoder-only-hides">What “decoder-only” hides</h2>
+<p>One warning before the book starts saying “decoder-only” as if it named a
+single design. The label fixes only the mask and the objective; within it,
+2026’s models diverge enormously:</p>
+<ul>
+<li><strong>Dense vs sparse.</strong> A dense model (Llama-3-405B) runs every parameter for
+every token; a <a href="/groundup/book/mixture-of-experts/">mixture-of-experts</a> (MoE) model
+(DeepSeek-V3, Mixtral, and — per public reporting — several frontier closed
+models) routes each token through a small subset of expert MLPs, decoupling
+parameter count from per-token compute.</li>
+<li><strong>Attention internals.</strong> Full multi-head attention vs grouped-query
+attention vs DeepSeek’s multi-head latent attention; global attention in
+every layer vs sliding-window/local layers interleaved — the whole menu of
+<a href="/groundup/book/kv-cache-and-efficient-attention/">Chapter 28</a>.</li>
+<li><strong>Sequence mixing beyond attention.</strong> Some “decoder-only” models replace
+part of the attention stack with <a href="/groundup/book/state-space-models/">state-space layers</a>
+(Mamba-style hybrids like Jamba). Same mask philosophy, different machinery.</li>
+</ul>
+<p>These differences — not the encoder/decoder question — are where architecture
+work happens now. The family war is over; the intra-family engineering is
+Chapters 28–30.</p>
+<p>And so, explicitly, the assumption this book makes from here forward: <strong>unless
+stated otherwise, “the model” means a decoder-only, causally masked
+transformer trained on next-token prediction.</strong> Pretraining
+(<a href="/groundup/book/pretraining-data/">Part V</a>), post-training, inference, and the entire
+<a href="/groundup/book/why-interpretability/">interpretability</a> part study that object. When a
+claim would change for encoders or encoder-decoders, the text will say so.</p>
+<h2 id="where-this-leaves-us">Where this leaves us</h2>
+<ul>
+<li>A transformer’s family is determined by its <strong>attention mask</strong>: full square
+(encoder-only), lower triangle (decoder-only), or square + triangle +
+cross-attention rectangle (encoder-decoder) — Figure 1 is the whole taxonomy.</li>
+<li><strong>Masked language modeling</strong> corrupts ~15% of tokens (80% <code>[MASK]</code>, 10%
+random, 10% unchanged) and predicts them bidirectionally; it builds superb
+readers — classifiers, <a href="/groundup/book/embeddings/">embedding models</a>, rerankers —
+that structurally cannot generate, because they never learn a chain-rule
+factorization of sequence probability.</li>
+<li><strong>Encoder-decoders</strong> pair a bidirectional reader with a causal writer via
+cross-attention; they survive where the task shape matches — translation,
+Whisper, some multimodal bridges — and T5’s text-to-text framing is the
+ancestor of “everything is a prompt.”</li>
+<li><strong>Decoder-only won</strong> on objective density (every token supervises: ~6.7×
+more predictions per token than MLM), simplicity that let the entire tooling
+ecosystem optimize one shape, trustworthy scaling laws, emergent in-context
+learning, KV-cache-friendly serving, and any-task-as-continuation.</li>
+<li><strong>Prefix-LM</strong> — bidirectional prefix, causal continuation — is the quiet
+compromise living inside many multimodal models.</li>
+<li>“Decoder-only” is a genus, not a species: dense vs MoE and the attention
+menu are where 2026’s real architectural diversity lives.</li>
+</ul>
+<p>The first consequence of the causal mask is an inference-time gift: everything
+computed for past tokens can be cached and reused. How that cache works, what
+it costs at long context, and the attention variants invented to shrink it are
+next: <a href="/groundup/book/kv-cache-and-efficient-attention/">The KV Cache and Efficient Attention</a>.</p> <div class="papers-card" id="papers-card"> <div class="pc-title">Key papers &amp; readings in this chapter</div> <ul> <li> <div> <a href="https://arxiv.org/abs/1810.04805" target="_blank" rel="noopener">BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding</a> <span class="p-meta"> — Devlin et al., 2018</span> <span class="p-note">The encoder-only recipe — Section 3.1 has the masked-language-modeling and 80/10/10 details this chapter works through.</span> </div> </li><li> <div> <a href="https://arxiv.org/abs/1910.10683" target="_blank" rel="noopener">Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer</a> <span class="p-meta"> — Raffel et al., 2019</span> <span class="p-note">T5 — the definitive encoder-decoder study; a giant, readable ablation of objectives and architectures.</span> </div> </li><li> <div> <a href="https://arxiv.org/abs/2005.14165" target="_blank" rel="noopener">Language Models are Few-Shot Learners</a> <span class="p-meta"> — Brown et al., 2020</span> <span class="p-note">GPT-3 — where in-context learning from pure next-token training became undeniable.</span> </div> </li><li> <div> <a href="https://arxiv.org/abs/2204.05832" target="_blank" rel="noopener">What Language Model Architecture and Pretraining Objective Work Best for Zero-Shot Generalization?</a> <span class="p-meta"> — Wang et al., 2022</span> <span class="p-note">The controlled head-to-head of the three families and their objectives.</span> </div> </li><li> <div> <a href="https://arxiv.org/abs/2205.05131" target="_blank" rel="noopener">UL2: Unifying Language Learning Paradigms</a> <span class="p-meta"> — Tay et al., 2022</span> <span class="p-note">Mixture-of-denoisers: one model trained on causal, prefix, and span-corruption objectives at once.</span> </div> </li><li> <div> <a href="https://arxiv.org/abs/2212.04356" target="_blank" rel="noopener">Robust Speech Recognition via Large-Scale Weak Supervision</a> <span class="p-meta"> — Radford et al., 2022</span> <span class="p-note">Whisper — the highest-profile encoder-decoder still in mass production use.</span> </div> </li><li> <div> <a href="https://arxiv.org/abs/2412.13663" target="_blank" rel="noopener">Smarter, Better, Faster, Longer: A Modern Bidirectional Encoder</a> <span class="p-meta"> — Warner et al., 2024</span> <span class="p-note">ModernBERT — the 2024 refresh proving encoder-only is alive and well for retrieval and classification.</span> </div> </li> </ul> </div> <nav class="chapter-nav"> <a href="/groundup/book/positional-encodings/" class="prev"> <span class="dir">← Previous</span> <span class="t">Positional Information and RoPE</span> </a> <a href="/groundup/book/kv-cache-and-efficient-attention/" class="next"> <span class="dir">Next →</span> <span class="t">The KV Cache and Efficient Attention</span> </a> </nav> <div class="chapter-foot"> <span>Last updated 2026-08-24</span> <a href="https://github.com/joewilbert/aisite/edit/main/src/content/book/27-architecture-families.md" target="_blank" rel="noopener">Edit this chapter</a> <a href="https://github.com/joewilbert/aisite/issues/new" target="_blank" rel="noopener">Report an issue</a> </div> </article> </div>  </main> </div> <!-- Right panel: papers / tutor / notes --> <aside class="panel-host" id="panel" aria-label="Side panel"> <div class="panel-resizer" id="panel-resizer"></div> <div class="panel-tabs"> <button class="panel-tab" data-tab="paper">Paper</button> <button class="panel-tab" data-tab="tutor">AI tutor</button> <button class="panel-tab" data-tab="notes">Notes</button> <button class="hbtn panel-close" id="panel-close" aria-label="Close panel"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg> </button> </div> <div class="panel-body"> <div class="panel-view" data-view="paper" id="view-paper"></div> <div class="panel-view" data-view="tutor" id="view-tutor"></div> <div class="panel-view" data-view="notes" id="view-notes"></div> </div> </aside> <!-- Selection toolbar --> <div class="sel-toolbar" id="sel-toolbar"> <div class="swatches"> <button class="sw" data-color="yellow" style="background:var(--hl-yellow)" aria-label="Highlight yellow"></button> <button class="sw" data-color="green" style="background:var(--hl-green)" aria-label="Highlight green"></button> <button class="sw" data-color="blue" style="background:var(--hl-blue)" aria-label="Highlight blue"></button> <button class="sw" data-color="pink" style="background:var(--hl-pink)" aria-label="Highlight pink"></button> </div> <div class="divider"></div> <button id="sel-note">✎ Note</button> <button id="sel-explain">✦ Explain</button> <button id="sel-remove" style="display:none">✕ Remove</button> </div> <!-- Settings modal --> <div class="modal-scrim" id="settings-scrim"> <div class="modal" role="dialog" aria-label="Settings" id="settings-modal"></div> </div> <!-- Search modal --> <div class="modal-scrim" id="search-scrim"> <div class="modal search-modal" role="dialog" aria-label="Search"> <input class="q" id="search-input" type="text" placeholder="Search the book…" autocomplete="off"> <div class="search-results" id="search-results"></div> </div> </div> <script>(function(){const base = "/groundup";
+const slug = "architecture-families";
+const pageTitle = "Architecture Families: BERT to Decoder-Only · Ground Up";
+
+      window.__GU__ = { base, slug, pageTitle };
+    })();</script> <script type="module" src="/groundup/_astro/Base.astro_astro_type_script_index_0_lang.65xM_WgJ.js"></script>  </body></html>

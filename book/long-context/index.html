@@ -1,0 +1,569 @@
+<!DOCTYPE html><html lang="en"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Long Context · Ground Up</title><meta name="description" content="What a million-token context window really buys you: the three costs, the engineering stack that pays them, honest evaluation from needle-in-a-haystack to RULER, and the economics of prompt caching."><meta name="theme-color" content="#faf9f6"><meta property="og:title" content="Long Context · Ground Up"><meta property="og:description" content="What a million-token context window really buys you: the three costs, the engineering stack that pays them, honest evaluation from needle-in-a-haystack to RULER, and the economics of prompt caching."><meta property="og:type" content="article"><meta property="og:site_name" content="Ground Up"><link rel="icon" href="/groundup/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="/groundup/apple-touch-icon.png"><link rel="manifest" href="/groundup/manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Ground Up"><script>
+      (function () {
+        try {
+          var t = localStorage.getItem('gu:theme');
+          var dark = t ? t === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+          if (dark) document.documentElement.classList.add('dark');
+          var fs = localStorage.getItem('gu:fontScale');
+          if (fs) document.documentElement.style.setProperty('--font-scale', fs);
+        } catch (e) {}
+      })();
+    </script><link rel="stylesheet" href="/groundup/_astro/_slug_.BCpHWCuJ.css"></head> <body> <header class="site-header"> <button class="hbtn" id="btn-toc" aria-label="Table of contents" title="Contents"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"></path></svg> </button> <a class="brand" href="/groundup/"> <span class="logo">G</span> <span class="brand-name">Ground&nbsp;Up</span> </a> <span class="header-crumb">Part VI · The Modern AI Landscape · Chapter 43</span> <div class="header-actions"> <button class="hbtn" id="btn-search" aria-label="Search" title="Search (/)"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg> </button> <button class="hbtn" id="btn-notes" aria-label="My notes" title="My notes & highlights"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg> </button> <button class="hbtn" id="btn-tutor" aria-label="AI tutor" title="AI tutor"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 1 1-4-6.9"></path><path d="M21 3v6h-6"></path><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"></circle><circle cx="8.5" cy="12" r="1.2" fill="currentColor" stroke="none"></circle><circle cx="15.5" cy="12" r="1.2" fill="currentColor" stroke="none"></circle></svg> </button> <button class="hbtn" id="btn-theme" aria-label="Toggle theme" title="Light / dark"> <svg class="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.5"></circle><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M19.4 4.6l-1.8 1.8M6.4 17.6l-1.8 1.8"></path></svg> </button> <button class="hbtn" id="btn-settings" aria-label="Settings" title="Settings"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.01a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.01a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.01a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"></path></svg> </button> </div> </header> <div class="shell"> <nav class="toc-rail" id="toc-rail" aria-label="Table of contents">  <div class="toc-part">Start here</div> <a class="toc-link" data-slug="how-to-read-this-book" href="/groundup/book/how-to-read-this-book/"> <span class="n">·</span> <span>How to Read This Book</span> </a><a class="toc-link" data-slug="the-whole-machine" href="/groundup/book/the-whole-machine/"> <span class="n">·</span> <span>Frontier AI In One Sitting</span> </a> <div class="toc-part">Part I · Mathematical Foundations</div> <a class="toc-link" data-slug="vectors-and-spaces" href="/groundup/book/vectors-and-spaces/"> <span class="n">1</span> <span>Vectors and Spaces</span> </a><a class="toc-link" data-slug="matrices-as-transformations" href="/groundup/book/matrices-as-transformations/"> <span class="n">2</span> <span>Matrices as Transformations</span> </a><a class="toc-link" data-slug="high-dimensional-geometry" href="/groundup/book/high-dimensional-geometry/"> <span class="n">3</span> <span>High-Dimensional Geometry</span> </a><a class="toc-link" data-slug="derivatives-and-gradients" href="/groundup/book/derivatives-and-gradients/"> <span class="n">4</span> <span>Derivatives and Gradients</span> </a><a class="toc-link" data-slug="chain-rule-and-jacobians" href="/groundup/book/chain-rule-and-jacobians/"> <span class="n">5</span> <span>The Chain Rule, Jacobians, and Curvature</span> </a><a class="toc-link" data-slug="probability" href="/groundup/book/probability/"> <span class="n">6</span> <span>Probability for Deep Learning</span> </a><a class="toc-link" data-slug="information-theory" href="/groundup/book/information-theory/"> <span class="n">7</span> <span>Information Theory: Surprise, Entropy, and KL</span> </a> <div class="toc-part">Part II · Deep Learning Foundations</div> <a class="toc-link" data-slug="neurons-and-mlps" href="/groundup/book/neurons-and-mlps/"> <span class="n">8</span> <span>Neurons, Layers, and MLPs</span> </a><a class="toc-link" data-slug="loss-functions" href="/groundup/book/loss-functions/"> <span class="n">9</span> <span>Loss Functions</span> </a><a class="toc-link" data-slug="gradient-descent-and-backprop" href="/groundup/book/gradient-descent-and-backprop/"> <span class="n">10</span> <span>Gradient Descent and Backpropagation</span> </a><a class="toc-link" data-slug="optimizers" href="/groundup/book/optimizers/"> <span class="n">11</span> <span>Optimizers: From SGD to AdamW and Muon</span> </a><a class="toc-link" data-slug="initialization-and-stability" href="/groundup/book/initialization-and-stability/"> <span class="n">12</span> <span>Initialization and Gradient Pathologies</span> </a><a class="toc-link" data-slug="regularization-and-generalization" href="/groundup/book/regularization-and-generalization/"> <span class="n">13</span> <span>Regularization and Generalization</span> </a><a class="toc-link" data-slug="normalization" href="/groundup/book/normalization/"> <span class="n">14</span> <span>Normalization: BatchNorm to RMSNorm</span> </a><a class="toc-link" data-slug="activation-functions" href="/groundup/book/activation-functions/"> <span class="n">15</span> <span>Activation Functions</span> </a><a class="toc-link" data-slug="residual-connections" href="/groundup/book/residual-connections/"> <span class="n">16</span> <span>Residual Connections and the Residual Stream</span> </a><a class="toc-link" data-slug="cnns-and-rnns" href="/groundup/book/cnns-and-rnns/"> <span class="n">17</span> <span>CNNs and RNNs: The World Before Transformers</span> </a> <div class="toc-part">Part III · Language Modeling</div> <a class="toc-link" data-slug="what-is-a-language-model" href="/groundup/book/what-is-a-language-model/"> <span class="n">18</span> <span>What a Language Model Is</span> </a><a class="toc-link" data-slug="tokenization" href="/groundup/book/tokenization/"> <span class="n">19</span> <span>Tokenization</span> </a><a class="toc-link" data-slug="embeddings" href="/groundup/book/embeddings/"> <span class="n">20</span> <span>Embeddings</span> </a><a class="toc-link" data-slug="evaluating-language-models" href="/groundup/book/evaluating-language-models/"> <span class="n">21</span> <span>Evaluating Language Models</span> </a> <div class="toc-part">Part IV · Attention &amp; Transformers</div> <a class="toc-link" data-slug="seq2seq-and-attention" href="/groundup/book/seq2seq-and-attention/"> <span class="n">22</span> <span>From seq2seq to Attention</span> </a><a class="toc-link" data-slug="scaled-dot-product-attention" href="/groundup/book/scaled-dot-product-attention/"> <span class="n">23</span> <span>Scaled Dot-Product Attention</span> </a><a class="toc-link" data-slug="multi-head-attention" href="/groundup/book/multi-head-attention/"> <span class="n">24</span> <span>Multi-Head Attention</span> </a><a class="toc-link" data-slug="transformer-architecture" href="/groundup/book/transformer-architecture/"> <span class="n">25</span> <span>The Transformer, Piece by Piece</span> </a><a class="toc-link" data-slug="positional-encodings" href="/groundup/book/positional-encodings/"> <span class="n">26</span> <span>Positional Information and RoPE</span> </a><a class="toc-link" data-slug="architecture-families" href="/groundup/book/architecture-families/"> <span class="n">27</span> <span>Architecture Families: BERT to Decoder-Only</span> </a><a class="toc-link" data-slug="kv-cache-and-efficient-attention" href="/groundup/book/kv-cache-and-efficient-attention/"> <span class="n">28</span> <span>The KV Cache and Efficient Attention</span> </a><a class="toc-link" data-slug="mixture-of-experts" href="/groundup/book/mixture-of-experts/"> <span class="n">29</span> <span>Mixture-of-Experts</span> </a><a class="toc-link" data-slug="state-space-models" href="/groundup/book/state-space-models/"> <span class="n">30</span> <span>State-Space Models and Hybrids</span> </a> <div class="toc-part">Part V · Training LLMs in Practice</div> <a class="toc-link" data-slug="pretraining-data" href="/groundup/book/pretraining-data/"> <span class="n">31</span> <span>Pretraining Data</span> </a><a class="toc-link" data-slug="scaling-laws" href="/groundup/book/scaling-laws/"> <span class="n">32</span> <span>Scaling Laws</span> </a><a class="toc-link" data-slug="compute-and-parallelism" href="/groundup/book/compute-and-parallelism/"> <span class="n">33</span> <span>Compute: GPUs, Precision, and Parallelism</span> </a><a class="toc-link" data-slug="the-training-run" href="/groundup/book/the-training-run/"> <span class="n">34</span> <span>The Training Run</span> </a><a class="toc-link" data-slug="sft-and-rlhf" href="/groundup/book/sft-and-rlhf/"> <span class="n">35</span> <span>Post-Training I: SFT, Reward Models, RLHF</span> </a><a class="toc-link" data-slug="dpo-and-friends" href="/groundup/book/dpo-and-friends/"> <span class="n">36</span> <span>Post-Training II: DPO and Its Family</span> </a><a class="toc-link" data-slug="reasoning-models" href="/groundup/book/reasoning-models/"> <span class="n">37</span> <span>Reasoning Training: RLVR, GRPO, and the o1/R1 Era</span> </a><a class="toc-link" data-slug="fine-tuning" href="/groundup/book/fine-tuning/"> <span class="n">38</span> <span>Fine-Tuning You Can Actually Do: LoRA and Friends</span> </a><a class="toc-link" data-slug="inference-and-serving" href="/groundup/book/inference-and-serving/"> <span class="n">39</span> <span>Inference: Sampling, Quantization, Serving</span> </a> <div class="toc-part">Part VI · The Modern AI Landscape</div> <a class="toc-link" data-slug="the-frontier" href="/groundup/book/the-frontier/"> <span class="n">40</span> <span>The Frontier Landscape (2023–2026)</span> </a><a class="toc-link" data-slug="multimodal-models" href="/groundup/book/multimodal-models/"> <span class="n">41</span> <span>Multimodal Models</span> </a><a class="toc-link" data-slug="diffusion-models" href="/groundup/book/diffusion-models/"> <span class="n">42</span> <span>Diffusion and Image/Video Generation</span> </a><a class="toc-link active" data-slug="long-context" href="/groundup/book/long-context/"> <span class="n">43</span> <span>Long Context</span> </a><a class="toc-link" data-slug="agents-and-tools" href="/groundup/book/agents-and-tools/"> <span class="n">44</span> <span>Agents, Tool Use, and MCP</span> </a><a class="toc-link" data-slug="retrieval-augmented-generation" href="/groundup/book/retrieval-augmented-generation/"> <span class="n">45</span> <span>Retrieval-Augmented Generation</span> </a><a class="toc-link" data-slug="benchmarks-and-evaluation" href="/groundup/book/benchmarks-and-evaluation/"> <span class="n">46</span> <span>Benchmarks and How to Read Them</span> </a><a class="toc-link" data-slug="open-vs-closed" href="/groundup/book/open-vs-closed/"> <span class="n">47</span> <span>Open vs Closed Models</span> </a> <div class="toc-part">Part VII · Interpretability</div> <a class="toc-link" data-slug="why-interpretability" href="/groundup/book/why-interpretability/"> <span class="n">48</span> <span>Why Interpretability</span> </a><a class="toc-link" data-slug="features-and-probes" href="/groundup/book/features-and-probes/"> <span class="n">49</span> <span>Features, Directions, and Probes</span> </a><a class="toc-link" data-slug="superposition" href="/groundup/book/superposition/"> <span class="n">50</span> <span>Superposition and Polysemanticity</span> </a><a class="toc-link" data-slug="sparse-autoencoders" href="/groundup/book/sparse-autoencoders/"> <span class="n">51</span> <span>Sparse Autoencoders</span> </a><a class="toc-link" data-slug="circuits" href="/groundup/book/circuits/"> <span class="n">52</span> <span>Circuits: Induction Heads to Attribution Graphs</span> </a><a class="toc-link" data-slug="causal-methods" href="/groundup/book/causal-methods/"> <span class="n">53</span> <span>Causal Methods: Patching, Ablation, and Lenses</span> </a><a class="toc-link" data-slug="steering-and-editing" href="/groundup/book/steering-and-editing/"> <span class="n">54</span> <span>Steering and Model Editing</span> </a><a class="toc-link" data-slug="cot-faithfulness" href="/groundup/book/cot-faithfulness/"> <span class="n">55</span> <span>Chain-of-Thought Faithfulness</span> </a><a class="toc-link" data-slug="frontier-interpretability" href="/groundup/book/frontier-interpretability/"> <span class="n">56</span> <span>Interpretability at the Frontier</span> </a> <div class="toc-part">Part VIII · Reference</div> <a class="toc-link" data-slug="where-to-go-next" href="/groundup/book/where-to-go-next/"> <span class="n">57</span> <span>Where to Go Next</span> </a><a class="toc-link" data-slug="glossary" href="/groundup/book/glossary/"> <span class="n">58</span> <span>Glossary</span> </a><a class="toc-link" data-slug="notation" href="/groundup/book/notation/"> <span class="n">59</span> <span>Notation Reference</span> </a> </nav> <div class="scrim" id="toc-scrim"></div> <main class="main-col">  <div class="article-wrap"> <article class="chapter" id="article" data-slug="long-context" data-title="Long Context" data-file="43-long-context.md" data-pagefind-body> <div class="chapter-kicker">Part VI · The Modern AI Landscape · Chapter 43</div> <h1>Long Context</h1> <p class="chapter-desc">What a million-token context window really buys you: the three costs, the engineering stack that pays them, honest evaluation from needle-in-a-haystack to RULER, and the economics of prompt caching.</p> <details class="section-nav"> <summary>In this chapter</summary> <ol> <li><a href="#what-a-context-window-actually-is">What a context window actually is</a></li><li><a href="#why-long-context-is-hard-three-costs">Why long context is hard: three costs</a></li><li><a href="#the-stack-how-a-million-token-window-is-actually-built">The stack: how a million-token window is actually built</a></li><li><a href="#evaluating-long-context-honestly">Evaluating long context honestly</a></li><li><a href="#prompt-caching-the-serving-side-complement">Prompt caching: the serving-side complement</a></li><li><a href="#long-context-versus-rag-complements-not-rivals">Long context versus RAG: complements, not rivals</a></li><li><a href="#context-engineering-the-agent-preview">Context engineering: the agent preview</a></li><li><a href="#where-this-leaves-us">Where this leaves us</a></li> </ol> </details> <p>Somewhere in the last few years, a line in every model card quietly became one of
+the most consequential specs in AI: <strong>context length</strong>. GPT-3 shipped in 2020
+with 2,048 tokens — a few pages. By 2026, frontier models advertise one or two
+<em>million</em> tokens, and at least one open model has claimed ten million. That is
+the difference between “paste in a paragraph” and “paste in a codebase, a
+season of legal discovery, or three novels, and ask questions.”</p>
+<p>This chapter is a synthesis, not a new mechanism. You have already built every
+piece of machinery involved: <a href="/groundup/book/scaled-dot-product-attention/">attention</a>
+and its quadratic cost, rotary position embeddings
+(<a href="/groundup/book/positional-encodings/">RoPE</a>) and the surgery
+that stretches it, the <a href="/groundup/book/kv-cache-and-efficient-attention/">key–value (KV)
+cache</a> and
+its brutal memory arithmetic, <a href="/groundup/book/compute-and-parallelism/">sequence
+parallelism</a> and <a href="/groundup/book/the-training-run/">length
+curricula</a>. What you have not yet seen is how those
+pieces assemble into the capability the market actually sells — and how honest
+that capability is. Because there is a real gap, in 2026, between the context
+length a model <em>advertises</em> and the context length at which it still <em>thinks
+well</em>, and knowing how to measure that gap is worth more than any single spec.</p>
+<p>By the end of this chapter you will be able to read a claim like “10M-token
+context window” the way an engineer does: as the start of a conversation, not
+the end of one.</p>
+<h2 id="what-a-context-window-actually-is">What a context window actually is</h2>
+<p>A model’s context window is the maximum number of
+<a href="/groundup/book/tokenization/">tokens</a> it can attend over in one forward pass: the
+prompt you send plus everything it has generated so far, all sitting in the KV
+cache, all visible to every attention head at every layer. Nothing outside the
+window exists for the model. There is no swap file, no “it sort of remembers” —
+tokens beyond the window are exactly as available as a book you never opened.</p>
+<aside class="box box-intuition" data-box="intuition"><div class="box-title"><span class="box-icon" aria-hidden="true">💡</span>Intuition</div><p>The most useful frame: context is the model’s <strong>working memory</strong>. Its
+parameters are long-term memory — everything it absorbed during pretraining,
+compressed and fuzzy, frozen at the training cutoff. The context window is the
+desk it is working at <em>right now</em>: perfectly sharp, verbatim, but strictly
+bounded in size. Long-context engineering is the art of making the desk
+enormous without making every glance across it unaffordably slow. And like a
+human desk, bigger is not automatically better: a desk piled with 900 pages of
+irrelevant paper can make you <em>worse</em> at finding the one page that matters.</p></aside>
+<p>To make the sizes concrete, here is roughly what fits at various scales, using
+the usual English-text rule of thumb of about 1.3 tokens per word (code is
+denser in tokens — roughly 10–15 tokens per line; all figures approximate):</p>
+<ul>
+<li><strong>8k tokens</strong> (GPT-4 at launch, 2023): about 6,000 words — a long magazine
+article, or one chapter of a book.</li>
+<li><strong>100k–200k tokens</strong>: a typical novel (75,000–120,000 words ≈ 100k–160k
+tokens); a full-day deposition transcript (~300 pages ≈ 100k tokens); a
+quarter’s worth of a company’s board materials.</li>
+<li><strong>1M tokens</strong>: roughly <em>War and Peace</em> plus change (~587,000 words ≈ 750k
+tokens); a mid-sized codebase of 60,000–100,000 lines; ten hours of
+transcribed meetings.</li>
+<li><strong>10M tokens</strong> (advertised, not yet honest — more below): a small company’s
+entire document store, or the complete works of a prolific author.</li>
+</ul>
+<p>The qualitative shift is real. At 8k you summarize documents; at 200k you
+<em>read</em> documents; at 1M you read <em>collections</em> — and questions like “which of
+these forty contracts has the non-standard indemnification clause, and does it
+conflict with the master agreement?” become a single prompt rather than a
+pipeline.</p>
+<aside class="box box-history" data-box="history"><div class="box-title"><span class="box-icon" aria-hidden="true">🕰</span>History</div><p>The window grew in lurches: 512 tokens (BERT, 2018), 2,048 (GPT-3, 2020),
+8k–32k (GPT-4 variants, March 2023), 100k (Claude, May 2023 — the first
+“paste in a whole book” moment), 200k (Claude 2.1, late 2023), then the big
+one: 1M–10M in the <a href="https://arxiv.org/abs/2403.05530">Gemini 1.5 report</a>
+(February 2024). Since then: 2M (Gemini 1.5 Pro, mid-2024), 1M (GPT-4.1, 2025;
+Claude Sonnet 4, 2025), and a 10M-token <em>advertised</em> window (Llama 4 Scout,
+2025) that became the field’s favorite cautionary tale about advertised versus
+effective context. Numbers are a snapshot; the trend line is the point.</p></aside>
+<h2 id="why-long-context-is-hard-three-costs">Why long context is hard: three costs</h2>
+<p>If long context were free, every model would have shipped with a billion-token
+window years ago. It is not free. Three separate costs grow with length, and
+each one, unmanaged, becomes the binding constraint at a different scale.</p>
+<h3 id="cost-one-attention-compute-grows-quadratically">Cost one: attention compute grows quadratically</h3>
+<p>Every token attends to every earlier token. Double the sequence and you
+quadruple the pairwise interactions. You saw this in <a href="/groundup/book/scaled-dot-product-attention/">Chapter
+23</a>; here is what it means at modern
+scales.</p>
+<aside class="box box-math" data-box="math"><div class="box-title"><span class="box-icon" aria-hidden="true">∑</span>The math</div><p>For a model with model dimension <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi></mrow><annotation encoding="application/x-tex">d</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">d</span></span></span></span>, <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi></mrow><annotation encoding="application/x-tex">L</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal">L</span></span></span></span> layers, and a causal sequence of <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span>
+tokens, the attention <em>interaction</em> cost — computing <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Q</mi><msup><mi>K</mi><mi mathvariant="normal">⊤</mi></msup></mrow><annotation encoding="application/x-tex">QK\T</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0435em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">Q</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0715em;">K</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8491em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">⊤</span></span></span></span></span></span></span></span></span></span></span></span> scores and the
+attention-weighted sum of values, across all layers — is approximately</p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mtext>FLOPs</mtext><mtext>attn</mtext></msub><mtext>  </mtext><mo>≈</mo><mtext>  </mtext><mn>2</mn><mtext> </mtext><mi>d</mi><mtext> </mtext><mi>L</mi><mtext> </mtext><msup><mi>n</mi><mn>2</mn></msup><mo separator="true">,</mo></mrow><annotation encoding="application/x-tex">\text{FLOPs}_{\text{attn}} \;\approx\; 2\, d\, L\, n^2,</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord text"><span class="mord">FLOPs</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">attn</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.0585em;vertical-align:-0.1944em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">d</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">L</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mpunct">,</span></span></span></span></span><p>counting a multiply-add as two floating-point operations (FLOPs) and the causal
+mask’s factor of <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle></mrow><annotation encoding="application/x-tex">\tfrac{1}{2}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.1901em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span> against the factor of 2 for doing both the
+score matrix and the value aggregation. Meanwhile the <em>linear</em> parts of the
+model — the projections and multi-layer perceptrons (MLPs), which touch each
+token independently — cost
+about <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mi>N</mi><mi>n</mi></mrow><annotation encoding="application/x-tex">2 N n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="mord mathnormal">n</span></span></span></span> FLOPs for a model with <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi></mrow><annotation encoding="application/x-tex">N</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">N</span></span></span></span> parameters. The linear cost grows
+like <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span>; attention grows like <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>n</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">n^2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span>. At short lengths attention is a rounding
+error. At long lengths it is the entire bill.</p></aside>
+<aside class="box box-example" data-box="example"><div class="box-title"><span class="box-icon" aria-hidden="true">✏️</span>Worked example</div><p>Take an 8-billion-parameter model with <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi><mo>=</mo><mn>4096</mn></mrow><annotation encoding="application/x-tex">d = 4096</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">d</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">4096</span></span></span></span> and <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mo>=</mo><mn>32</mn></mrow><annotation encoding="application/x-tex">L = 32</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal">L</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">32</span></span></span></span>
+(Llama-3.1-8B-shaped). <strong>At <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>8,192</mn></mrow><annotation encoding="application/x-tex">n = 8{,}192</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">8</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">192</span></span></span></span>:</strong> linear cost <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>≈</mo><mn>2</mn><mo>×</mo><mn>8</mn><mo>×</mo><msup><mn>10</mn><mn>9</mn></msup><mo>×</mo><mn>8192</mn><mo>≈</mo><mn>1.3</mn><mo>×</mo><msup><mn>10</mn><mn>14</mn></msup></mrow><annotation encoding="application/x-tex">\approx 2 \times 8
+\times 10^9 \times 8192 \approx 1.3 \times 10^{14}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4831em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">8</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8974em;vertical-align:-0.0833em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">9</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">8192</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1.3</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">14</span></span></span></span></span></span></span></span></span></span></span></span> FLOPs; attention cost
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>≈</mo><mn>2</mn><mo>×</mo><mn>4096</mn><mo>×</mo><mn>32</mn><mo>×</mo><mo stretchy="false">(</mo><mn>8192</mn><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mo>≈</mo><mn>1.8</mn><mo>×</mo><msup><mn>10</mn><mn>13</mn></msup></mrow><annotation encoding="application/x-tex">\approx 2 \times 4096 \times 32 \times (8192)^2 \approx 1.8 \times 10^{13}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4831em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">4096</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">32</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">8192</span><span class="mclose"><span class="mclose">)</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1.8</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">13</span></span></span></span></span></span></span></span></span></span></span></span>
+FLOPs — about 13% of the linear cost. Ignorable. <strong>At <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>1,048,576</mn></mrow><annotation encoding="application/x-tex">n = 1{,}048{,}576</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">1</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">048</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">576</span></span></span></span>
+(1M):</strong> linear cost <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>≈</mo><mn>1.7</mn><mo>×</mo><msup><mn>10</mn><mn>16</mn></msup></mrow><annotation encoding="application/x-tex">\approx 1.7 \times 10^{16}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4831em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1.7</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">16</span></span></span></span></span></span></span></span></span></span></span></span> FLOPs; attention cost
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>≈</mo><mn>2</mn><mo>×</mo><mn>4096</mn><mo>×</mo><mn>32</mn><mo>×</mo><mo stretchy="false">(</mo><mn>1.05</mn><mo>×</mo><msup><mn>10</mn><mn>6</mn></msup><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mo>≈</mo><mn>2.9</mn><mo>×</mo><msup><mn>10</mn><mn>17</mn></msup></mrow><annotation encoding="application/x-tex">\approx 2 \times 4096 \times 32 \times (1.05 \times 10^6)^2 \approx 2.9
+\times 10^{17}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4831em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">4096</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">32</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">1.05</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">6</span></span></span></span></span></span></span></span><span class="mclose"><span class="mclose">)</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2.9</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">17</span></span></span></span></span></span></span></span></span></span></span></span> FLOPs — now <em>seventeen times</em> the linear cost. The sequence
+got 128× longer; the attention work got <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>128</mn><mn>2</mn></msup><mo>=</mo><mn>16,384</mn></mrow><annotation encoding="application/x-tex">128^2 = 16{,}384</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord">12</span><span class="mord"><span class="mord">8</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">16</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">384</span></span></span></span>× larger. Total
+prefill: roughly <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>3</mn><mo>×</mo><msup><mn>10</mn><mn>17</mn></msup></mrow><annotation encoding="application/x-tex">3 \times 10^{17}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">3</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">17</span></span></span></span></span></span></span></span></span></span></span></span> FLOPs. On a single H100 sustaining
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>∼</mo><mn>5</mn><mo>×</mo><msup><mn>10</mn><mn>14</mn></msup></mrow><annotation encoding="application/x-tex">\sim 5 \times 10^{14}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.3669em;"></span><span class="mrel">∼</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">5</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">14</span></span></span></span></span></span></span></span></span></span></span></span> FLOP/s, that one prompt would take <strong>~10 minutes of
+pure compute</strong> — which is why million-token prefill is spread across many
+graphics processing units (GPUs) working on the same sequence at once.</p></aside>
+<h3 id="cost-two-kv-memory-is-linear--but-linear-times-huge">Cost two: KV memory is linear — but linear times huge</h3>
+<p>The <a href="/groundup/book/kv-cache-and-efficient-attention/">KV cache</a> grows only linearly
+with length, which sounds benign until you multiply it out. Chapter 28’s
+formula, reused verbatim:</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mtext>KV bytes</mtext><mtext>  </mtext><mo>=</mo><mtext>  </mtext><munder><munder><mn>2</mn><mo stretchy="true">⏟</mo></munder><mtext>K and V</mtext></munder><mo>×</mo><mi>L</mi><mo>×</mo><msub><mi>n</mi><mrow><mi>k</mi><mi>v</mi></mrow></msub><mo>×</mo><msub><mi>d</mi><mi>h</mi></msub><mo>×</mo><mi>S</mi><mo>×</mo><mi>B</mi><mo>×</mo><mi>b</mi><mo separator="true">,</mo></mrow><annotation encoding="application/x-tex">\text{KV bytes} \;=\; \underbrace{2}_{\text{K and V}} \times L \times n_{kv} \times d_h \times S \times B \times b,</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord text"><span class="mord">KV bytes</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.9785em;vertical-align:-1.3341em;"></span><span class="minner munder"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.6444em;"><span style="top:-1.6659em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">K and V</span></span></span></span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="minner munder"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.6444em;"><span class="svg-align" style="top:-2.352em;"><span class="pstrut" style="height:3em;"></span><span class="stretchy" style="height:0.548em;min-width:1.6em;"><span class="brace-left" style="height:0.548em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="0.548em" viewBox="0 0 400000 548" preserveAspectRatio="xMinYMin slice"><path d="M0 6l6-6h17c12.688 0 19.313.3 20 1 4 4 7.313 8.3 10 13
+ 35.313 51.3 80.813 93.8 136.5 127.5 55.688 33.7 117.188 55.8 184.5 66.5.688
+ 0 2 .3 4 1 18.688 2.7 76 4.3 172 5h399450v120H429l-6-1c-124.688-8-235-61.7
+-331-161C60.687 138.7 32.312 99.3 7 54L0 41V6z"></path></svg></span><span class="brace-center" style="height:0.548em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="0.548em" viewBox="0 0 400000 548" preserveAspectRatio="xMidYMin slice"><path d="M199572 214
+c100.7 8.3 195.3 44 280 108 55.3 42 101.7 93 139 153l9 14c2.7-4 5.7-8.7 9-14
+ 53.3-86.7 123.7-153 211-199 66.7-36 137.3-56.3 212-62h199568v120H200432c-178.3
+ 11.7-311.7 78.3-403 201-6 8-9.7 12-11 12-.7.7-6.7 1-18 1s-17.3-.3-18-1c-1.3 0
+-5-4-11-12-44.7-59.3-101.3-106.3-170-141s-145.3-54.3-229-60H0V214z"></path></svg></span><span class="brace-right" style="height:0.548em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="0.548em" viewBox="0 0 400000 548" preserveAspectRatio="xMaxYMin slice"><path d="M399994 0l6 6v35l-6 11c-56 104-135.3 181.3-238 232-57.3
+ 28.7-117 45-179 50H-300V214h399897c43.3-7 81-15 113-26 100.7-33 179.7-91 237
+-174 2.7-5 6-9 10-13 .7-1 7.3-1 20-1h17z"></path></svg></span></span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.648em;"><span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.3341em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">L</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.7333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0315em;">k</span><span class="mord mathnormal mtight" style="margin-right:0.0359em;">v</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8444em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">h</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">b</span><span class="mpunct">,</span></span></span></span></span>
+<p>where <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi></mrow><annotation encoding="application/x-tex">L</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal">L</span></span></span></span> is layers, <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>n</mi><mrow><mi>k</mi><mi>v</mi></mrow></msub></mrow><annotation encoding="application/x-tex">n_{kv}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0315em;">k</span><span class="mord mathnormal mtight" style="margin-right:0.0359em;">v</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> the number of KV heads, <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>d</mi><mi>h</mi></msub></mrow><annotation encoding="application/x-tex">d_h</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8444em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">h</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> the head
+dimension, <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi></mrow><annotation encoding="application/x-tex">S</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span></span></span></span> the sequence length, <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>B</mi></mrow><annotation encoding="application/x-tex">B</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span></span></span></span> the batch size, and <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>b</mi></mrow><annotation encoding="application/x-tex">b</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">b</span></span></span></span> bytes per
+number (2 for BF16). For the same 8B model with grouped-query attention (GQA:
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>n</mi><mrow><mi>k</mi><mi>v</mi></mrow></msub><mo>=</mo><mn>8</mn></mrow><annotation encoding="application/x-tex">n_{kv}=8</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0315em;">k</span><span class="mord mathnormal mtight" style="margin-right:0.0359em;">v</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">8</span></span></span></span>, <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>d</mi><mi>h</mi></msub><mo>=</mo><mn>128</mn></mrow><annotation encoding="application/x-tex">d_h=128</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8444em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">h</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">128</span></span></span></span>), one token costs <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mo>×</mo><mn>32</mn><mo>×</mo><mn>8</mn><mo>×</mo><mn>128</mn><mo>×</mo><mn>2</mn><mo>=</mo><mn>131,072</mn></mrow><annotation encoding="application/x-tex">2 \times 32 \times 8 \times 128
+\times 2 = 131{,}072</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">32</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">8</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">128</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">131</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">072</span></span></span></span> bytes — 128 KB. At <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">S = 1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span>M tokens, batch of one:
+<strong>~131 GB of cache for a single user’s single conversation</strong> — more than an
+entire 80 GB H100, on top of the 16 GB of weights. Without GQA (32 KV heads
+instead of 8) it would be 524 GB. This is why every long-context architecture
+decision in <a href="/groundup/book/kv-cache-and-efficient-attention/">Chapter 28</a> — GQA,
+DeepSeek’s multi-head latent attention (MLA), sliding windows, hybrid layers —
+exists: the cache, not the compute, is what caps how many long conversations a
+serving fleet can hold in memory at once.</p>
+<h3 id="cost-three-training-data-with-genuine-long-range-structure-is-scarce">Cost three: training data with genuine long-range structure is scarce</h3>
+<p>The sneakiest cost. You can pay for compute and memory; you cannot easily buy
+documents whose <em>meaning</em> actually spans a million tokens. Most web pages are
+under a thousand tokens. Concatenating unrelated short documents into a long
+training sequence teaches the model nothing about long-range dependency — the
+correct thing to learn from such data is that distant tokens are irrelevant,
+which is precisely the wrong lesson. Genuine long-range structure lives in a
+few places: books (a character introduced in chapter 2 matters in chapter 40),
+large code repositories (a function defined in one file is called from
+thirty others), long transcripts and legal records, and increasingly
+<em>synthetic</em> tasks manufactured to require long-range retrieval and reasoning.
+This scarcity is why long-context ability is trained in a short, targeted
+extension phase on a specially up-weighted mixture (<a href="/groundup/book/the-training-run/">Chapter
+34</a>) rather than throughout pretraining — and why
+retrieval-style skills (find the fact) have improved faster than synthesis
+skills (integrate the book), a gap we will return to.</p>
+<figure class="fig">
+  <svg viewBox="0 0 720 330" role="img" aria-label="Log-log chart showing quadratic attention cost and linear KV-slash-compute cost versus context length">
+    <defs>
+      <marker id="arr43a" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+        <path d="M0,0 L6,3 L0,6" fill="none" stroke="currentColor" stroke-width="1.5"></path>
+      </marker>
+    </defs>
+    <!-- axes -->
+    <line x1="90" y1="270" x2="668" y2="270" stroke="currentColor" opacity="0.35" marker-end="url(#arr43a)"></line>
+    <line x1="90" y1="270" x2="90" y2="28" stroke="currentColor" opacity="0.35" marker-end="url(#arr43a)"></line>
+    <text x="379" y="308" text-anchor="middle" font-family="Inter Variable, sans-serif" font-size="14" fill="currentColor">context length (log scale)</text>
+    <text x="38" y="150" text-anchor="middle" font-family="Inter Variable, sans-serif" font-size="14" fill="currentColor" transform="rotate(-90 38 150)">relative cost (log scale)</text>
+    <!-- x ticks -->
+    <g font-family="Inter Variable, sans-serif" font-size="12.5" fill="currentColor" opacity="0.55" text-anchor="middle">
+      <text x="90" y="288">8k</text>
+      <text x="250" y="288">32k</text>
+      <text x="410" y="288">128k</text>
+      <text x="570" y="288">512k</text>
+      <text x="650" y="288">1M</text>
+    </g>
+    <g stroke="currentColor" opacity="0.2">
+      <line x1="250" y1="266" x2="250" y2="274"></line>
+      <line x1="410" y1="266" x2="410" y2="274"></line>
+      <line x1="570" y1="266" x2="570" y2="274"></line>
+      <line x1="650" y1="266" x2="650" y2="274"></line>
+    </g>
+    <!-- linear line: slope 1 in log-log -->
+    <line x1="90" y1="260" x2="650" y2="150" stroke="#14b8a6" stroke-width="2.5"></line>
+    <!-- quadratic line: slope 2 -->
+    <line x1="90" y1="260" x2="650" y2="40" stroke="#fb7185" stroke-width="2.5"></line>
+    <!-- labels -->
+    <text x="452" y="66" font-family="Inter Variable, sans-serif" font-size="13.5" fill="#fb7185">attention pairs — quadratic</text>
+    <text x="452" y="84" font-family="Inter Variable, sans-serif" font-size="12.5" fill="#fb7185" opacity="0.8">×16,384 from 8k to 1M</text>
+    <text x="400" y="225" font-family="Inter Variable, sans-serif" font-size="13.5" fill="#14b8a6">KV cache and per-token compute — linear</text>
+    <text x="400" y="243" font-family="Inter Variable, sans-serif" font-size="12.5" fill="#14b8a6" opacity="0.8">×128 from 8k to 1M — still 131 GB of KV at 1M</text>
+    <!-- marker dots at 1M -->
+    <circle cx="650" cy="40" r="4" fill="#fb7185"></circle>
+    <circle cx="650" cy="150" r="4" fill="#14b8a6"></circle>
+  </svg>
+  <figcaption><strong>Figure:</strong> the two hardware costs of length, on log-log axes where a power law is a straight line. Attention's pairwise interactions grow with slope 2; KV memory and per-token linear compute grow with slope 1. Both bite: the quadratic term dominates prefill compute at long lengths, while the "merely linear" KV term is what overflows GPU memory. The third cost — scarcity of genuinely long training data — does not fit on a hardware chart, and is arguably the hardest of the three.</figcaption>
+</figure>
+<h2 id="the-stack-how-a-million-token-window-is-actually-built">The stack: how a million-token window is actually built</h2>
+<p>No single trick produces a working 1M-token model. Shipping one means solving
+four problems at four different layers of the system, each covered in an
+earlier chapter — this is where they assemble.</p>
+<p><strong>Layer 1 — positions.</strong> A model trained at 8k has never seen the rotation
+angles that RoPE assigns to position 400,000; feed it a long sequence naively
+and attention degrades into noise. The fix is the RoPE surgery of <a href="/groundup/book/positional-encodings/">Chapter
+26</a>: raise the base <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>b</mi></mrow><annotation encoding="application/x-tex">b</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">b</span></span></span></span> (Llama 3’s
+<code>rope_theta: 500000</code>), or interpolate positions (PI), or do per-frequency-band
+interpolation with an attention-temperature correction
+(<a href="https://arxiv.org/abs/2309.00071">YaRN</a>). This makes long positions
+<em>representable</em>. It does not, by itself, make them <em>usable</em> — the model still
+has to learn what to do with them.</p>
+<p><strong>Layer 2 — attention and memory.</strong> The KV cache must shrink and the attention
+kernel must stop materializing an <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>×</mo><mi>n</mi></mrow><annotation encoding="application/x-tex">n \times n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span> matrix. GQA or MLA cuts cache
+size 4–57× (<a href="/groundup/book/kv-cache-and-efficient-attention/">Chapter 28</a>);
+FlashAttention computes exact attention in tiles without ever writing the full
+score matrix; and many 2025–2026 architectures interleave <strong>local</strong> layers
+(sliding-window attention over a few thousand recent tokens) with occasional
+<strong>global</strong> layers that see everything — paying the quadratic price in only a
+fraction of the layers. <a href="/groundup/book/state-space-models/">State-space and hybrid
+models</a> push this further by replacing most
+attention layers with fixed-size recurrent state.</p>
+<p><strong>Layer 3 — systems.</strong> Even with efficient kernels, a million-token activation
+set does not fit on one GPU. <a href="https://arxiv.org/abs/2310.01889">Ring Attention</a>
+and its descendants — “context parallelism” in <a href="/groundup/book/compute-and-parallelism/">Chapter
+33</a>’s taxonomy — shard the <em>sequence itself</em>
+across devices: each GPU holds a block of tokens, and KV blocks circulate
+around the ring so every query block eventually attends over every key block,
+with communication hidden behind computation. This is what makes both training
+on and serving million-token sequences physically possible.</p>
+<p><strong>Layer 4 — training.</strong> Context extension is a <em>phase</em>, not a property of the
+whole run. The main pretraining run uses short sequences (4k–8k) because they
+are vastly cheaper per token; then a final stage — typically a fraction of a
+percent to a few percent of total tokens — trains at progressively longer
+lengths on a mixture up-weighted toward books, code repositories, and
+synthetic long-range tasks. Llama 3.1, for instance, extended from 8k to 128k
+in six staged increments using roughly 800B of its 15.6T total training tokens
+(approximate, from the Llama 3 report). The <a href="https://arxiv.org/abs/2403.05530">Gemini 1.5
+report</a> showed this whole stack scaling to
+10M tokens in research settings — the existence proof that the recipe has no
+hard wall before that point.</p>
+<figure class="fig">
+  <svg viewBox="0 0 720 350" role="img" aria-label="Four-layer stack diagram showing how positions, attention, systems, and training combine into a long-context model">
+    <defs>
+      <marker id="arr43b" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+        <path d="M0,0 L6,3 L0,6" fill="none" stroke="currentColor" stroke-width="1.5"></path>
+      </marker>
+    </defs>
+    <!-- output box -->
+    <rect x="180" y="20" width="360" height="44" rx="8" fill="#f59e0b" fill-opacity="0.15" stroke="#f59e0b" stroke-width="1.5"></rect>
+    <text x="360" y="47" text-anchor="middle" font-family="Inter Variable, sans-serif" font-size="14.5" fill="currentColor">a usable 128k–1M token window</text>
+    <!-- arrow from stack to output -->
+    <line x1="360" y1="86" x2="360" y2="70" stroke="currentColor" opacity="0.5" marker-end="url(#arr43b)"></line>
+    <!-- layer 4: training -->
+    <rect x="70" y="90" width="580" height="52" rx="8" fill="#fb7185" fill-opacity="0.15" stroke="#fb7185" stroke-width="1.5"></rect>
+    <text x="86" y="112" font-family="Inter Variable, sans-serif" font-size="13.5" fill="currentColor" font-weight="600">Training — length curriculum</text>
+    <text x="86" y="130" font-family="Inter Variable, sans-serif" font-size="12.5" fill="currentColor" opacity="0.55">short main run, then an extension stage on a long-document + synthetic mix (ch. 34)</text>
+    <!-- layer 3: systems -->
+    <rect x="70" y="152" width="580" height="52" rx="8" fill="#38bdf8" fill-opacity="0.15" stroke="#38bdf8" stroke-width="1.5"></rect>
+    <text x="86" y="174" font-family="Inter Variable, sans-serif" font-size="13.5" fill="currentColor" font-weight="600">Systems — context parallelism</text>
+    <text x="86" y="192" font-family="Inter Variable, sans-serif" font-size="12.5" fill="currentColor" opacity="0.55">Ring Attention: shard the sequence across GPUs, circulate KV blocks (ch. 33)</text>
+    <!-- layer 2: attention -->
+    <rect x="70" y="214" width="580" height="52" rx="8" fill="#818cf8" fill-opacity="0.15" stroke="#818cf8" stroke-width="1.5"></rect>
+    <text x="86" y="236" font-family="Inter Variable, sans-serif" font-size="13.5" fill="currentColor" font-weight="600">Attention &#x26; memory — shrink the cache, tile the kernel</text>
+    <text x="86" y="254" font-family="Inter Variable, sans-serif" font-size="12.5" fill="currentColor" opacity="0.55">GQA / MLA, FlashAttention, local–global layer interleaving, sliding windows (ch. 28)</text>
+    <!-- layer 1: positions -->
+    <rect x="70" y="276" width="580" height="52" rx="8" fill="#14b8a6" fill-opacity="0.15" stroke="#14b8a6" stroke-width="1.5"></rect>
+    <text x="86" y="298" font-family="Inter Variable, sans-serif" font-size="13.5" fill="currentColor" font-weight="600">Positions — RoPE surgery</text>
+    <text x="86" y="316" font-family="Inter Variable, sans-serif" font-size="12.5" fill="currentColor" opacity="0.55">raise base θ, position interpolation, NTK-aware scaling, YaRN (ch. 26)</text>
+  </svg>
+  <figcaption><strong>Figure:</strong> the long-context stack. Each layer solves a different failure mode: positions must be representable, attention must be affordable, the sequence must physically fit across hardware, and the model must be trained to actually use distance. Remove any layer and the advertised window either crashes, costs too much, or works only on paper.</figcaption>
+</figure>
+<aside class="box box-practice" data-box="practice"><div class="box-title"><span class="box-icon" aria-hidden="true">⚙️</span>In practice</div><p>What ships in 2026 (all numbers fast-moving snapshots): Gemini 2.5 Pro serves
+1M tokens (2M announced for earlier versions); GPT-4.1-class OpenAI models and
+Claude Sonnet-class models serve 1M; most strong open-weight models (Llama,
+Qwen, DeepSeek) advertise 128k–256k, usually via YaRN-style extension noted
+right in their config files. Nearly every one of them uses GQA or MLA, mixes
+local and global attention layers, and was context-extended in a late training
+phase rather than trained long from scratch. The advertised ceiling is
+increasingly a <em>pricing and serving</em> decision as much as a capability one —
+serving 1M-token requests means reserving enormous KV memory per user, which
+is why long-context tiers often cost more per token beyond a threshold
+(e.g., higher input pricing above 200k tokens).</p></aside>
+<h2 id="evaluating-long-context-honestly">Evaluating long context honestly</h2>
+<p>Now the uncomfortable part. A model that <em>accepts</em> a million tokens has a
+million-token window. Whether it <em>uses</em> a million tokens is an empirical
+question, and the evaluation story is a ladder of increasingly hard tests —
+each introduced because models saturated the previous rung without actually
+being good at long context.</p>
+<h3 id="needle-in-a-haystack-necessary-nowhere-near-sufficient">Needle in a haystack: necessary, nowhere near sufficient</h3>
+<p>The original test, from <a href="https://github.com/gkamradt/LLMTest_NeedleInAHaystack">Greg Kamradt’s 2023
+repo</a>: hide one
+distinctive sentence (the “needle” — famously, the best thing to do in San
+Francisco involves a sandwich and Dolores Park) inside a long haystack of Paul
+Graham essays, and ask the model to retrieve it. Sweep needle depth ×
+context length, plot a heatmap, hope for solid green.</p>
+<p>By 2024–2025, frontier models made the heatmap solid green nearly
+everywhere — Gemini 1.5 reported ~99% single-needle recall out to 1M tokens
+and beyond. But saturation revealed the test’s weakness rather than the
+models’ strength. A single semantically <em>out-of-place</em> sentence is the easiest
+possible retrieval target: it is the one thing in the haystack that looks
+nothing like the haystack. Attention heads that do
+<a href="/groundup/book/circuits/">induction-style</a> matching can find it without anything you
+would call reading comprehension. Passing needle-in-a-haystack (NIAH) is like proving you can find
+your name in a phone book: necessary, and almost meaningless alone.</p>
+<aside class="box box-warning" data-box="warning"><div class="box-title"><span class="box-icon" aria-hidden="true">⚠️</span>Careful</div><p>A green NIAH heatmap in a model announcement tells you the positional
+machinery works — RoPE extension didn’t break, attention reaches all
+positions. It tells you nearly nothing about whether the model can <em>reason
+over</em> long inputs. Treat it as a smoke test the marketing department has
+learned to frame as a capability claim.</p></aside>
+<h3 id="harder-rungs-multi-needle-multi-hop-ruler">Harder rungs: multi-needle, multi-hop, RULER</h3>
+<p>The successors make retrieval compositional. <strong>Multi-needle</strong> tests hide
+several facts and require all of them. <strong>Multi-hop</strong> variants chain them: fact
+A points to fact B (“the code for the vault is written on the back of the
+painting”; 400k tokens later, “the painting hangs in the east corridor”), so
+the model must retrieve, then retrieve again conditioned on the first result.
+<strong>Aggregation</strong> tasks ask about the haystack itself — count occurrences, find
+the most frequent name — so no single lucky retrieval can succeed.</p>
+<p><a href="https://arxiv.org/abs/2404.06654">RULER</a> (Hsieh et al., 2024) packaged
+thirteen such tasks into a length-configurable synthetic benchmark and
+introduced the concept this chapter keeps leaning on: <strong>effective context
+length</strong> — the longest length at which a model still clears a fixed quality
+bar. The headline finding: of the models then claiming 32k or more, roughly
+half fell below the bar <em>before</em> reaching their claimed length. Models
+advertising 128k commonly had effective lengths of 4k–64k on RULER’s harder
+tasks. Realistic-document suites (LongBench and its descendants, long-document
+question answering (QA) and summarization sets) paint the same picture with
+messier data: scores
+decline with length long before the advertised wall, and decline fastest on
+tasks that need more than lookup.</p>
+<h3 id="lost-in-the-middle-position-matters-not-only-length">Lost in the middle: position matters, not only length</h3>
+<p><a href="https://arxiv.org/abs/2307.03172">Liu et al. (2023)</a> found something stranger
+than degradation-with-length: degradation-with-<em>position</em>. In multi-document
+question answering — twenty retrieved documents, one containing the answer —
+accuracy traced a <strong>U-curve</strong> over where the gold document sat. Models were
+sharp when the answer was at the very beginning (primacy) or the very end
+(recency) of the context, and dramatically worse in the middle. The most
+damning detail: with the answer sitting mid-context, GPT-3.5-Turbo scored
+<em>below its own closed-book performance</em> — having the answer in front of it,
+in the middle of the pile, was worth less than not having it at all.</p>
+<figure class="fig">
+  <svg viewBox="0 0 720 310" role="img" aria-label="U-shaped curve of question-answering accuracy versus position of the relevant document in the context">
+    <defs>
+      <marker id="arr43c" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+        <path d="M0,0 L6,3 L0,6" fill="none" stroke="currentColor" stroke-width="1.5"></path>
+      </marker>
+    </defs>
+    <!-- axes -->
+    <line x1="90" y1="260" x2="670" y2="260" stroke="currentColor" opacity="0.35" marker-end="url(#arr43c)"></line>
+    <line x1="90" y1="260" x2="90" y2="30" stroke="currentColor" opacity="0.35" marker-end="url(#arr43c)"></line>
+    <text x="380" y="298" text-anchor="middle" font-family="Inter Variable, sans-serif" font-size="14" fill="currentColor">position of the relevant document among 20</text>
+    <text x="40" y="145" text-anchor="middle" font-family="Inter Variable, sans-serif" font-size="14" fill="currentColor" transform="rotate(-90 40 145)">accuracy (%)</text>
+    <!-- x tick labels -->
+    <g font-family="Inter Variable, sans-serif" font-size="12.5" fill="currentColor" opacity="0.55" text-anchor="middle">
+      <text x="90" y="278">1st</text>
+      <text x="238" y="278">5th</text>
+      <text x="380" y="278">10th</text>
+      <text x="522" y="278">15th</text>
+      <text x="650" y="278">20th</text>
+    </g>
+    <!-- y tick labels -->
+    <g font-family="Inter Variable, sans-serif" font-size="12.5" fill="currentColor" opacity="0.55" text-anchor="end">
+      <text x="82" y="72">75</text>
+      <text x="82" y="127">65</text>
+      <text x="82" y="182">55</text>
+      <text x="82" y="237">45</text>
+    </g>
+    <g stroke="currentColor" opacity="0.12">
+      <line x1="90" y1="68" x2="660" y2="68"></line>
+      <line x1="90" y1="123" x2="660" y2="123"></line>
+      <line x1="90" y1="178" x2="660" y2="178"></line>
+      <line x1="90" y1="233" x2="660" y2="233"></line>
+    </g>
+    <!-- closed-book dashed line at ~56% -->
+    <line x1="90" y1="172" x2="660" y2="172" stroke="#f59e0b" stroke-width="2" stroke-dasharray="7 5"></line>
+    <text x="656" y="160" text-anchor="end" font-family="Inter Variable, sans-serif" font-size="12.5" fill="#f59e0b">closed-book accuracy (no documents at all)</text>
+    <!-- U curve -->
+    <path d="M 90,68 C 160,95 190,140 238,158 C 290,177 330,186 380,187 C 430,186 470,175 522,158 C 575,140 615,110 650,84" fill="none" stroke="#818cf8" stroke-width="2.5"></path>
+    <circle cx="90" cy="68" r="4" fill="#818cf8"></circle>
+    <circle cx="380" cy="187" r="4" fill="#818cf8"></circle>
+    <circle cx="650" cy="84" r="4" fill="#818cf8"></circle>
+    <text x="120" y="52" font-family="Inter Variable, sans-serif" font-size="12.5" fill="#818cf8">primacy</text>
+    <text x="576" y="62" font-family="Inter Variable, sans-serif" font-size="12.5" fill="#818cf8">recency</text>
+    <text x="380" y="225" text-anchor="middle" font-family="Inter Variable, sans-serif" font-size="12.5" fill="#818cf8">the lost middle — below closed-book</text>
+  </svg>
+  <figcaption><strong>Figure:</strong> the "lost in the middle" U-curve: multi-document QA accuracy as a function of where the answer-bearing document sits in the context. Accuracy is highest at the edges (primacy and recency) and dips below the model's <em>closed-book</em> accuracy in the middle. Values are approximate and characteristic of 2023-era models. (After Liu et al., 2023 — redrawn.)</figcaption>
+</figure>
+<p>Two honest caveats. First, the U-curve was measured on 2023 models; frontier
+models in 2026 have flattened it substantially on tasks of that difficulty —
+long-context training explicitly targets it, often with synthetic data that
+plants needles uniformly across positions. Second, it has not <em>disappeared</em>:
+positional bias re-emerges in weaker models, at longer lengths, and on harder
+tasks, and practitioners still order their prompts around it (instructions and
+the most important material at the beginning or end, never buried at token
+400,000). A bias this consistent with human serial-position effects — and
+with the recency structure that both RoPE’s decay and training data impose —
+should be assumed present until measured absent.</p>
+<h3 id="retrieval-versus-synthesis-the-real-frontier">Retrieval versus synthesis: the real frontier</h3>
+<p>Every task above is, at heart, <em>find things</em>. The capability that would
+justify the working-memory framing is <em>use everything</em>: summarize the book,
+trace the character’s arc, determine whether the codebase’s error handling is
+consistent, reconcile forty contracts. Synthesis requires representing and
+integrating the whole input, not locating a piece of it — and here the honest
+2026 assessment is that models are far better than they were and still worse
+than the marketing implies. On benchmarks built from genuine book-length
+comprehension — claims about novels that require having followed the plot
+(e.g., the NoCha benchmark of
+<a href="https://scholar.google.com/scholar?q=%22One+Thousand+and+One+Pairs%22+novels+claim+verification">claim verification over novels</a>),
+or full-repository code tasks — frontier models score far above chance and
+far below humans who have actually read the text. Length degrades everything,
+but it degrades synthesis first.</p>
+<aside class="box box-note" data-box="note"><div class="box-title"><span class="box-icon" aria-hidden="true">✎</span>Note</div><p><strong>Effective versus advertised context — the 2026 scorecard.</strong> Advertised
+context is a hard number (the position limit the application programming
+interface (API) accepts). Effective
+context is task-dependent and softer, but the pattern across RULER-style and
+realistic evals is consistent enough to state: for frontier closed models,
+retrieval-flavored performance holds into the
+many-hundreds-of-thousands of tokens; synthesis-flavored performance typically degrades
+noticeably beyond roughly 100k–200k. For most open-weight models, effective
+context on hard tasks runs around a quarter to a half of the advertised
+number. The 10M-token advertisements of 2025 were, by any effective-context
+measure, aspirational. None of these figures is stable; all of them are
+improving; the <em>gap</em> itself is the durable fact to remember.</p></aside>
+<h2 id="prompt-caching-the-serving-side-complement">Prompt caching: the serving-side complement</h2>
+<p>Long context has a second cost problem that shows up not in the model but in
+the bill. A conversation is stateless at the API level: every turn resends the
+entire history, and the provider must prefill — run the full forward pass over
+— everything before generating the next token. From <a href="/groundup/book/inference-and-serving/">Chapter
+39</a> you know prefill is the compute-hungry
+phase. Now imagine an agent holding a 500k-token codebase in context across a
+50-turn session: without help, the serving fleet re-processes half a million
+tokens <em>per turn</em>, 25 million cumulative token-prefills, nearly all of it
+recomputing keys and values for text that has not changed since the last turn.</p>
+<p>The fix is the KV cache wearing a new hat: <strong>prefix caching</strong> (prompt
+caching). The provider keeps the computed KV cache for a prompt prefix —
+keyed by an exact-match hash of the prefix tokens — and when the next request
+begins with the same prefix, prefill skips straight to the first new token.
+The physics you already know (KV cache = the state of a processed sequence)
+becomes an economic instrument: cached input is billed at a steep discount
+because the provider does almost no work for it.</p>
+<aside class="box box-example" data-box="example"><div class="box-title"><span class="box-icon" aria-hidden="true">✏️</span>Worked example</div><p>Agent session: 150k-token fixed prefix (system prompt + codebase), 30 turns,
+each turn adding ~2k tokens of new conversation. <strong>Without caching:</strong> turn
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi></mrow><annotation encoding="application/x-tex">k</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span></span></span></span> prefills roughly <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>150,000</mn><mo>+</mo><mn>2,000</mn><mi>k</mi></mrow><annotation encoding="application/x-tex">150{,}000 + 2{,}000k</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">150</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">000</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord">2</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">000</span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span></span></span></span> tokens; summed over 30 turns
+that is <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>30</mn><mo>×</mo><mn>150,000</mn><mo>+</mo><mn>2,000</mn><mo>×</mo><mo stretchy="false">(</mo><mn>1</mn><mo>+</mo><mn>2</mn><mo>+</mo><mo>⋯</mo><mo>+</mo><mn>30</mn><mo stretchy="false">)</mo><mo>=</mo><mn>4,500,000</mn><mo>+</mo><mn>930,000</mn><mo>≈</mo><mn>5.4</mn></mrow><annotation encoding="application/x-tex">30 \times 150{,}000 + 2{,}000 \times (1 + 2 + \cdots + 30) =
+4{,}500{,}000 + 930{,}000 \approx 5.4</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">30</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">150</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">000</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">2</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">000</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="minner">⋯</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">30</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">4</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">500</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">000</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">930</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">000</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">5.4</span></span></span></span>M token-prefills. <strong>With prefix
+caching</strong> at a typical ~10× read discount: the 150k prefix is paid in full
+once, then read 29 times at one-tenth price — <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>150</mn><mtext>k</mtext><mo>+</mo><mn>29</mn><mo>×</mo><mn>15</mn><mtext>k</mtext><mo>+</mo><mn>930</mn><mtext>k</mtext><mo>≈</mo><mn>1.5</mn></mrow><annotation encoding="application/x-tex">150\text{k} + 29 \times
+15\text{k} + 930\text{k} \approx 1.5</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7778em;vertical-align:-0.0833em;"></span><span class="mord">150</span><span class="mord text"><span class="mord">k</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">29</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.7778em;vertical-align:-0.0833em;"></span><span class="mord">15</span><span class="mord text"><span class="mord">k</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord">930</span><span class="mord text"><span class="mord">k</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1.5</span></span></span></span>M effective full-price tokens, about
+<strong>3.6× cheaper</strong>, and the discount grows with more turns and longer prefixes.
+Latency improves even more than cost: a 150k-token prefill that took tens of
+seconds becomes a near-instant cache hit, which is the difference between an
+agent that plods and one that flows.</p></aside>
+<aside class="box box-practice" data-box="practice"><div class="box-title"><span class="box-icon" aria-hidden="true">⚙️</span>In practice</div><p>Pricing patterns as of 2026 (approximate and fast-moving): cache <em>reads</em>
+typically cost around 10% of normal input price (Anthropic, DeepSeek — which
+made caching automatic and default) to 25–50% (OpenAI’s automatic caching for
+prefixes over 1k tokens). Some providers charge a modest premium (~25%) to
+<em>write</em> a cache entry, and entries expire after minutes unless refreshed or
+paid for at longer durations. The design consequence flows backward into how
+you build prompts: <strong>stable content first</strong>. System prompt, documents, code —
+the unchanging bulk — must be a byte-identical prefix; anything that varies
+per turn (the user’s question, the timestamp you were tempted to put at the
+top) goes last, because the first changed byte invalidates everything after
+it. Every serious agent framework in 2026 is architected around this rule.</p></aside>
+<p>One more serving trick deserves a mention because it is often confused with
+long context: <a href="https://arxiv.org/abs/2309.17453">StreamingLLM</a>-style
+<strong>attention sinks</strong>. Xiao et al. noticed that models dump surprisingly large
+attention mass on the first few tokens — a stable “sink” — and that keeping
+only those first ~4 tokens plus a sliding window of recent ones lets a model
+generate <em>indefinitely</em> without perplexity blowing up. That gives you infinite
+generation length, which is not long context: tokens that fall out of the
+window are gone, and the model remains fluent while forgetting them.
+Advertised “infinite streaming” and genuine million-token recall are different
+claims; only one of them involves remembering.</p>
+<h2 id="long-context-versus-rag-complements-not-rivals">Long context versus RAG: complements, not rivals</h2>
+<p>When context windows hit 1M, a chorus announced the death of
+<a href="/groundup/book/retrieval-augmented-generation/">retrieval-augmented generation (RAG)</a>
+— why retrieve snippets when you can paste everything? The chorus was wrong
+for a boring reason: corpora are bigger than context windows and always will
+be. A million tokens is one shelf of books; an enterprise document store, a
+legal database, or the live web is millions of shelves. Retrieval is how you
+select <em>which</em> million tokens deserve the desk. What long context changed is
+the <em>shape</em> of RAG: retrieval can now be generous — pull whole documents, not
+paragraph shards — because the window can afford to read broadly and let the
+model, rather than the ranker, judge relevance.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Situation</th><th>Favors</th></tr></thead><tbody><tr><td>Corpus fits in the window and the task needs cross-document reasoning</td><td>Long context — paste it all</td></tr><tr><td>Corpus is millions of documents / terabytes</td><td>RAG — retrieval is the only option</td></tr><tr><td>Same large document interrogated across many turns</td><td>Long context + prompt caching (pay prefill once)</td></tr><tr><td>Data changes constantly; freshness per query matters</td><td>RAG — re-retrieve, don’t re-train your prompt</td></tr><tr><td>One deeply interdependent artifact (a codebase, a contract stack)</td><td>Long context — chunking destroys the dependencies</td></tr><tr><td>Answers must cite auditable sources with provenance</td><td>RAG — retrieval hands you the citation for free</td></tr><tr><td>Cost-sensitive, high-volume, simple lookups</td><td>RAG — shipping 500k tokens per query is ruinous</td></tr></tbody></table>
+<p>The 2026 default for serious systems is <em>both</em>: retrieval selects generously,
+the long window reads generously, and caching makes the reading affordable.
+<a href="/groundup/book/retrieval-augmented-generation/">Chapter 45</a> builds the retrieval side
+properly.</p>
+<h2 id="context-engineering-the-agent-preview">Context engineering: the agent preview</h2>
+<p>There is one consumer of long context that deserves its own mention, because
+it is where all of this chapter’s threads knot together:
+<a href="/groundup/book/agents-and-tools/">agents</a>. An agent running for hours accumulates
+context relentlessly — every tool call, every file read, every error message
+appends to the transcript — and it hits three walls in order: the <em>quality</em>
+wall (performance degrades as the window fills with stale tool output — the
+degradation patterns from the evaluation section, experienced live, which
+practitioners have taken to calling “context rot”), the <em>cost</em> wall (even
+cached, a bloated context taxes every turn), and eventually the <em>hard</em> wall
+(the window’s actual limit).</p>
+<p>The emerging discipline of <strong>context engineering</strong> treats the window as the
+scarce resource it is: <strong>compaction</strong> (summarize old turns into a short digest
+and drop the raw transcript), <strong>memory files</strong> (persist durable facts to disk
+— notes the agent writes and re-reads — so knowledge survives outside the
+window), and <strong>sub-agents</strong> (delegate a subtask to a fresh context, keep only
+the result). If that sounds like an operating system managing random-access
+memory (RAM) with paging and swap, it should — the working-memory metaphor from the top of this
+chapter runs deep enough that the same design patterns reappear. <a href="/groundup/book/agents-and-tools/">Chapter
+44</a> takes this up properly.</p>
+<h2 id="where-this-leaves-us">Where this leaves us</h2>
+<ul>
+<li>Context is the model’s <strong>working memory</strong>: verbatim and sharp, hard-bounded,
+and expensive in three distinct ways — quadratic attention compute
+(×16,384 from 8k to 1M), linear-but-huge KV memory (~131 GB for one
+million-token user on an 8B GQA model), and the scarcity of training data
+with genuine long-range structure.</li>
+<li>A shipped 1M-token window is a four-layer stack: RoPE surgery makes
+positions representable, GQA/MLA + FlashAttention + local–global
+interleaving make attention affordable, Ring-style context parallelism makes
+sequences fit across GPUs, and a late length-curriculum stage teaches the
+model to actually use distance.</li>
+<li>You can now read long-context evals critically: needle-in-a-haystack is a
+saturated smoke test; RULER-style suites measure <strong>effective context</strong>,
+which routinely runs a quarter to a half of advertised on hard tasks; the
+“lost in the middle” U-curve means position matters, not only length; and
+the retrieval–synthesis gap is the real frontier.</li>
+<li>Prompt caching is the KV cache turned economic instrument: stable-prefix
+prompt design plus ~10× cache-read discounts are what make long documents
+and long agent sessions affordable at all.</li>
+<li>Long context and RAG are complements: retrieval chooses which million
+tokens deserve the desk; the window and the cache make reading them
+practical.</li>
+</ul>
+<p>Next, the chapter where context stops being a document you paste and becomes a
+resource an autonomous system manages for itself: <a href="/groundup/book/agents-and-tools/">Next: Agents, Tool Use, and
+MCP</a>.</p> <div class="papers-card" id="papers-card"> <div class="pc-title">Key papers &amp; readings in this chapter</div> <ul> <li> <div> <a href="https://arxiv.org/abs/2307.03172" target="_blank" rel="noopener">Lost in the Middle: How Language Models Use Long Contexts</a> <span class="p-meta"> — Liu et al., 2023</span> <span class="p-note">The U-curve paper — models retrieve well from the edges of the context and poorly from the middle.</span> </div> </li><li> <div> <a href="https://arxiv.org/abs/2404.06654" target="_blank" rel="noopener">RULER: What&#39;s the Real Context Size of Your Long-Context Language Models?</a> <span class="p-meta"> — Hsieh et al., 2024</span> <span class="p-note">The benchmark that made &quot;effective context&quot; a standard concept; Table 1 is the honest scoreboard.</span> </div> </li><li> <div> <a href="https://arxiv.org/abs/2403.05530" target="_blank" rel="noopener">Gemini 1.5: Unlocking Multimodal Understanding Across Millions of Tokens of Context</a> <span class="p-meta"> — Gemini Team, Google, 2024</span> <span class="p-note">The report that moved the frontier from 200k to 1M+; Sections 4.2–4.3 cover the needle and multi-needle evals.</span> </div> </li><li> <div> <a href="https://arxiv.org/abs/2309.17453" target="_blank" rel="noopener">Efficient Streaming Language Models with Attention Sinks</a> <span class="p-meta"> — Xiao et al., 2023</span> <span class="p-note">StreamingLLM — why the first few tokens matter so much, and why infinite generation is not the same as long memory.</span> </div> </li><li> <div> <a href="https://arxiv.org/abs/2310.01889" target="_blank" rel="noopener">Ring Attention with Blockwise Transformers for Near-Infinite Context</a> <span class="p-meta"> — Liu et al., 2023</span> <span class="p-note">The systems trick behind million-token training: shard the sequence across GPUs and pass KV blocks around a ring.</span> </div> </li><li> <div> <a href="https://arxiv.org/abs/2309.00071" target="_blank" rel="noopener">YaRN: Efficient Context Window Extension of Large Language Models</a> <span class="p-meta"> — Peng et al., 2023</span> <span class="p-note">The RoPE-extension recipe most 128k open models actually shipped with.</span> </div> </li><li> <div> <a href="https://github.com/gkamradt/LLMTest_NeedleInAHaystack" target="_blank" rel="noopener">Needle In A Haystack — Pressure Testing LLMs</a> <span class="p-meta"> — Kamradt, 2023</span> <span class="p-note">The original repo: a single fact hidden in Paul Graham essays, swept over depth × length. The green heatmap that launched a thousand marketing slides.</span> </div> </li> </ul> </div> <nav class="chapter-nav"> <a href="/groundup/book/diffusion-models/" class="prev"> <span class="dir">← Previous</span> <span class="t">Diffusion and Image/Video Generation</span> </a> <a href="/groundup/book/agents-and-tools/" class="next"> <span class="dir">Next →</span> <span class="t">Agents, Tool Use, and MCP</span> </a> </nav> <div class="chapter-foot"> <span>Last updated 2026-08-24</span> <a href="https://github.com/joewilbert/aisite/edit/main/src/content/book/43-long-context.md" target="_blank" rel="noopener">Edit this chapter</a> <a href="https://github.com/joewilbert/aisite/issues/new" target="_blank" rel="noopener">Report an issue</a> </div> </article> </div>  </main> </div> <!-- Right panel: papers / tutor / notes --> <aside class="panel-host" id="panel" aria-label="Side panel"> <div class="panel-resizer" id="panel-resizer"></div> <div class="panel-tabs"> <button class="panel-tab" data-tab="paper">Paper</button> <button class="panel-tab" data-tab="tutor">AI tutor</button> <button class="panel-tab" data-tab="notes">Notes</button> <button class="hbtn panel-close" id="panel-close" aria-label="Close panel"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg> </button> </div> <div class="panel-body"> <div class="panel-view" data-view="paper" id="view-paper"></div> <div class="panel-view" data-view="tutor" id="view-tutor"></div> <div class="panel-view" data-view="notes" id="view-notes"></div> </div> </aside> <!-- Selection toolbar --> <div class="sel-toolbar" id="sel-toolbar"> <div class="swatches"> <button class="sw" data-color="yellow" style="background:var(--hl-yellow)" aria-label="Highlight yellow"></button> <button class="sw" data-color="green" style="background:var(--hl-green)" aria-label="Highlight green"></button> <button class="sw" data-color="blue" style="background:var(--hl-blue)" aria-label="Highlight blue"></button> <button class="sw" data-color="pink" style="background:var(--hl-pink)" aria-label="Highlight pink"></button> </div> <div class="divider"></div> <button id="sel-note">✎ Note</button> <button id="sel-explain">✦ Explain</button> <button id="sel-remove" style="display:none">✕ Remove</button> </div> <!-- Settings modal --> <div class="modal-scrim" id="settings-scrim"> <div class="modal" role="dialog" aria-label="Settings" id="settings-modal"></div> </div> <!-- Search modal --> <div class="modal-scrim" id="search-scrim"> <div class="modal search-modal" role="dialog" aria-label="Search"> <input class="q" id="search-input" type="text" placeholder="Search the book…" autocomplete="off"> <div class="search-results" id="search-results"></div> </div> </div> <script>(function(){const base = "/groundup";
+const slug = "long-context";
+const pageTitle = "Long Context · Ground Up";
+
+      window.__GU__ = { base, slug, pageTitle };
+    })();</script> <script type="module" src="/groundup/_astro/Base.astro_astro_type_script_index_0_lang.65xM_WgJ.js"></script>  </body></html>

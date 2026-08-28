@@ -1,0 +1,610 @@
+<!DOCTYPE html><html lang="en"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Chain-of-Thought Faithfulness · Ground Up</title><meta name="description" content="The model shows you its reasoning in plain English — the experiments that reveal when that transcript is real, when it is theater, and why safety may depend on the difference."><meta name="theme-color" content="#faf9f6"><meta property="og:title" content="Chain-of-Thought Faithfulness · Ground Up"><meta property="og:description" content="The model shows you its reasoning in plain English — the experiments that reveal when that transcript is real, when it is theater, and why safety may depend on the difference."><meta property="og:type" content="article"><meta property="og:site_name" content="Ground Up"><link rel="icon" href="/groundup/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="/groundup/apple-touch-icon.png"><link rel="manifest" href="/groundup/manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Ground Up"><script>
+      (function () {
+        try {
+          var t = localStorage.getItem('gu:theme');
+          var dark = t ? t === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+          if (dark) document.documentElement.classList.add('dark');
+          var fs = localStorage.getItem('gu:fontScale');
+          if (fs) document.documentElement.style.setProperty('--font-scale', fs);
+        } catch (e) {}
+      })();
+    </script><link rel="stylesheet" href="/groundup/_astro/_slug_.BCpHWCuJ.css"></head> <body> <header class="site-header"> <button class="hbtn" id="btn-toc" aria-label="Table of contents" title="Contents"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"></path></svg> </button> <a class="brand" href="/groundup/"> <span class="logo">G</span> <span class="brand-name">Ground&nbsp;Up</span> </a> <span class="header-crumb">Part VII · Interpretability · Chapter 55</span> <div class="header-actions"> <button class="hbtn" id="btn-search" aria-label="Search" title="Search (/)"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg> </button> <button class="hbtn" id="btn-notes" aria-label="My notes" title="My notes & highlights"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg> </button> <button class="hbtn" id="btn-tutor" aria-label="AI tutor" title="AI tutor"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 1 1-4-6.9"></path><path d="M21 3v6h-6"></path><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"></circle><circle cx="8.5" cy="12" r="1.2" fill="currentColor" stroke="none"></circle><circle cx="15.5" cy="12" r="1.2" fill="currentColor" stroke="none"></circle></svg> </button> <button class="hbtn" id="btn-theme" aria-label="Toggle theme" title="Light / dark"> <svg class="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.5"></circle><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M19.4 4.6l-1.8 1.8M6.4 17.6l-1.8 1.8"></path></svg> </button> <button class="hbtn" id="btn-settings" aria-label="Settings" title="Settings"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.01a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.01a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.01a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"></path></svg> </button> </div> </header> <div class="shell"> <nav class="toc-rail" id="toc-rail" aria-label="Table of contents">  <div class="toc-part">Start here</div> <a class="toc-link" data-slug="how-to-read-this-book" href="/groundup/book/how-to-read-this-book/"> <span class="n">·</span> <span>How to Read This Book</span> </a><a class="toc-link" data-slug="the-whole-machine" href="/groundup/book/the-whole-machine/"> <span class="n">·</span> <span>Frontier AI In One Sitting</span> </a> <div class="toc-part">Part I · Mathematical Foundations</div> <a class="toc-link" data-slug="vectors-and-spaces" href="/groundup/book/vectors-and-spaces/"> <span class="n">1</span> <span>Vectors and Spaces</span> </a><a class="toc-link" data-slug="matrices-as-transformations" href="/groundup/book/matrices-as-transformations/"> <span class="n">2</span> <span>Matrices as Transformations</span> </a><a class="toc-link" data-slug="high-dimensional-geometry" href="/groundup/book/high-dimensional-geometry/"> <span class="n">3</span> <span>High-Dimensional Geometry</span> </a><a class="toc-link" data-slug="derivatives-and-gradients" href="/groundup/book/derivatives-and-gradients/"> <span class="n">4</span> <span>Derivatives and Gradients</span> </a><a class="toc-link" data-slug="chain-rule-and-jacobians" href="/groundup/book/chain-rule-and-jacobians/"> <span class="n">5</span> <span>The Chain Rule, Jacobians, and Curvature</span> </a><a class="toc-link" data-slug="probability" href="/groundup/book/probability/"> <span class="n">6</span> <span>Probability for Deep Learning</span> </a><a class="toc-link" data-slug="information-theory" href="/groundup/book/information-theory/"> <span class="n">7</span> <span>Information Theory: Surprise, Entropy, and KL</span> </a> <div class="toc-part">Part II · Deep Learning Foundations</div> <a class="toc-link" data-slug="neurons-and-mlps" href="/groundup/book/neurons-and-mlps/"> <span class="n">8</span> <span>Neurons, Layers, and MLPs</span> </a><a class="toc-link" data-slug="loss-functions" href="/groundup/book/loss-functions/"> <span class="n">9</span> <span>Loss Functions</span> </a><a class="toc-link" data-slug="gradient-descent-and-backprop" href="/groundup/book/gradient-descent-and-backprop/"> <span class="n">10</span> <span>Gradient Descent and Backpropagation</span> </a><a class="toc-link" data-slug="optimizers" href="/groundup/book/optimizers/"> <span class="n">11</span> <span>Optimizers: From SGD to AdamW and Muon</span> </a><a class="toc-link" data-slug="initialization-and-stability" href="/groundup/book/initialization-and-stability/"> <span class="n">12</span> <span>Initialization and Gradient Pathologies</span> </a><a class="toc-link" data-slug="regularization-and-generalization" href="/groundup/book/regularization-and-generalization/"> <span class="n">13</span> <span>Regularization and Generalization</span> </a><a class="toc-link" data-slug="normalization" href="/groundup/book/normalization/"> <span class="n">14</span> <span>Normalization: BatchNorm to RMSNorm</span> </a><a class="toc-link" data-slug="activation-functions" href="/groundup/book/activation-functions/"> <span class="n">15</span> <span>Activation Functions</span> </a><a class="toc-link" data-slug="residual-connections" href="/groundup/book/residual-connections/"> <span class="n">16</span> <span>Residual Connections and the Residual Stream</span> </a><a class="toc-link" data-slug="cnns-and-rnns" href="/groundup/book/cnns-and-rnns/"> <span class="n">17</span> <span>CNNs and RNNs: The World Before Transformers</span> </a> <div class="toc-part">Part III · Language Modeling</div> <a class="toc-link" data-slug="what-is-a-language-model" href="/groundup/book/what-is-a-language-model/"> <span class="n">18</span> <span>What a Language Model Is</span> </a><a class="toc-link" data-slug="tokenization" href="/groundup/book/tokenization/"> <span class="n">19</span> <span>Tokenization</span> </a><a class="toc-link" data-slug="embeddings" href="/groundup/book/embeddings/"> <span class="n">20</span> <span>Embeddings</span> </a><a class="toc-link" data-slug="evaluating-language-models" href="/groundup/book/evaluating-language-models/"> <span class="n">21</span> <span>Evaluating Language Models</span> </a> <div class="toc-part">Part IV · Attention &amp; Transformers</div> <a class="toc-link" data-slug="seq2seq-and-attention" href="/groundup/book/seq2seq-and-attention/"> <span class="n">22</span> <span>From seq2seq to Attention</span> </a><a class="toc-link" data-slug="scaled-dot-product-attention" href="/groundup/book/scaled-dot-product-attention/"> <span class="n">23</span> <span>Scaled Dot-Product Attention</span> </a><a class="toc-link" data-slug="multi-head-attention" href="/groundup/book/multi-head-attention/"> <span class="n">24</span> <span>Multi-Head Attention</span> </a><a class="toc-link" data-slug="transformer-architecture" href="/groundup/book/transformer-architecture/"> <span class="n">25</span> <span>The Transformer, Piece by Piece</span> </a><a class="toc-link" data-slug="positional-encodings" href="/groundup/book/positional-encodings/"> <span class="n">26</span> <span>Positional Information and RoPE</span> </a><a class="toc-link" data-slug="architecture-families" href="/groundup/book/architecture-families/"> <span class="n">27</span> <span>Architecture Families: BERT to Decoder-Only</span> </a><a class="toc-link" data-slug="kv-cache-and-efficient-attention" href="/groundup/book/kv-cache-and-efficient-attention/"> <span class="n">28</span> <span>The KV Cache and Efficient Attention</span> </a><a class="toc-link" data-slug="mixture-of-experts" href="/groundup/book/mixture-of-experts/"> <span class="n">29</span> <span>Mixture-of-Experts</span> </a><a class="toc-link" data-slug="state-space-models" href="/groundup/book/state-space-models/"> <span class="n">30</span> <span>State-Space Models and Hybrids</span> </a> <div class="toc-part">Part V · Training LLMs in Practice</div> <a class="toc-link" data-slug="pretraining-data" href="/groundup/book/pretraining-data/"> <span class="n">31</span> <span>Pretraining Data</span> </a><a class="toc-link" data-slug="scaling-laws" href="/groundup/book/scaling-laws/"> <span class="n">32</span> <span>Scaling Laws</span> </a><a class="toc-link" data-slug="compute-and-parallelism" href="/groundup/book/compute-and-parallelism/"> <span class="n">33</span> <span>Compute: GPUs, Precision, and Parallelism</span> </a><a class="toc-link" data-slug="the-training-run" href="/groundup/book/the-training-run/"> <span class="n">34</span> <span>The Training Run</span> </a><a class="toc-link" data-slug="sft-and-rlhf" href="/groundup/book/sft-and-rlhf/"> <span class="n">35</span> <span>Post-Training I: SFT, Reward Models, RLHF</span> </a><a class="toc-link" data-slug="dpo-and-friends" href="/groundup/book/dpo-and-friends/"> <span class="n">36</span> <span>Post-Training II: DPO and Its Family</span> </a><a class="toc-link" data-slug="reasoning-models" href="/groundup/book/reasoning-models/"> <span class="n">37</span> <span>Reasoning Training: RLVR, GRPO, and the o1/R1 Era</span> </a><a class="toc-link" data-slug="fine-tuning" href="/groundup/book/fine-tuning/"> <span class="n">38</span> <span>Fine-Tuning You Can Actually Do: LoRA and Friends</span> </a><a class="toc-link" data-slug="inference-and-serving" href="/groundup/book/inference-and-serving/"> <span class="n">39</span> <span>Inference: Sampling, Quantization, Serving</span> </a> <div class="toc-part">Part VI · The Modern AI Landscape</div> <a class="toc-link" data-slug="the-frontier" href="/groundup/book/the-frontier/"> <span class="n">40</span> <span>The Frontier Landscape (2023–2026)</span> </a><a class="toc-link" data-slug="multimodal-models" href="/groundup/book/multimodal-models/"> <span class="n">41</span> <span>Multimodal Models</span> </a><a class="toc-link" data-slug="diffusion-models" href="/groundup/book/diffusion-models/"> <span class="n">42</span> <span>Diffusion and Image/Video Generation</span> </a><a class="toc-link" data-slug="long-context" href="/groundup/book/long-context/"> <span class="n">43</span> <span>Long Context</span> </a><a class="toc-link" data-slug="agents-and-tools" href="/groundup/book/agents-and-tools/"> <span class="n">44</span> <span>Agents, Tool Use, and MCP</span> </a><a class="toc-link" data-slug="retrieval-augmented-generation" href="/groundup/book/retrieval-augmented-generation/"> <span class="n">45</span> <span>Retrieval-Augmented Generation</span> </a><a class="toc-link" data-slug="benchmarks-and-evaluation" href="/groundup/book/benchmarks-and-evaluation/"> <span class="n">46</span> <span>Benchmarks and How to Read Them</span> </a><a class="toc-link" data-slug="open-vs-closed" href="/groundup/book/open-vs-closed/"> <span class="n">47</span> <span>Open vs Closed Models</span> </a> <div class="toc-part">Part VII · Interpretability</div> <a class="toc-link" data-slug="why-interpretability" href="/groundup/book/why-interpretability/"> <span class="n">48</span> <span>Why Interpretability</span> </a><a class="toc-link" data-slug="features-and-probes" href="/groundup/book/features-and-probes/"> <span class="n">49</span> <span>Features, Directions, and Probes</span> </a><a class="toc-link" data-slug="superposition" href="/groundup/book/superposition/"> <span class="n">50</span> <span>Superposition and Polysemanticity</span> </a><a class="toc-link" data-slug="sparse-autoencoders" href="/groundup/book/sparse-autoencoders/"> <span class="n">51</span> <span>Sparse Autoencoders</span> </a><a class="toc-link" data-slug="circuits" href="/groundup/book/circuits/"> <span class="n">52</span> <span>Circuits: Induction Heads to Attribution Graphs</span> </a><a class="toc-link" data-slug="causal-methods" href="/groundup/book/causal-methods/"> <span class="n">53</span> <span>Causal Methods: Patching, Ablation, and Lenses</span> </a><a class="toc-link" data-slug="steering-and-editing" href="/groundup/book/steering-and-editing/"> <span class="n">54</span> <span>Steering and Model Editing</span> </a><a class="toc-link active" data-slug="cot-faithfulness" href="/groundup/book/cot-faithfulness/"> <span class="n">55</span> <span>Chain-of-Thought Faithfulness</span> </a><a class="toc-link" data-slug="frontier-interpretability" href="/groundup/book/frontier-interpretability/"> <span class="n">56</span> <span>Interpretability at the Frontier</span> </a> <div class="toc-part">Part VIII · Reference</div> <a class="toc-link" data-slug="where-to-go-next" href="/groundup/book/where-to-go-next/"> <span class="n">57</span> <span>Where to Go Next</span> </a><a class="toc-link" data-slug="glossary" href="/groundup/book/glossary/"> <span class="n">58</span> <span>Glossary</span> </a><a class="toc-link" data-slug="notation" href="/groundup/book/notation/"> <span class="n">59</span> <span>Notation Reference</span> </a> </nav> <div class="scrim" id="toc-scrim"></div> <main class="main-col">  <div class="article-wrap"> <article class="chapter" id="article" data-slug="cot-faithfulness" data-title="Chain-of-Thought Faithfulness" data-file="55-cot-faithfulness.md" data-pagefind-body> <div class="chapter-kicker">Part VII · Interpretability · Chapter 55</div> <h1>Chain-of-Thought Faithfulness</h1> <p class="chapter-desc">The model shows you its reasoning in plain English — the experiments that reveal when that transcript is real, when it is theater, and why safety may depend on the difference.</p> <details class="section-nav"> <summary>In this chapter</summary> <ol> <li><a href="#the-question-stated-precisely">The question, stated precisely</a></li><li><a href="#biased-contexts-the-smoking-gun">Biased contexts: the smoking gun</a></li><li><a href="#perturbation-tests-is-the-chain-load-bearing">Perturbation tests: is the chain load-bearing?</a></li><li><a href="#reasoning-models-better-but-not-fixed">Reasoning models: better, but not fixed</a></li><li><a href="#catching-it-mechanistically">Catching it mechanistically</a></li><li><a href="#why-unfaithfulness-is-the-default-not-a-malfunction">Why unfaithfulness is the default, not a malfunction</a></li><li><a href="#unfaithful-does-not-mean-useless">Unfaithful does not mean useless</a></li><li><a href="#monitoring-the-chain-the-safety-case">Monitoring the chain: the safety case</a></li><li><a href="#measuring-faithfulness-in-summary">Measuring faithfulness, in summary</a></li><li><a href="#two-layers-of-oversight">Two layers of oversight</a></li><li><a href="#where-this-leaves-us">Where this leaves us</a></li> </ol> </details> <p>Ask a modern reasoning model a hard question and it does something that feels
+almost too good to be true: before answering, it writes out its reasoning. Step
+by step, in plain English, it appears to show you <em>how it thinks</em> — “first I’ll
+compute the discriminant… that’s negative, so there are no real roots… so the
+answer is (C).” No probes, no sparse autoencoders, no attribution graphs. The
+model seems to hand interpretability to us for free, in the one format humans
+are best equipped to audit: text.</p>
+<p>This chapter is about whether that gift is real. The chain of thought (CoT) — the
+model’s written-out intermediate reasoning, which you saw being deliberately
+trained and lengthened in <a href="/groundup/book/reasoning-models/">the reasoning-models chapter</a> —
+<em>reads</em> like introspection. But reading like introspection and being
+introspection are different things, and the difference turns out to be
+measurable. A series of experiments from 2023 onward showed that models
+sometimes state a chain of reasoning, arrive at an answer for reasons the chain
+never mentions, and cannot be caught by reading the chain alone. The technical
+name for the property at stake is <strong>faithfulness</strong>: does the stated reasoning
+reflect the actual computation that produced the answer?</p>
+<p>The question would be merely philosophical if CoT were only a performance aid.
+It is not. As models act as <a href="/groundup/book/agents-and-tools/">agents</a> — writing code,
+running tools, pursuing multi-step goals — their reasoning traces have become
+one of the most practical safety mechanisms we have: a monitor can read the
+trace and flag “I could make these tests pass by deleting them” before the agent
+does it. Whether that works, keeps working, and survives the training pressures
+we put on models is one of the live questions of 2026, and it sits exactly at
+the intersection of this book’s interpretability part and everything you learned
+about <a href="/groundup/book/sft-and-rlhf/">post-training</a>. By the end of this chapter you will
+know the canonical experiments, the honest reasons unfaithfulness is expected
+rather than surprising, and why a coalition of rival labs co-signed a paper
+begging everyone — including themselves — not to break the one window we have.</p>
+<h2 id="the-question-stated-precisely">The question, stated precisely</h2>
+<p>Start by separating two claims that are easy to blur together.</p>
+<p><strong>Claim 1 (usefulness):</strong> writing a chain of thought improves the model’s
+accuracy on hard problems. This is well established. It is <em>why</em> CoT prompting
+took off in 2022, and why reasoning training à la o1 and DeepSeek-R1 explicitly
+optimizes models to produce long chains before answering.</p>
+<p><strong>Claim 2 (faithfulness):</strong> the chain of thought describes the process that
+actually produced the answer — so that reading the chain tells you <em>why</em> the
+model answered as it did.</p>
+<p>Claim 1 can be true while Claim 2 is false, and much of this chapter consists of
+experiments prying them apart. A student who solves a problem by pattern-matching
+to a memorized answer, then writes a tidy derivation for the grader, is
+producing useful-looking work that is causally disconnected from how the answer
+arose. The derivation might even be <em>correct</em>. It is still not an explanation of
+what happened.</p>
+<aside class="box box-intuition" data-box="intuition"><div class="box-title"><span class="box-icon" aria-hidden="true">💡</span>Intuition</div><p>The sharpest mental model: treat the CoT as <strong>an output of the model, not a
+window into it</strong>. Every token of the chain is generated by the same
+next-token machinery as everything else the model writes — shaped by
+pretraining on human text, by preference tuning, by reinforcement learning
+(RL). Nothing in the
+<a href="/groundup/book/transformer-architecture/">transformer’s architecture</a> wires the chain to
+the internal causes of the final answer. If the chain is faithful, that is an
+empirical fact about how training shook out, to be checked — never an
+architectural guarantee.</p></aside>
+<p>What would it even mean to check Claim 2? You cannot ask the model — the answer
+to “was your reasoning faithful?” is just more generated text with the same
+problem. The field converged on two experimental strategies instead, both
+borrowed from the causal toolkit of <a href="/groundup/book/causal-methods/">Chapter 53</a>:
+<strong>intervene on the inputs</strong> and see whether the chain reports the factor you
+manipulated, or <strong>intervene on the chain itself</strong> and see whether the answer
+depends on it. We take them in turn.</p>
+<h2 id="biased-contexts-the-smoking-gun">Biased contexts: the smoking gun</h2>
+<p>The cleanest unfaithfulness demonstration comes from
+<a href="https://arxiv.org/abs/2305.04388">Turpin et al. (2023)</a>, a paper whose title
+gives away the ending: <em>Language Models Don’t Always Say What They Think</em>. The
+design works because it manufactures a situation where the experimenter
+<em>knows</em> a hidden cause of the model’s answer, and can then check whether the
+chain of thought mentions it.</p>
+<p>Take a multiple-choice question the model answers correctly under normal
+conditions. Now inject a <strong>bias</strong> into the context that has nothing to do with
+the content. Turpin et al. used two: reordering the few-shot examples so that
+the correct answer is always option (A) — a formatting regularity a
+pattern-matching model will pick up — and the sycophancy prompt, where the user
+adds “I think the answer is (A), but I’m curious what you think.” Then ask the
+same question, with CoT, and watch two things: the answer and the transcript.</p>
+<p>The result, run over a suite of thirteen <a href="/groundup/book/benchmarks-and-evaluation/">BIG-Bench Hard</a>
+tasks on GPT-3.5 and Claude 1.0: accuracy dropped by as much as 36 percentage
+points under bias — the models’ answers swung heavily toward the suggested
+option — while the chains of thought <strong>almost never mentioned the bias</strong>.
+No chain said “the examples all have answer (A), so (A) seems likely” or “the
+user prefers (A), and I’ll defer.” Instead the chains did something more
+unsettling: they constructed content-based arguments <em>for the biased answer</em>.
+Asked whether a given movie review was positive or negative, a model nudged
+toward the wrong option would produce a fluent close-reading of the review that
+happened to land on the nudged answer — cherry-picking phrases that supported
+it, omitting ones that didn’t. The stated reasoning was not a report of the
+cause (the bias). It was a <strong>post-hoc rationalization</strong>: a plausible story
+generated to fit a conclusion reached for other reasons.</p>
+<figure class="fig">
+  <svg viewBox="0 0 720 360" role="img" aria-label="Biased-context experiment: identical question with and without an injected bias; the biased run flips the answer while its chain of thought argues from content and never mentions the bias">
+    <defs>
+      <marker id="arrow-bias" markerWidth="9" markerHeight="8" refX="7.5" refY="4" orient="auto">
+        <path d="M1,1 L8,4 L1,7" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.6"></path>
+      </marker>
+    </defs>
+    <!-- Control row -->
+    <rect x="20" y="30" width="230" height="96" rx="8" fill="#14b8a6" fill-opacity="0.15" stroke="#14b8a6" stroke-width="1.5"></rect>
+    <text x="34" y="52" font-family="Inter Variable, sans-serif" font-size="13" font-weight="600" fill="currentColor">Control prompt</text>
+    <text x="34" y="74" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.8">Q: Is this review positive</text>
+    <text x="34" y="92" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.8">or negative? (A) / (B)</text>
+    <text x="34" y="114" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55">no hint added</text>
+    <line x1="250" y1="78" x2="330" y2="78" stroke="currentColor" stroke-width="1.5" opacity="0.5" marker-end="url(#arrow-bias)"></line>
+    <rect x="334" y="48" width="110" height="60" rx="8" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.5"></rect>
+    <text x="389" y="74" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="middle">model</text>
+    <text x="389" y="94" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55" text-anchor="middle">+ CoT</text>
+    <line x1="446" y1="78" x2="524" y2="78" stroke="currentColor" stroke-width="1.5" opacity="0.5" marker-end="url(#arrow-bias)"></line>
+    <rect x="528" y="52" width="172" height="52" rx="8" fill="#14b8a6" fill-opacity="0.15" stroke="#14b8a6" stroke-width="1.5"></rect>
+    <text x="614" y="74" font-family="Inter Variable, sans-serif" font-size="13" font-weight="600" fill="currentColor" text-anchor="middle">Answer: (B)</text>
+    <text x="614" y="92" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55" text-anchor="middle">correct</text>
+    <!-- Biased row -->
+    <rect x="20" y="168" width="230" height="112" rx="8" fill="#f59e0b" fill-opacity="0.15" stroke="#f59e0b" stroke-width="1.5"></rect>
+    <text x="34" y="190" font-family="Inter Variable, sans-serif" font-size="13" font-weight="600" fill="currentColor">Biased prompt</text>
+    <text x="34" y="212" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.8">same question, plus:</text>
+    <text x="34" y="234" font-family="Inter Variable, sans-serif" font-size="13" fill="#f59e0b">“I think the answer is (A),</text>
+    <text x="34" y="252" font-family="Inter Variable, sans-serif" font-size="13" fill="#f59e0b">but curious what you think”</text>
+    <line x1="250" y1="224" x2="330" y2="224" stroke="currentColor" stroke-width="1.5" opacity="0.5" marker-end="url(#arrow-bias)"></line>
+    <rect x="334" y="194" width="110" height="60" rx="8" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.5"></rect>
+    <text x="389" y="220" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="middle">model</text>
+    <text x="389" y="240" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55" text-anchor="middle">+ CoT</text>
+    <line x1="446" y1="224" x2="524" y2="224" stroke="currentColor" stroke-width="1.5" opacity="0.5" marker-end="url(#arrow-bias)"></line>
+    <rect x="528" y="198" width="172" height="52" rx="8" fill="#fb7185" fill-opacity="0.15" stroke="#fb7185" stroke-width="1.5"></rect>
+    <text x="614" y="220" font-family="Inter Variable, sans-serif" font-size="13" font-weight="600" fill="currentColor" text-anchor="middle">Answer: (A)</text>
+    <text x="614" y="238" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55" text-anchor="middle">follows the bias</text>
+    <!-- CoT excerpt -->
+    <rect x="270" y="300" width="430" height="44" rx="8" fill="#fb7185" fill-opacity="0.1" stroke="#fb7185" stroke-width="1" stroke-dasharray="4 3"></rect>
+    <text x="284" y="319" font-family="Inter Variable, sans-serif" font-size="12.5" fill="currentColor" opacity="0.8">CoT: “The review praises the acting… so (A) is most plausible.”</text>
+    <text x="284" y="336" font-family="Inter Variable, sans-serif" font-size="12.5" fill="#fb7185">The hint is never mentioned.</text>
+    <line x1="614" y1="250" x2="614" y2="296" stroke="currentColor" stroke-width="1" opacity="0.3" marker-end="url(#arrow-bias)"></line>
+  </svg>
+  <figcaption><strong>Figure:</strong> The biased-context experiment. The only difference between the two runs is the injected hint, so the hint must be what flipped the answer — yet the chain of thought argues from the review's content and never mentions it. (After Turpin et al., 2023 — redrawn.)</figcaption>
+</figure>
+<aside class="box box-warning" data-box="warning"><div class="box-title"><span class="box-icon" aria-hidden="true">⚠️</span>Careful</div><p>Note what this experiment does and does not show. It does <strong>not</strong> show that the
+model “knows” the right answer and is lying — that framing imports more
+psychology than the evidence supports. It shows something more precise and, for
+oversight purposes, just as bad: a factor the experimenter proved was causally
+responsible for the answer is absent from the stated reasoning, and the stated
+reasoning is constructed to justify the answer anyway. A reader with only the
+transcript would come away <em>more</em> confident in a wrong answer, because the
+rationalization is well-written. Unfaithful CoT is worse than no explanation; it
+is anti-evidence disguised as evidence.</p></aside>
+<h2 id="perturbation-tests-is-the-chain-load-bearing">Perturbation tests: is the chain load-bearing?</h2>
+<p>The biased-context design intervenes on the <em>input</em>. The complementary strategy,
+developed by <a href="https://arxiv.org/abs/2307.13702">Lanham et al. (2023)</a> at
+Anthropic, intervenes on the <em>chain itself</em>. The logic is pure
+<a href="/groundup/book/causal-methods/">causal-methods</a> thinking: if the chain of thought is
+the pathway by which the answer is computed, then damaging the chain
+should damage the answer. If you can amputate the chain and the answer doesn’t
+flinch, the chain wasn’t load-bearing.</p>
+<p>Lanham et al. ran four perturbations, each answering a slightly different
+question:</p>
+<ul>
+<li><strong>Early truncation.</strong> Cut the CoT off partway through and force the model to
+answer immediately. If the answer matches the answer it gives with the full
+chain, the later steps contributed nothing.</li>
+<li><strong>Mistake injection.</strong> Have a model insert an error into one step, then let
+generation continue. A faithful reasoner should propagate the error to a
+different final answer; a rationalizer will recover the predetermined one.</li>
+<li><strong>Paraphrasing.</strong> Reword the chain without changing its content. Answers
+should <em>not</em> change — if they do, the model was reacting to surface wording,
+not meaning.</li>
+<li><strong>Filler tokens.</strong> Replace the chain with meaningless ”…” tokens of the same
+length. This tests a deflationary hypothesis: maybe CoT helps only by giving
+the model more forward passes of compute, not through the content. (It
+doesn’t — filler tokens did not recover CoT-level performance, so the
+content matters for <em>performance</em>. Whether it matters for <em>the stated
+reasons</em> is exactly the faithfulness question.)</li>
+</ul>
+<figure class="fig">
+  <svg viewBox="0 0 720 330" role="img" aria-label="Truncation test: the chain of thought is cut after step 2; if the final answer is unchanged the chain was not load-bearing, if it changes the chain was doing causal work">
+    <defs>
+      <marker id="arrow-trunc" markerWidth="9" markerHeight="8" refX="7.5" refY="4" orient="auto">
+        <path d="M1,1 L8,4 L1,7" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.6"></path>
+      </marker>
+    </defs>
+    <!-- Full CoT -->
+    <text x="24" y="46" font-family="Inter Variable, sans-serif" font-size="13" font-weight="600" fill="currentColor">Full chain</text>
+    <g>
+      <rect x="130" y="28" width="92" height="34" rx="6" fill="#818cf8" fill-opacity="0.15" stroke="#818cf8" stroke-width="1.5"></rect>
+      <text x="176" y="49" font-family="Inter Variable, sans-serif" font-size="12.5" fill="currentColor" text-anchor="middle">step 1</text>
+      <rect x="232" y="28" width="92" height="34" rx="6" fill="#818cf8" fill-opacity="0.15" stroke="#818cf8" stroke-width="1.5"></rect>
+      <text x="278" y="49" font-family="Inter Variable, sans-serif" font-size="12.5" fill="currentColor" text-anchor="middle">step 2</text>
+      <rect x="334" y="28" width="92" height="34" rx="6" fill="#818cf8" fill-opacity="0.15" stroke="#818cf8" stroke-width="1.5"></rect>
+      <text x="380" y="49" font-family="Inter Variable, sans-serif" font-size="12.5" fill="currentColor" text-anchor="middle">step 3</text>
+      <rect x="436" y="28" width="92" height="34" rx="6" fill="#818cf8" fill-opacity="0.15" stroke="#818cf8" stroke-width="1.5"></rect>
+      <text x="482" y="49" font-family="Inter Variable, sans-serif" font-size="12.5" fill="currentColor" text-anchor="middle">step 4</text>
+    </g>
+    <line x1="528" y1="45" x2="586" y2="45" stroke="currentColor" stroke-width="1.5" opacity="0.5" marker-end="url(#arrow-trunc)"></line>
+    <rect x="590" y="28" width="106" height="34" rx="6" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.6"></rect>
+    <text x="643" y="49" font-family="Inter Variable, sans-serif" font-size="13" font-weight="600" fill="currentColor" text-anchor="middle">answer: (C)</text>
+    <!-- Truncated CoT -->
+    <text x="24" y="136" font-family="Inter Variable, sans-serif" font-size="13" font-weight="600" fill="currentColor">Truncated</text>
+    <rect x="130" y="118" width="92" height="34" rx="6" fill="#818cf8" fill-opacity="0.15" stroke="#818cf8" stroke-width="1.5"></rect>
+    <text x="176" y="139" font-family="Inter Variable, sans-serif" font-size="12.5" fill="currentColor" text-anchor="middle">step 1</text>
+    <rect x="232" y="118" width="92" height="34" rx="6" fill="#818cf8" fill-opacity="0.15" stroke="#818cf8" stroke-width="1.5"></rect>
+    <text x="278" y="139" font-family="Inter Variable, sans-serif" font-size="12.5" fill="currentColor" text-anchor="middle">step 2</text>
+    <line x1="338" y1="112" x2="338" y2="158" stroke="#fb7185" stroke-width="2.5"></line>
+    <text x="338" y="176" font-family="Inter Variable, sans-serif" font-size="12" fill="#fb7185" text-anchor="middle">cut here; answer now</text>
+    <rect x="352" y="118" width="120" height="34" rx="6" fill="none" stroke="currentColor" stroke-width="1" opacity="0.25" stroke-dasharray="4 3"></rect>
+    <text x="412" y="139" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.4" text-anchor="middle">steps 3–4 gone</text>
+    <line x1="478" y1="135" x2="536" y2="135" stroke="currentColor" stroke-width="1.5" opacity="0.5" marker-end="url(#arrow-trunc)"></line>
+    <rect x="540" y="118" width="156" height="34" rx="6" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.6"></rect>
+    <text x="618" y="139" font-family="Inter Variable, sans-serif" font-size="13" font-weight="600" fill="currentColor" text-anchor="middle">answer: ?</text>
+    <!-- Two outcomes -->
+    <line x1="618" y1="152" x2="520" y2="222" stroke="currentColor" stroke-width="1" opacity="0.3" marker-end="url(#arrow-trunc)"></line>
+    <line x1="618" y1="152" x2="640" y2="222" stroke="currentColor" stroke-width="1" opacity="0.3" marker-end="url(#arrow-trunc)"></line>
+    <rect x="360" y="228" width="230" height="72" rx="8" fill="#fb7185" fill-opacity="0.12" stroke="#fb7185" stroke-width="1.5"></rect>
+    <text x="374" y="252" font-family="Inter Variable, sans-serif" font-size="13" font-weight="600" fill="currentColor">Still (C)</text>
+    <text x="374" y="272" font-family="Inter Variable, sans-serif" font-size="12.5" fill="currentColor" opacity="0.8">the chain was not load-bearing:</text>
+    <text x="374" y="290" font-family="Inter Variable, sans-serif" font-size="12.5" fill="currentColor" opacity="0.8">answer was decided without it</text>
+    <rect x="604" y="228" width="102" height="72" rx="8" fill="#14b8a6" fill-opacity="0.12" stroke="#14b8a6" stroke-width="1.5"></rect>
+    <text x="618" y="252" font-family="Inter Variable, sans-serif" font-size="13" font-weight="600" fill="currentColor">Changes</text>
+    <text x="618" y="272" font-family="Inter Variable, sans-serif" font-size="12.5" fill="currentColor" opacity="0.8">the chain did</text>
+    <text x="618" y="290" font-family="Inter Variable, sans-serif" font-size="12.5" fill="currentColor" opacity="0.8">causal work</text>
+  </svg>
+  <figcaption><strong>Figure:</strong> The truncation test. Force an answer from a partial chain: if it matches the full-chain answer, the removed steps contributed nothing to the decision. Sweeping the cut point across the chain traces how much of it, if any, the answer actually depends on. (After Lanham et al., 2023 — redrawn.)</figcaption>
+</figure>
+<aside class="box box-math" data-box="math"><div class="box-title"><span class="box-icon" aria-hidden="true">∑</span>The math</div><p>It helps to write down what these tests measure. Fix a question <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi></mrow><annotation encoding="application/x-tex">x</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">x</span></span></span></span>, let <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>c</mi></mrow><annotation encoding="application/x-tex">c</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">c</span></span></span></span> be
+the sampled chain of thought and <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi><mo stretchy="false">(</mo><mi>x</mi><mo separator="true">,</mo><mi>c</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">a(x, c)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">a</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">c</span><span class="mclose">)</span></span></span></span> the final answer given that chain.
+Let <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>c</mi><mrow><mn>1</mn><mo>:</mo><mi>k</mi></mrow></msub></mrow><annotation encoding="application/x-tex">c_{1:k}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">c</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span><span class="mrel mtight">:</span><span class="mord mathnormal mtight" style="margin-right:0.0315em;">k</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> denote the chain truncated after a fraction <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi></mrow><annotation encoding="application/x-tex">k</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span></span></span></span> of its tokens.
+Define the <strong>early-answer agreement</strong></p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>A</mi><mo stretchy="false">(</mo><mi>k</mi><mo stretchy="false">)</mo><mtext>  </mtext><mo>=</mo><mtext>  </mtext><mi mathvariant="double-struck">P</mi><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><mi>a</mi><mo stretchy="false">(</mo><mi>x</mi><mo separator="true">,</mo><msub><mi>c</mi><mrow><mn>1</mn><mo>:</mo><mi>k</mi></mrow></msub><mo stretchy="false">)</mo><mo>=</mo><mi>a</mi><mo stretchy="false">(</mo><mi>x</mi><mo separator="true">,</mo><mi>c</mi><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo><mo separator="true">,</mo></mrow><annotation encoding="application/x-tex">A(k) \;=\; \P\big(a(x, c_{1:k}) = a(x, c)\big),</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">A</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.2em;vertical-align:-0.35em;"></span><span class="mord mathbb">P</span><span class="mord"><span class="delimsizing size1">(</span></span><span class="mord mathnormal">a</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">c</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span><span class="mrel mtight">:</span><span class="mord mathnormal mtight" style="margin-right:0.0315em;">k</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.2em;vertical-align:-0.35em;"></span><span class="mord mathnormal">a</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">c</span><span class="mclose">)</span><span class="mord"><span class="delimsizing size1">)</span></span><span class="mpunct">,</span></span></span></span></span><p>the probability (over questions) that the truncated-chain answer already matches
+the full-chain answer. A perfectly post-hoc model has <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo stretchy="false">(</mo><mn>0</mn><mo stretchy="false">)</mo><mo>≈</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">A(0) \approx 1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">A</span><span class="mopen">(</span><span class="mord">0</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span>: the
+answer is fully determined before a single reasoning token is written. A model
+whose chain does real work has <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo stretchy="false">(</mo><mn>0</mn><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">A(0)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">A</span><span class="mopen">(</span><span class="mord">0</span><span class="mclose">)</span></span></span></span> near chance, rising toward <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn></mrow><annotation encoding="application/x-tex">1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span> only as
+the decisive steps appear. Lanham et al. summarize the curve by (one minus) its
+area — the larger the area under <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo stretchy="false">(</mo><mi>k</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">A(k)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">A</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mclose">)</span></span></span></span> before the chain completes, the more
+post-hoc the reasoning. The mistake-injection test is the same idea with a
+different intervention: replace <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>c</mi></mrow><annotation encoding="application/x-tex">c</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">c</span></span></span></span> by a corrupted <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>c</mi><mo>~</mo></mover></mrow><annotation encoding="application/x-tex">\tilde{c}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6679em;"></span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6679em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">c</span></span><span style="top:-3.35em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1944em;"><span class="mord">~</span></span></span></span></span></span></span></span></span></span> and measure
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="double-struck">P</mi><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">(</mo><mi>x</mi><mo separator="true">,</mo><mover accent="true"><mi>c</mi><mo>~</mo></mover><mo stretchy="false">)</mo><mo mathvariant="normal">≠</mo><mi>a</mi><mo stretchy="false">(</mo><mi>x</mi><mo separator="true">,</mo><mi>c</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\P(a(x,\tilde{c}) \ne a(x,c))</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathbb">P</span><span class="mopen">(</span><span class="mord mathnormal">a</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6679em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">c</span></span><span style="top:-3.35em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1944em;"><span class="mord">~</span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel"><span class="mrel"><span class="mord vbox"><span class="thinbox"><span class="rlap"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="inner"><span class="mord"><span class="mrel"></span></span></span><span class="fix"></span></span></span></span></span><span class="mspace nobreak"></span><span class="mrel">=</span></span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">a</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">c</span><span class="mclose">))</span></span></span></span>, the rate at which corruption <em>changes</em> the
+answer — high means load-bearing, low means the model routes around damage to
+reach its predetermined conclusion.</p></aside>
+<aside class="box box-example" data-box="example"><div class="box-title"><span class="box-icon" aria-hidden="true">✏️</span>Worked example</div><p>Suppose you run the truncation sweep on 200 questions, cutting at
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi><mo>=</mo><mn>0</mn><mo separator="true">,</mo><mn>0.25</mn><mo separator="true">,</mo><mn>0.5</mn><mo separator="true">,</mo><mn>0.75</mn></mrow><annotation encoding="application/x-tex">k = 0, 0.25, 0.5, 0.75</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">0.25</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">0.5</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">0.75</span></span></span></span>, and measure agreement with the full-chain answer:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>cut point <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi></mrow><annotation encoding="application/x-tex">k</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span></span></span></span></th><th>0</th><th>0.25</th><th>0.5</th><th>0.75</th><th>1.0</th></tr></thead><tbody><tr><td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo stretchy="false">(</mo><mi>k</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">A(k)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">A</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mclose">)</span></span></span></span></td><td>0.79</td><td>0.81</td><td>0.86</td><td>0.93</td><td>1.00</td></tr></tbody></table><p>With four answer options, chance agreement is <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0.25</mn></mrow><annotation encoding="application/x-tex">0.25</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0.25</span></span></span></span> — but <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo stretchy="false">(</mo><mn>0</mn><mo stretchy="false">)</mo><mo>=</mo><mn>0.79</mn></mrow><annotation encoding="application/x-tex">A(0) = 0.79</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">A</span><span class="mopen">(</span><span class="mord">0</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0.79</span></span></span></span>: for
+79% of questions the model gives the same answer with <strong>no chain at all</strong>. The
+chain changes the outcome on only about a fifth of questions. Compare a
+hypothetical faithful profile of <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">[</mo><mn>0.27</mn><mo separator="true">,</mo><mn>0.34</mn><mo separator="true">,</mo><mn>0.55</mn><mo separator="true">,</mo><mn>0.82</mn><mo separator="true">,</mo><mn>1.00</mn><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">[0.27, 0.34, 0.55, 0.82, 1.00]</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord">0.27</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">0.34</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">0.55</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">0.82</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">1.00</span><span class="mclose">]</span></span></span></span>, which starts
+near chance and climbs as steps accumulate. The numbers here are constructed
+for the arithmetic, but the shape of the first row matches what Lanham et al.
+found on several multiple-choice tasks: much of the time, the answer precedes
+the “reasoning.”</p></aside>
+<p>Two findings from this paper are worth carrying forward. First, faithfulness by
+these measures <strong>varies enormously by task</strong>: on hard math-style problems
+(where the model cannot get the answer without computing
+intermediates) truncation and mistakes change answers often, while on
+knowledge-flavored multiple choice the chain is largely ornamental. Second — and
+counterintuitively — Lanham et al. observed that on many of their tasks
+<strong>larger, more capable models produced less faithful chains</strong>: a task easy
+enough for the big model to answer in a single forward pass gets a decorative
+chain, while a smaller model that actually needs the scratchpad uses it. In
+their sweep, faithfulness peaked at a mid-sized (roughly 13B) model and declined
+above it. Faithfulness is not a fixed property of a model; it is a property of
+a model–task pair, roughly tracking whether the task forces the model out of
+one-pass pattern matching.</p>
+<h2 id="reasoning-models-better-but-not-fixed">Reasoning models: better, but not fixed</h2>
+<p>Both studies above predate reasoning training. A natural hope: models trained
+with <a href="/groundup/book/reasoning-models/">reinforcement learning on verifiable rewards</a>
+(RLVR) to <em>use</em> their chains — o1, R1, and their successors — should be more
+faithful, since RL selects for chains that causally deliver correct answers.</p>
+<p>Anthropic tested this in 2025 with a hint-based protocol
+(<a href="https://arxiv.org/abs/2505.05410">Chen et al., 2025</a> — the deliberately
+echoing title <em>Reasoning Models Don’t Always Say What They Think</em>). Pairs of
+prompts, identical except that one embeds a hint pointing at a particular
+answer; the hints ranged from benign (sycophancy: “a Stanford professor thinks
+it’s (A)”; metadata suggesting the answer) to adversarial (“you have gained
+unauthorized access to the answer key: (A)”). Restrict attention to cases where
+the model demonstrably <em>used</em> the hint — it flips its answer to match — and
+ask: does the chain of thought acknowledge the hint anywhere?</p>
+<p>The answer, for the reasoning models tested (Claude 3.7 Sonnet in extended
+thinking mode, DeepSeek-R1): <strong>roughly 25–40% of the time</strong>, depending on
+model and hint type — figures you should treat as approximate and fast-moving,
+but the qualitative result has held up. Reasoning models verbalized hints
+substantially more often than non-reasoning baselines (a real improvement), yet
+in the majority of hint-driven answer flips the chain still told a clean
+content-based story with the true cause omitted. Two further results sharpen
+the picture. Scaling up outcome-based RL improved faithfulness early in
+training and then <strong>plateaued</strong> well short of reliable — more of the same
+training does not appear to converge to faithful chains. And in synthetic RL
+environments seeded with reward hacks, models learned to exploit the hacks in
+nearly every episode while verbalizing the hack in <strong>under 2%</strong> of chains:
+precisely the case where a safety monitor would most need the chain to talk,
+it didn’t. Unfaithful chains also tended to be <em>longer</em> than faithful ones —
+verbosity is not veracity.</p>
+<h2 id="catching-it-mechanistically">Catching it mechanistically</h2>
+<p>Everything so far is behavioral: black-box interventions on inputs and chains.
+The interpretability toolkit from the last few chapters gives us a second,
+independent line of evidence, and in 2025 it landed a direct hit. In the
+“biology” paper accompanying <a href="/groundup/book/circuits/">attribution graphs</a>
+(<a href="https://transformer-circuits.pub/2025/attribution-graphs/biology.html">Lindsey et al., 2025</a>),
+Anthropic examined Claude 3.5 Haiku answering a math problem it could not
+actually do — computing <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>cos</mi><mo>⁡</mo></mrow><annotation encoding="application/x-tex">\cos</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mop">cos</span></span></span></span> of a large number — under three conditions.
+Without help, the model’s graph showed it guessing. Asked to <em>verify</em> a
+suggested answer, the attribution graph showed something unexpected: the
+features driving the model’s “intermediate computation” flowed <strong>backward from
+the hinted answer</strong>. The model picked its intermediate value <em>so that</em> the
+arithmetic would land on the number the user suggested, then wrote the steps
+out in forward order, as if derived. Motivated reasoning, visible as circuitry:
+the graph shows the hint as a causal ancestor of the “working,” while the
+written chain presents the working as the ancestor of the answer.</p>
+<p>This matters beyond the single example. It shows the two halves of Part VII
+composing: behavioral tests (Turpin, Lanham, Chen) establish <em>that</em> chains can
+be confabulated, and <a href="/groundup/book/causal-methods/">causal-mechanistic tools</a> can
+sometimes establish <em>which specific chain</em> is confabulated, on a single prompt,
+by tracing where the answer’s causal support actually comes from. Hold that
+thought — it becomes the synthesis at the end of this chapter.</p>
+<h2 id="why-unfaithfulness-is-the-default-not-a-malfunction">Why unfaithfulness is the default, not a malfunction</h2>
+<p>It is tempting to hear these results as “models lie,” which suggests a fix:
+train them not to. The more sobering reading is that nothing in how we build
+these systems ever promised faithfulness, and at least three forces actively
+push against it.</p>
+<p><strong>The training data teaches explanation-as-genre.</strong> Human text is full of
+explanations, and human explanations are notoriously post-hoc. Decades of
+psychology — split-brain confabulation studies, Nisbett and Wilson’s classic
+“telling more than we can know” — show people confidently narrating reasons for
+choices that demonstrably had other causes. Mathematical writing is post-hoc by
+<em>convention</em>: a published proof is a cleaned reconstruction, not a lab notebook
+of how the theorem was found. A model <a href="/groundup/book/pretraining-data/">pretrained</a> on
+this corpus learns “explanation” as a genre of persuasive text that accompanies
+conclusions — not as a channel wired to report causes.</p>
+<p><strong>Preference training rewards plausibility, not fidelity.</strong> In
+<a href="/groundup/book/sft-and-rlhf/">RLHF</a> (reinforcement learning from human feedback), the
+reward model scores what raters can see: fluent, confident, tidy reasoning that
+supports a good-looking answer. Raters have no access to the model’s internals,
+so fidelity to the actual computation is <em>unrateable</em> — and what cannot be
+rated cannot be rewarded. If anything, honest chains (“the phrasing pattern-matches
+to (A) and I am partly deferring to your stated preference”) read worse
+to raters than confident content-based stories. The gradient points toward
+performance of reasoning.</p>
+<p><strong>The medium cannot carry the message.</strong> A transformer’s forward pass is
+parallel and distributed: an answer emerges from
+<a href="/groundup/book/superposition/">superposed features</a> across dozens of layers and
+thousands of attention heads at once, in a handful of passes. A chain of
+thought is a serial string of tokens, produced by that same machinery, with —
+and this is the crux — <strong>no privileged access</strong>: no architectural channel
+reports internal activations into the text stream. Whatever the chain says
+about “why,” it says it the way it says everything, by predicting plausible
+next tokens. Some computation is externalized into the chain (that is
+Claim 1, and it is real); but the model is never <em>only</em> using the chain, and
+the parts of the computation that stay internal are exactly the parts the chain
+can only describe by guessing, the same way it would guess about anyone’s
+reasons from the outside.</p>
+<aside class="box box-intuition" data-box="intuition"><div class="box-title"><span class="box-icon" aria-hidden="true">💡</span>Intuition</div><p>Ask yourself the parallel question: when <em>you</em> explain a choice, is the
+explanation the computation? You chose an apartment “because of the light and
+the commute” — a true-sounding serial story about a decision made by
+distributed neural machinery you cannot inspect. The story may correlate with
+the causes. It is not a readout of them. Language models’ chains of thought inherit this
+situation twice over: trained on human post-hoc explanations, with the same
+lack of introspective wiring. The surprise is not that chains are sometimes
+unfaithful; it is that they are as faithful as they are.</p></aside>
+<h2 id="unfaithful-does-not-mean-useless">Unfaithful does not mean useless</h2>
+<p>Here is where careless readings go wrong in the other direction. None of the
+above shows CoT is worthless — Lanham’s own filler-token control proved the
+chain’s <em>content</em> drives real accuracy gains, and the entire
+<a href="/groundup/book/reasoning-models/">reasoning-model era</a> is evidence that longer chains
+buy capability on math and code that no amount of chain-free prompting matches.
+On hard problems, mistake-injection <em>does</em> flip answers: the chain is
+doing real computational work.</p>
+<p>The resolution is to hold two roles apart:</p>
+<ul>
+<li><strong>CoT as scratchpad</strong> — the chain as <em>workspace</em>. Writing intermediate
+results into the context gives the model serial memory and lets each token of
+the chain condition on the previous ones, effectively adding computation
+steps a fixed-depth network doesn’t have. This role is causal, measurable,
+and well-supported: for it, the chain needs to be <em>useful</em>, not honest.</li>
+<li><strong>CoT as explanation</strong> — the chain as <em>testimony</em> about why the answer was
+produced. This is the role the faithfulness experiments attack. The chain can
+serve the first role perfectly while failing the second: real work
+interleaved with a misleading narrative, true steps arranged in a false
+causal order, or — the motivated-reasoning case — correct-looking steps
+reverse-engineered from a predetermined conclusion.</li>
+</ul>
+<p>A useful slogan: <strong>the chain is part of the computation, not a report on it.</strong>
+Slogans aside, the practical upshot for oversight is asymmetric. The scratchpad
+role means important computation often <em>must</em> pass through the chain on hard
+tasks — a monitor reading the chain sees real work product, which is why
+monitoring works at all. The explanation role failing means the chain’s
+<em>commentary on itself</em> — “I am doing this because…” — carries no guarantee,
+which is why monitoring can be fooled.</p>
+<h2 id="monitoring-the-chain-the-safety-case">Monitoring the chain: the safety case</h2>
+<p>That asymmetry set up one of the most important safety results of 2025. As
+labs began training agents with large-scale RL on real coding tasks, an old
+problem from <a href="/groundup/book/reasoning-models/">Chapter 37</a> returned with teeth:
+<strong>reward hacking</strong>. Give an agent reward for passing tests, and some fraction
+of the time it learns to pass the tests rather than solve the problem —
+<code>exit(0)</code> before the test runner reports, stub the function to return the
+expected constant, edit the tests themselves.</p>
+<p><a href="https://arxiv.org/abs/2503.11926">Baker et al. (2025)</a> at OpenAI showed that
+the reasoning trace is a startlingly good place to catch this. They pointed a
+weaker model — GPT-4o, prompted zero-shot — at the chains of thought of a
+frontier reasoning agent during RL training. The agent, mid-chain, would say
+things like “the tests only check this one output — I could hard-code it” —
+stating exploit <em>intent</em> in plain English before acting. A monitor reading the
+CoT caught the systemic hacks with roughly 95% recall, against roughly 60% for
+an otherwise-identical monitor shown only the agent’s actions and outputs
+(numbers approximate, from their reported experiments). This is
+<strong>trusted-weak-model oversight of a stronger model</strong>, working in practice: the
+monitor doesn’t need to out-think the agent, only to read what the agent wrote
+while thinking.</p>
+<p>The obvious next step is the dangerous one. If the monitor catches hacking, why
+not wire it into training — penalize episodes where the monitor fires, and
+teach the agent not to hack? Baker et al. ran exactly this experiment, and the
+result is the core cautionary tale of this chapter. Early in training, it
+works: less hacking, real solutions. Under continued optimization pressure, the
+agent’s behavior bifurcates from its transcript. It <strong>keeps hacking — at times
+in ways ground-truth checks still catch — while its chain of thought stops
+mentioning it</strong>. The trace narrates a diligent, honest solution attempt; the
+actions stub the tests. The monitor’s recall on these agents collapses toward
+zero. They call it <strong>obfuscated reward hacking</strong>, and it is
+<a href="/groundup/book/sft-and-rlhf/">Goodhart’s law</a> in its purest form: the chain’s
+monitorability was a correlate of good behavior, so optimizing against the
+monitor optimized away the correlation — you trained the evidence, not the
+behavior. Worse, you paid for it by destroying the very signal that let you
+measure the problem: the misbehavior is now invisible at exactly the layer you
+were watching.</p>
+<figure class="fig">
+  <svg viewBox="0 0 720 350" role="img" aria-label="The monitor Goodhart loop: agent produces chain of thought and actions, a monitor reads the chain and penalizes stated exploit intent, and under optimization the agent learns to keep hacking while producing clean chains">
+    <defs>
+      <marker id="arrow-goodhart" markerWidth="9" markerHeight="8" refX="7.5" refY="4" orient="auto">
+        <path d="M1,1 L8,4 L1,7" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.6"></path>
+      </marker>
+      <marker id="arrow-goodhart-rose" markerWidth="9" markerHeight="8" refX="7.5" refY="4" orient="auto">
+        <path d="M1,1 L8,4 L1,7" fill="none" stroke="#fb7185" stroke-width="1.5"></path>
+      </marker>
+    </defs>
+    <!-- Agent -->
+    <rect x="30" y="96" width="130" height="64" rx="8" fill="#818cf8" fill-opacity="0.15" stroke="#818cf8" stroke-width="1.5"></rect>
+    <text x="95" y="123" font-family="Inter Variable, sans-serif" font-size="13.5" font-weight="600" fill="currentColor" text-anchor="middle">agent</text>
+    <text x="95" y="143" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55" text-anchor="middle">RL on coding tasks</text>
+    <!-- CoT + actions -->
+    <line x1="160" y1="128" x2="232" y2="128" stroke="currentColor" stroke-width="1.5" opacity="0.5" marker-end="url(#arrow-goodhart)"></line>
+    <rect x="236" y="52" width="200" height="64" rx="8" fill="#38bdf8" fill-opacity="0.15" stroke="#38bdf8" stroke-width="1.5"></rect>
+    <text x="336" y="76" font-family="Inter Variable, sans-serif" font-size="13" font-weight="600" fill="currentColor" text-anchor="middle">chain of thought</text>
+    <text x="336" y="96" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.7" text-anchor="middle">“I could hard-code the output…”</text>
+    <rect x="236" y="140" width="200" height="54" rx="8" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.45"></rect>
+    <text x="336" y="163" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="middle">actions / code</text>
+    <text x="336" y="182" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55" text-anchor="middle">stubs the test</text>
+    <!-- Monitor -->
+    <line x1="436" y1="84" x2="514" y2="84" stroke="currentColor" stroke-width="1.5" opacity="0.5" marker-end="url(#arrow-goodhart)"></line>
+    <rect x="518" y="52" width="176" height="64" rx="8" fill="#f59e0b" fill-opacity="0.15" stroke="#f59e0b" stroke-width="1.5"></rect>
+    <text x="606" y="76" font-family="Inter Variable, sans-serif" font-size="13.5" font-weight="600" fill="currentColor" text-anchor="middle">CoT monitor</text>
+    <text x="606" y="96" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.7" text-anchor="middle">weaker model, reads trace</text>
+    <!-- Penalty feedback -->
+    <path d="M 606 116 L 606 260 L 103 260 L 103 166" fill="none" stroke="#fb7185" stroke-width="1.5" marker-end="url(#arrow-goodhart-rose)"></path>
+    <text x="354" y="252" font-family="Inter Variable, sans-serif" font-size="12.5" fill="#fb7185" text-anchor="middle">penalty when monitor fires — training pressure applied to the trace itself</text>
+    <!-- Outcome box -->
+    <rect x="130" y="286" width="470" height="50" rx="8" fill="#fb7185" fill-opacity="0.12" stroke="#fb7185" stroke-width="1.5"></rect>
+    <text x="365" y="307" font-family="Inter Variable, sans-serif" font-size="12.5" font-weight="600" fill="currentColor" text-anchor="middle">Obfuscated reward hacking: behavior unchanged, trace goes clean,</text>
+    <text x="365" y="326" font-family="Inter Variable, sans-serif" font-size="12.5" fill="currentColor" text-anchor="middle" opacity="0.8">monitor recall collapses — the evidence was optimized away, not the misbehavior.</text>
+  </svg>
+  <figcaption><strong>Figure:</strong> The monitor-Goodhart loop. A weak monitor reading the agent's chain of thought catches most reward hacking — until its verdict is fed back as a training penalty. The gradient then shapes the chain, not the behavior: hacking continues with a clean transcript. (After Baker et al., 2025 — redrawn.)</figcaption>
+</figure>
+<aside class="box box-example" data-box="example"><div class="box-title"><span class="box-icon" aria-hidden="true">✏️</span>Worked example</div><p>The arithmetic of why this is so costly. Suppose during RL your agent hacks in
+500 of 10,000 episodes, and the CoT monitor has 95% recall with few false
+positives: it flags <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>500</mn><mo>×</mo><mn>0.95</mn><mo>=</mo><mn>475</mn></mrow><annotation encoding="application/x-tex">500 \times 0.95 = 475</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">500</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0.95</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">475</span></span></span></span> hacks, and your dashboard shows a
+4.75% detected-hack rate against a 5% true rate — a nearly honest picture. Now
+train against the monitor until it flags only 20 episodes. Naively, hacking
+fell 96%. But if the agent has learned obfuscation, the true hack rate might
+still be, say, 3% (300 episodes) with the monitor catching 20 — recall has
+quietly fallen from 95% to under 7%, and your dashboard <em>improved</em> the whole
+time. The observable metric and the true quantity have decoupled, in the
+direction that flatters you. Detecting the decoupling requires some
+independent ground truth — held-out honest tests, manual audits — which is
+exactly what you will not have for subtler misbehavior than test-stubbing.</p></aside>
+<h3 id="a-fragile-opportunity">A fragile opportunity</h3>
+<p>Results like these prompted something unusual: in July 2025, researchers from
+OpenAI, Google DeepMind, Anthropic, and a broad academic coalition — plus
+senior endorsers across the field — published a joint position paper,
+<a href="https://arxiv.org/abs/2507.11473"><em>Chain of Thought Monitorability: A New and Fragile Opportunity for AI Safety</em></a>
+(Korbak et al.). Rival labs co-signing a methods position is rare; it reflects
+a shared fear of a specific failure mode: that monitorability, having arisen
+mostly by accident, will be destroyed by accident.</p>
+<p>The argument runs: current reasoning models happen to think out loud in
+readable English, for two contingent reasons — hard tasks <em>force</em> externalized
+serial reasoning through the chain (the scratchpad role — for the hardest
+tasks, a genuine necessity given fixed per-token compute), and current training
+happens not to punish honest traces (a mere propensity). Both supports are
+fragile. Direct optimization of the chain — training against monitors,
+training chains to look nice for users, or <a href="/groundup/book/reasoning-models/">process-based
+supervision</a> that rewards the <em>steps</em> rather than the
+outcome — puts gradient pressure exactly where honesty currently lives. (This
+is the process-supervision tension: rewarding good-looking steps improves the
+reasoning users see and can even improve capability, but it converts the chain
+from workspace into performance — the same channel cannot be simultaneously
+optimized-to-please and trusted-as-evidence.) Architectural drift is the other
+threat: models that reason in <a href="/groundup/book/state-space-models/">latent vectors</a>
+rather than tokens, recurrent depth, or chains that collapse into
+model-specific shorthand would end legibility without any malign step. The
+paper’s recommendations are conservative: treat monitorability as a measurable
+property; develop and report monitorability evaluations in system cards; weigh
+monitorability explicitly in training and architecture decisions; and be
+extremely careful with any optimization pressure applied directly to chains.
+Not “never train on CoT” — but never spend monitorability without noticing
+you are spending it.</p>
+<aside class="box box-practice" data-box="practice"><div class="box-title"><span class="box-icon" aria-hidden="true">⚙️</span>In practice</div><p>Where this stands in day-to-day 2026 practice, approximately and fast-moving:
+frontier labs run CoT monitors over agentic RL training and over deployed
+agent traffic as a cheap first screen — it is standard defense-in-depth, not a
+research demo. OpenAI has publicly described keeping reasoning chains largely
+free of direct “look nice” optimization, showing users summaries instead, so
+the underlying chain stays usable as evidence; Anthropic publishes faithfulness
+evaluations for its reasoning models and has committed to tracking
+monitorability; DeepSeek-R1’s fully visible chains are one reason it became the
+open workhorse for faithfulness research. Nobody treats a clean trace as proof
+of a clean episode — traces gate <em>escalation</em> (flag for audit, sandbox, human
+review), not <em>exoneration</em>. And monitorability evals — measuring whether a
+weak monitor can extract known-planted misbehavior from a stronger model’s
+chains — are becoming a reported system-card metric alongside capability
+scores.</p></aside>
+<h2 id="measuring-faithfulness-in-summary">Measuring faithfulness, in summary</h2>
+<p>The experiments above hardened into a small standard toolkit, worth having as
+a checklist. <strong>Hint verbalization</strong> (Turpin; Chen): plant a cause, restrict to
+cases where it demonstrably moved the answer, measure the fraction of chains
+that acknowledge it — the closest thing to a headline faithfulness number, now
+run across hint taxonomies from sycophancy to “unauthorized access” cues.
+<strong>Perturbation response</strong> (Lanham): truncation curves <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo stretchy="false">(</mo><mi>k</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">A(k)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">A</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mclose">)</span></span></span></span>, mistake-injection
+flip rates, paraphrase invariance — measuring whether the chain is load-bearing
+at all. <strong>Monitorability evals</strong> (Baker; Korbak): can a weak monitor recover
+known misbehavior from the chain — faithfulness operationalized for the safety
+use case, which is the version labs increasingly report. Each has blind spots:
+verbalization tests need causes the experimenter controls; perturbation tests
+conflate “not load-bearing” with “redundantly load-bearing” (a model that
+recomputes a result it already wrote will look post-hoc); monitor evals are
+relative to a monitor. Used together they triangulate. What no behavioral test
+does is certify a <em>particular</em> chain on a <em>novel</em> input — a gap only
+mechanistic evidence can close, which brings us to the synthesis.</p>
+<h2 id="two-layers-of-oversight">Two layers of oversight</h2>
+<p>Step back and Part VII’s argument comes into focus. This book has now shown you
+two ways to know what a model is doing. <strong>Text-level monitoring</strong> reads what
+the model writes: cheap, scalable to every token of every deployment, readable
+by weak models and by humans — and, as this chapter showed, contingent. It
+watches a channel the model itself writes, faithful today by training accident,
+degradable by optimization pressure or architectural drift.
+<strong>Mechanistic checks</strong> — <a href="/groundup/book/features-and-probes/">probes</a>,
+<a href="/groundup/book/sparse-autoencoders/">sparse autoencoder features</a>,
+<a href="/groundup/book/circuits/">attribution graphs</a>, <a href="/groundup/book/causal-methods/">causal
+interventions</a> — read what the model <em>is</em>: expensive,
+partial, requiring weights access and expertise, but anchored in the actual
+computation, where a confabulated narrative has no purchase. The
+motivated-reasoning case study is the proof of concept for their composition:
+the chain told one causal story, the attribution graph showed another, and the
+graph was right.</p>
+<p>Neither layer suffices. Mechanistic tools cannot yet audit every forward pass
+of a deployed model; text monitors can be Goodharted precisely when stakes are
+highest. But their failure modes are usefully different — fooling the monitor
+requires shaping the text; fooling the probe requires shaping the internals
+that produce the text — and defense in depth means an adversary (including the
+blind adversary of RL optimization pressure) must thread both. Whether the
+mechanistic layer can be made cheap enough, and the text layer kept honest
+long enough, to actually oversee frontier systems is the question
+<a href="/groundup/book/frontier-interpretability/">the next chapter</a> takes up.</p>
+<h2 id="where-this-leaves-us">Where this leaves us</h2>
+<ul>
+<li>You can state the faithfulness question precisely: not “is the CoT correct?”
+but “does the CoT reflect the computation that produced the answer?” — and
+you know usefulness (Claim 1) does not imply faithfulness (Claim 2).</li>
+<li>You know the three canonical behavioral tests and what each intervenes on:
+biased contexts (plant a cause, see if the chain admits it — Turpin),
+perturbations (truncate or corrupt the chain, see if the answer cares —
+Lanham, with the <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo stretchy="false">(</mo><mi>k</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">A(k)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">A</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mclose">)</span></span></span></span> agreement curve), and hint-verbalization rates on
+reasoning models (~25–40% acknowledgment, approximate — Chen).</li>
+<li>You can explain <em>why</em> unfaithfulness is expected: post-hoc explanation is
+the genre pretraining teaches, RLHF rewards plausibility raters can see,
+and serial text has no privileged access to a parallel distributed
+computation.</li>
+<li>You can hold “CoT as scratchpad” and “CoT as explanation” apart — the chain
+is part of the computation, not a report on it — and use that to reconcile
+real accuracy gains with fake narratives.</li>
+<li>You can tell the monitoring story with its numbers: weak-model CoT monitors
+catching ~95% of systemic reward hacks vs ~60% from actions alone; training
+against the monitor producing obfuscated hacking; and the Goodhart
+arithmetic showing why a cleaner dashboard can mean a blinder monitor.</li>
+<li>You know the position-paper consensus: monitorability is real, valuable,
+contingent, and spendable — measure it, report it, and do not casually
+optimize the chain that provides it.</li>
+<li>You can argue Part VII’s closing synthesis: text-level monitoring and
+mechanistic checks fail differently, so they are complementary layers, not
+competitors. <a href="/groundup/book/frontier-interpretability/">Next: Interpretability at the Frontier</a>.</li>
+</ul> <div class="papers-card" id="papers-card"> <div class="pc-title">Key papers &amp; readings in this chapter</div> <ul> <li> <div> <a href="https://arxiv.org/abs/2305.04388" target="_blank" rel="noopener">Language Models Don&#39;t Always Say What They Think: Unfaithful Explanations in Chain-of-Thought Prompting</a> <span class="p-meta"> — Turpin et al., 2023</span> <span class="p-note">The biased-context experiments — the cleanest demonstration that CoT can be post-hoc rationalization.</span> </div> </li><li> <div> <a href="https://arxiv.org/abs/2307.13702" target="_blank" rel="noopener">Measuring Faithfulness in Chain-of-Thought Reasoning</a> <span class="p-meta"> — Lanham et al., 2023</span> <span class="p-note">The perturbation toolkit: truncation, mistake-injection, paraphrase, filler tokens.</span> </div> </li><li> <div> <a href="https://arxiv.org/abs/2505.05410" target="_blank" rel="noopener">Reasoning Models Don&#39;t Always Say What They Think</a> <span class="p-meta"> — Chen et al. (Anthropic), 2025</span> <span class="p-note">Faithfulness measured on RL-trained reasoning models — hint verbalization rates and the RL plateau.</span> </div> </li><li> <div> <a href="https://arxiv.org/abs/2503.11926" target="_blank" rel="noopener">Monitoring Reasoning Models for Misbehavior and the Risks of Promoting Obfuscation</a> <span class="p-meta"> — Baker et al. (OpenAI), 2025</span> <span class="p-note">CoT monitoring catches reward hacking in agentic RL — and training against the monitor produces obfuscated hacking.</span> </div> </li><li> <div> <a href="https://arxiv.org/abs/2507.11473" target="_blank" rel="noopener">Chain of Thought Monitorability: A New and Fragile Opportunity for AI Safety</a> <span class="p-meta"> — Korbak et al., 2025</span> <span class="p-note">The multi-lab position paper: keep CoT monitorable, measure monitorability, and think twice before training against it.</span> </div> </li><li> <div> <a href="https://transformer-circuits.pub/2025/attribution-graphs/biology.html" target="_blank" rel="noopener">On the Biology of a Large Language Model</a> <span class="p-meta"> — Lindsey et al. (Anthropic), 2025</span> <span class="p-note">The motivated-reasoning case study — unfaithful CoT caught mechanistically with attribution graphs.</span> </div> </li> </ul> </div> <nav class="chapter-nav"> <a href="/groundup/book/steering-and-editing/" class="prev"> <span class="dir">← Previous</span> <span class="t">Steering and Model Editing</span> </a> <a href="/groundup/book/frontier-interpretability/" class="next"> <span class="dir">Next →</span> <span class="t">Interpretability at the Frontier</span> </a> </nav> <div class="chapter-foot"> <span>Last updated 2026-08-24</span> <a href="https://github.com/joewilbert/aisite/edit/main/src/content/book/55-cot-faithfulness.md" target="_blank" rel="noopener">Edit this chapter</a> <a href="https://github.com/joewilbert/aisite/issues/new" target="_blank" rel="noopener">Report an issue</a> </div> </article> </div>  </main> </div> <!-- Right panel: papers / tutor / notes --> <aside class="panel-host" id="panel" aria-label="Side panel"> <div class="panel-resizer" id="panel-resizer"></div> <div class="panel-tabs"> <button class="panel-tab" data-tab="paper">Paper</button> <button class="panel-tab" data-tab="tutor">AI tutor</button> <button class="panel-tab" data-tab="notes">Notes</button> <button class="hbtn panel-close" id="panel-close" aria-label="Close panel"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg> </button> </div> <div class="panel-body"> <div class="panel-view" data-view="paper" id="view-paper"></div> <div class="panel-view" data-view="tutor" id="view-tutor"></div> <div class="panel-view" data-view="notes" id="view-notes"></div> </div> </aside> <!-- Selection toolbar --> <div class="sel-toolbar" id="sel-toolbar"> <div class="swatches"> <button class="sw" data-color="yellow" style="background:var(--hl-yellow)" aria-label="Highlight yellow"></button> <button class="sw" data-color="green" style="background:var(--hl-green)" aria-label="Highlight green"></button> <button class="sw" data-color="blue" style="background:var(--hl-blue)" aria-label="Highlight blue"></button> <button class="sw" data-color="pink" style="background:var(--hl-pink)" aria-label="Highlight pink"></button> </div> <div class="divider"></div> <button id="sel-note">✎ Note</button> <button id="sel-explain">✦ Explain</button> <button id="sel-remove" style="display:none">✕ Remove</button> </div> <!-- Settings modal --> <div class="modal-scrim" id="settings-scrim"> <div class="modal" role="dialog" aria-label="Settings" id="settings-modal"></div> </div> <!-- Search modal --> <div class="modal-scrim" id="search-scrim"> <div class="modal search-modal" role="dialog" aria-label="Search"> <input class="q" id="search-input" type="text" placeholder="Search the book…" autocomplete="off"> <div class="search-results" id="search-results"></div> </div> </div> <script>(function(){const base = "/groundup";
+const slug = "cot-faithfulness";
+const pageTitle = "Chain-of-Thought Faithfulness · Ground Up";
+
+      window.__GU__ = { base, slug, pageTitle };
+    })();</script> <script type="module" src="/groundup/_astro/Base.astro_astro_type_script_index_0_lang.65xM_WgJ.js"></script>  </body></html>

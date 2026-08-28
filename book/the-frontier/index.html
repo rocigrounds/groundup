@@ -1,0 +1,720 @@
+<!DOCTYPE html><html lang="en"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>The Frontier Landscape (2023–2026) · Ground Up</title><meta name="description" content="A field guide to the frontier as of mid-2026 — the major model families and their genealogies, the seven durable trends underneath the release noise, and how to read lab announcements without being fooled."><meta name="theme-color" content="#faf9f6"><meta property="og:title" content="The Frontier Landscape (2023–2026) · Ground Up"><meta property="og:description" content="A field guide to the frontier as of mid-2026 — the major model families and their genealogies, the seven durable trends underneath the release noise, and how to read lab announcements without being fooled."><meta property="og:type" content="article"><meta property="og:site_name" content="Ground Up"><link rel="icon" href="/groundup/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="/groundup/apple-touch-icon.png"><link rel="manifest" href="/groundup/manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Ground Up"><script>
+      (function () {
+        try {
+          var t = localStorage.getItem('gu:theme');
+          var dark = t ? t === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+          if (dark) document.documentElement.classList.add('dark');
+          var fs = localStorage.getItem('gu:fontScale');
+          if (fs) document.documentElement.style.setProperty('--font-scale', fs);
+        } catch (e) {}
+      })();
+    </script><link rel="stylesheet" href="/groundup/_astro/_slug_.BCpHWCuJ.css"></head> <body> <header class="site-header"> <button class="hbtn" id="btn-toc" aria-label="Table of contents" title="Contents"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"></path></svg> </button> <a class="brand" href="/groundup/"> <span class="logo">G</span> <span class="brand-name">Ground&nbsp;Up</span> </a> <span class="header-crumb">Part VI · The Modern AI Landscape · Chapter 40</span> <div class="header-actions"> <button class="hbtn" id="btn-search" aria-label="Search" title="Search (/)"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg> </button> <button class="hbtn" id="btn-notes" aria-label="My notes" title="My notes & highlights"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg> </button> <button class="hbtn" id="btn-tutor" aria-label="AI tutor" title="AI tutor"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 1 1-4-6.9"></path><path d="M21 3v6h-6"></path><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"></circle><circle cx="8.5" cy="12" r="1.2" fill="currentColor" stroke="none"></circle><circle cx="15.5" cy="12" r="1.2" fill="currentColor" stroke="none"></circle></svg> </button> <button class="hbtn" id="btn-theme" aria-label="Toggle theme" title="Light / dark"> <svg class="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.5"></circle><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M19.4 4.6l-1.8 1.8M6.4 17.6l-1.8 1.8"></path></svg> </button> <button class="hbtn" id="btn-settings" aria-label="Settings" title="Settings"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.01a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.01a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.01a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"></path></svg> </button> </div> </header> <div class="shell"> <nav class="toc-rail" id="toc-rail" aria-label="Table of contents">  <div class="toc-part">Start here</div> <a class="toc-link" data-slug="how-to-read-this-book" href="/groundup/book/how-to-read-this-book/"> <span class="n">·</span> <span>How to Read This Book</span> </a><a class="toc-link" data-slug="the-whole-machine" href="/groundup/book/the-whole-machine/"> <span class="n">·</span> <span>Frontier AI In One Sitting</span> </a> <div class="toc-part">Part I · Mathematical Foundations</div> <a class="toc-link" data-slug="vectors-and-spaces" href="/groundup/book/vectors-and-spaces/"> <span class="n">1</span> <span>Vectors and Spaces</span> </a><a class="toc-link" data-slug="matrices-as-transformations" href="/groundup/book/matrices-as-transformations/"> <span class="n">2</span> <span>Matrices as Transformations</span> </a><a class="toc-link" data-slug="high-dimensional-geometry" href="/groundup/book/high-dimensional-geometry/"> <span class="n">3</span> <span>High-Dimensional Geometry</span> </a><a class="toc-link" data-slug="derivatives-and-gradients" href="/groundup/book/derivatives-and-gradients/"> <span class="n">4</span> <span>Derivatives and Gradients</span> </a><a class="toc-link" data-slug="chain-rule-and-jacobians" href="/groundup/book/chain-rule-and-jacobians/"> <span class="n">5</span> <span>The Chain Rule, Jacobians, and Curvature</span> </a><a class="toc-link" data-slug="probability" href="/groundup/book/probability/"> <span class="n">6</span> <span>Probability for Deep Learning</span> </a><a class="toc-link" data-slug="information-theory" href="/groundup/book/information-theory/"> <span class="n">7</span> <span>Information Theory: Surprise, Entropy, and KL</span> </a> <div class="toc-part">Part II · Deep Learning Foundations</div> <a class="toc-link" data-slug="neurons-and-mlps" href="/groundup/book/neurons-and-mlps/"> <span class="n">8</span> <span>Neurons, Layers, and MLPs</span> </a><a class="toc-link" data-slug="loss-functions" href="/groundup/book/loss-functions/"> <span class="n">9</span> <span>Loss Functions</span> </a><a class="toc-link" data-slug="gradient-descent-and-backprop" href="/groundup/book/gradient-descent-and-backprop/"> <span class="n">10</span> <span>Gradient Descent and Backpropagation</span> </a><a class="toc-link" data-slug="optimizers" href="/groundup/book/optimizers/"> <span class="n">11</span> <span>Optimizers: From SGD to AdamW and Muon</span> </a><a class="toc-link" data-slug="initialization-and-stability" href="/groundup/book/initialization-and-stability/"> <span class="n">12</span> <span>Initialization and Gradient Pathologies</span> </a><a class="toc-link" data-slug="regularization-and-generalization" href="/groundup/book/regularization-and-generalization/"> <span class="n">13</span> <span>Regularization and Generalization</span> </a><a class="toc-link" data-slug="normalization" href="/groundup/book/normalization/"> <span class="n">14</span> <span>Normalization: BatchNorm to RMSNorm</span> </a><a class="toc-link" data-slug="activation-functions" href="/groundup/book/activation-functions/"> <span class="n">15</span> <span>Activation Functions</span> </a><a class="toc-link" data-slug="residual-connections" href="/groundup/book/residual-connections/"> <span class="n">16</span> <span>Residual Connections and the Residual Stream</span> </a><a class="toc-link" data-slug="cnns-and-rnns" href="/groundup/book/cnns-and-rnns/"> <span class="n">17</span> <span>CNNs and RNNs: The World Before Transformers</span> </a> <div class="toc-part">Part III · Language Modeling</div> <a class="toc-link" data-slug="what-is-a-language-model" href="/groundup/book/what-is-a-language-model/"> <span class="n">18</span> <span>What a Language Model Is</span> </a><a class="toc-link" data-slug="tokenization" href="/groundup/book/tokenization/"> <span class="n">19</span> <span>Tokenization</span> </a><a class="toc-link" data-slug="embeddings" href="/groundup/book/embeddings/"> <span class="n">20</span> <span>Embeddings</span> </a><a class="toc-link" data-slug="evaluating-language-models" href="/groundup/book/evaluating-language-models/"> <span class="n">21</span> <span>Evaluating Language Models</span> </a> <div class="toc-part">Part IV · Attention &amp; Transformers</div> <a class="toc-link" data-slug="seq2seq-and-attention" href="/groundup/book/seq2seq-and-attention/"> <span class="n">22</span> <span>From seq2seq to Attention</span> </a><a class="toc-link" data-slug="scaled-dot-product-attention" href="/groundup/book/scaled-dot-product-attention/"> <span class="n">23</span> <span>Scaled Dot-Product Attention</span> </a><a class="toc-link" data-slug="multi-head-attention" href="/groundup/book/multi-head-attention/"> <span class="n">24</span> <span>Multi-Head Attention</span> </a><a class="toc-link" data-slug="transformer-architecture" href="/groundup/book/transformer-architecture/"> <span class="n">25</span> <span>The Transformer, Piece by Piece</span> </a><a class="toc-link" data-slug="positional-encodings" href="/groundup/book/positional-encodings/"> <span class="n">26</span> <span>Positional Information and RoPE</span> </a><a class="toc-link" data-slug="architecture-families" href="/groundup/book/architecture-families/"> <span class="n">27</span> <span>Architecture Families: BERT to Decoder-Only</span> </a><a class="toc-link" data-slug="kv-cache-and-efficient-attention" href="/groundup/book/kv-cache-and-efficient-attention/"> <span class="n">28</span> <span>The KV Cache and Efficient Attention</span> </a><a class="toc-link" data-slug="mixture-of-experts" href="/groundup/book/mixture-of-experts/"> <span class="n">29</span> <span>Mixture-of-Experts</span> </a><a class="toc-link" data-slug="state-space-models" href="/groundup/book/state-space-models/"> <span class="n">30</span> <span>State-Space Models and Hybrids</span> </a> <div class="toc-part">Part V · Training LLMs in Practice</div> <a class="toc-link" data-slug="pretraining-data" href="/groundup/book/pretraining-data/"> <span class="n">31</span> <span>Pretraining Data</span> </a><a class="toc-link" data-slug="scaling-laws" href="/groundup/book/scaling-laws/"> <span class="n">32</span> <span>Scaling Laws</span> </a><a class="toc-link" data-slug="compute-and-parallelism" href="/groundup/book/compute-and-parallelism/"> <span class="n">33</span> <span>Compute: GPUs, Precision, and Parallelism</span> </a><a class="toc-link" data-slug="the-training-run" href="/groundup/book/the-training-run/"> <span class="n">34</span> <span>The Training Run</span> </a><a class="toc-link" data-slug="sft-and-rlhf" href="/groundup/book/sft-and-rlhf/"> <span class="n">35</span> <span>Post-Training I: SFT, Reward Models, RLHF</span> </a><a class="toc-link" data-slug="dpo-and-friends" href="/groundup/book/dpo-and-friends/"> <span class="n">36</span> <span>Post-Training II: DPO and Its Family</span> </a><a class="toc-link" data-slug="reasoning-models" href="/groundup/book/reasoning-models/"> <span class="n">37</span> <span>Reasoning Training: RLVR, GRPO, and the o1/R1 Era</span> </a><a class="toc-link" data-slug="fine-tuning" href="/groundup/book/fine-tuning/"> <span class="n">38</span> <span>Fine-Tuning You Can Actually Do: LoRA and Friends</span> </a><a class="toc-link" data-slug="inference-and-serving" href="/groundup/book/inference-and-serving/"> <span class="n">39</span> <span>Inference: Sampling, Quantization, Serving</span> </a> <div class="toc-part">Part VI · The Modern AI Landscape</div> <a class="toc-link active" data-slug="the-frontier" href="/groundup/book/the-frontier/"> <span class="n">40</span> <span>The Frontier Landscape (2023–2026)</span> </a><a class="toc-link" data-slug="multimodal-models" href="/groundup/book/multimodal-models/"> <span class="n">41</span> <span>Multimodal Models</span> </a><a class="toc-link" data-slug="diffusion-models" href="/groundup/book/diffusion-models/"> <span class="n">42</span> <span>Diffusion and Image/Video Generation</span> </a><a class="toc-link" data-slug="long-context" href="/groundup/book/long-context/"> <span class="n">43</span> <span>Long Context</span> </a><a class="toc-link" data-slug="agents-and-tools" href="/groundup/book/agents-and-tools/"> <span class="n">44</span> <span>Agents, Tool Use, and MCP</span> </a><a class="toc-link" data-slug="retrieval-augmented-generation" href="/groundup/book/retrieval-augmented-generation/"> <span class="n">45</span> <span>Retrieval-Augmented Generation</span> </a><a class="toc-link" data-slug="benchmarks-and-evaluation" href="/groundup/book/benchmarks-and-evaluation/"> <span class="n">46</span> <span>Benchmarks and How to Read Them</span> </a><a class="toc-link" data-slug="open-vs-closed" href="/groundup/book/open-vs-closed/"> <span class="n">47</span> <span>Open vs Closed Models</span> </a> <div class="toc-part">Part VII · Interpretability</div> <a class="toc-link" data-slug="why-interpretability" href="/groundup/book/why-interpretability/"> <span class="n">48</span> <span>Why Interpretability</span> </a><a class="toc-link" data-slug="features-and-probes" href="/groundup/book/features-and-probes/"> <span class="n">49</span> <span>Features, Directions, and Probes</span> </a><a class="toc-link" data-slug="superposition" href="/groundup/book/superposition/"> <span class="n">50</span> <span>Superposition and Polysemanticity</span> </a><a class="toc-link" data-slug="sparse-autoencoders" href="/groundup/book/sparse-autoencoders/"> <span class="n">51</span> <span>Sparse Autoencoders</span> </a><a class="toc-link" data-slug="circuits" href="/groundup/book/circuits/"> <span class="n">52</span> <span>Circuits: Induction Heads to Attribution Graphs</span> </a><a class="toc-link" data-slug="causal-methods" href="/groundup/book/causal-methods/"> <span class="n">53</span> <span>Causal Methods: Patching, Ablation, and Lenses</span> </a><a class="toc-link" data-slug="steering-and-editing" href="/groundup/book/steering-and-editing/"> <span class="n">54</span> <span>Steering and Model Editing</span> </a><a class="toc-link" data-slug="cot-faithfulness" href="/groundup/book/cot-faithfulness/"> <span class="n">55</span> <span>Chain-of-Thought Faithfulness</span> </a><a class="toc-link" data-slug="frontier-interpretability" href="/groundup/book/frontier-interpretability/"> <span class="n">56</span> <span>Interpretability at the Frontier</span> </a> <div class="toc-part">Part VIII · Reference</div> <a class="toc-link" data-slug="where-to-go-next" href="/groundup/book/where-to-go-next/"> <span class="n">57</span> <span>Where to Go Next</span> </a><a class="toc-link" data-slug="glossary" href="/groundup/book/glossary/"> <span class="n">58</span> <span>Glossary</span> </a><a class="toc-link" data-slug="notation" href="/groundup/book/notation/"> <span class="n">59</span> <span>Notation Reference</span> </a> </nav> <div class="scrim" id="toc-scrim"></div> <main class="main-col">  <div class="article-wrap"> <article class="chapter" id="article" data-slug="the-frontier" data-title="The Frontier Landscape (2023–2026)" data-file="40-the-frontier.md" data-pagefind-body> <div class="chapter-kicker">Part VI · The Modern AI Landscape · Chapter 40</div> <h1>The Frontier Landscape (2023–2026)</h1> <p class="chapter-desc">A field guide to the frontier as of mid-2026 — the major model families and their genealogies, the seven durable trends underneath the release noise, and how to read lab announcements without being fooled.</p> <details class="section-nav"> <summary>In this chapter</summary> <ol> <li><a href="#how-to-read-the-frontier">How to read the frontier</a></li><li><a href="#a-field-guide-to-the-model-families">A field guide to the model families</a></li><li><a href="#theme-everything-at-the-frontier-is-a-mixture-of-experts">Theme: everything at the frontier is a mixture-of-experts</a></li><li><a href="#theme-thinking-modes-and-routers-as-product-architecture">Theme: thinking modes and routers as product architecture</a></li><li><a href="#theme-the-open-weight-gap-closed-to-months">Theme: the open-weight gap closed to months</a></li><li><a href="#theme-agents-multimodality-and-the-falling-price-of-intelligence">Theme: agents, multimodality, and the falling price of intelligence</a></li><li><a href="#theme-safety-frameworks-grew-up-alongside-capability">Theme: safety frameworks grew up alongside capability</a></li><li><a href="#where-this-leaves-us">Where this leaves us</a></li> </ol> </details> <p>Every chapter before this one taught you machinery: attention, mixture-of-experts,
+scaling laws, reinforcement learning from human feedback (RLHF), reasoning
+training, serving. This chapter is different. It is
+a map — of who builds frontier models, how each family got to where it is, and
+what actually changed between 2023 and 2026 underneath the release-day noise.</p>
+<p>A map of a fast-moving field has an obvious problem: it ages. A version of this
+chapter written in early 2025 would already read like a museum exhibit — no
+GPT-5, no Claude 4 (let alone 5), no Kimi K2, no trillion-parameter open
+weights. So this chapter is deliberately built in two layers. The first layer is
+<strong>durable</strong>: how to read frontier announcements critically, and seven structural
+trends — the shift to mixture-of-experts (MoE), thinking modes, the closing open-weight
+gap, the agentic turn, multimodality-by-default, collapsing prices, and
+formalized safety frameworks — that have held for years and will likely outlive
+any particular model name. The second layer is <strong>dated</strong>: a genealogy of the
+major families and a scoreboard table, both explicitly stamped as a <strong>snapshot
+as of mid-2026</strong>. When you read this later than that, treat the genealogies as
+history (history doesn’t rot) and check the <a href="/groundup/updates/">updates page</a> for
+whatever has shipped since.</p>
+<p>One more framing note before we start. Nothing in this chapter is new
+<em>machinery</em>. Every model below is a decoder-only transformer variant you could
+now describe layer by layer (<a href="/groundup/book/transformer-architecture/">Chapter 25</a>),
+usually sparse (<a href="/groundup/book/mixture-of-experts/">Chapter 29</a>), trained the way
+Chapters <a href="/groundup/book/pretraining-data/">31</a>–<a href="/groundup/book/reasoning-models/">37</a> describe,
+and served the way <a href="/groundup/book/inference-and-serving/">Chapter 39</a> describes. The
+frontier is not a different kind of object. It is the same object with more
+zeros, better data, and post-training that took years to industrialize.</p>
+<h2 id="how-to-read-the-frontier">How to read the frontier</h2>
+<p>Before the map, the map-reading skills — because most of what you will read
+about frontier models, for the rest of your life, will be some mixture of
+disclosure, inference, and folklore, and telling them apart is a learnable
+skill.</p>
+<p><strong>Disclosed versus inferred.</strong> Until 2023, frontier papers told you almost
+everything: GPT-3’s paper gave parameter counts, layer counts, data mixture,
+compute. The <a href="https://arxiv.org/abs/2303.08774">GPT-4 Technical Report</a>
+(March 2023) broke that norm on purpose, stating that it would report “no
+further details about the architecture (including model size), hardware,
+training compute, dataset construction, or training method,” citing
+“the competitive landscape and the safety implications.” That sentence marks
+a watershed: from then on, closed-lab information comes in three grades.
+<em>Disclosed</em>: stated in a technical report or system card (Claude’s context
+window; Gemini 1.5’s mixture-of-experts architecture). <em>Inferred</em>: estimated
+from behavior, pricing, latency, or hardware supply chains (most closed
+parameter counts; most closed training-compute figures — organizations like
+Epoch AI publish careful inference-based estimates and label them as such).
+<em>Folklore</em>: numbers from anonymous leaks that got repeated until they felt
+official (the “GPT-4 is 1.8 trillion parameters” figure is the canonical
+example — plausible, widely repeated, never confirmed). This book cites
+disclosed numbers as facts, inferred numbers as estimates, and folklore as
+folklore.</p>
+<p><strong>Model cards and system cards.</strong> The primary sources worth your time are
+<em>technical reports</em> (architecture and training, when disclosed), <em>model cards</em>
+(a structured summary of capabilities, limits, and evaluation results —
+a genre proposed by <a href="https://arxiv.org/abs/1810.03993">Mitchell et al., 2018</a>),
+and <em>system cards</em> (a newer genre covering the deployed system: safety
+evaluations, red-teaming results, mitigations, known failure modes). Anthropic,
+OpenAI, and Google DeepMind all now ship system cards with flagship releases,
+and they are consistently more informative than any press coverage of the same
+release. When you want to know what a model actually is, read the card, not
+the headline.</p>
+<p><strong>Primary sources over leaderboard aggregators.</strong> Third-party leaderboards are
+useful but structurally gameable, for reasons <a href="/groundup/book/benchmarks-and-evaluation/">Chapter 46</a>
+dissects in detail: benchmark contamination, prompt sensitivity, and — for
+preference-vote arenas — the ability to submit specially tuned variants. A
+cautionary tale from April 2025: Meta submitted an “experimental” chat-optimized
+variant of Llama 4 Maverick to LM Arena that outranked the model actually
+released, prompting the leaderboard to change its policies. The lesson is not
+that leaderboards lie; it is that a leaderboard rank is one noisy measurement,
+while a system card plus your own task-specific evaluation is evidence.</p>
+<aside class="box box-warning" data-box="warning"><div class="box-title"><span class="box-icon" aria-hidden="true">⚠️</span>Careful</div><p><strong>Version-number folklore.</strong> Model version numbers are marketing labels, not
+measurements. They do not map cleanly onto training runs (a “.1” may be a new
+pretrain, a post-training refresh, or a router change), they do not imply size
+(“GPT-5 must be 10× GPT-4” has no basis — public reporting suggests the
+opposite emphasis, on efficiency and routing), and they are not comparable
+across labs (Claude 4 and Gemini 2.5 and GPT-4.1 coexisted as peers). Numbers
+also get skipped, retired, and reshuffled: OpenAI shipped GPT-4.5 in February
+2025 as a research preview and retired it from the application programming
+interface (API) within months; “o2”
+never existed (trademark conflict — the o-series went o1, o3, o4-mini).
+Treat any claim of the form “version X.Y is N times better/bigger” as
+folklore unless a primary source says it.</p></aside>
+<h2 id="a-field-guide-to-the-model-families">A field guide to the model families</h2>
+<p>Everything in this section is dated by construction — it is the genealogy layer,
+<strong>a snapshot as of mid-2026</strong>. Newer point releases almost certainly exist by
+the time you read this; the cadence at every major lab is now measured in
+months. The <a href="/groundup/updates/">updates page</a> tracks what changed after this was
+written.</p>
+<figure class="fig">
+  <svg viewBox="0 0 720 410" role="img" aria-label="Timeline of major model releases from 2023 to mid-2026 across six lanes: OpenAI, Anthropic, Google, Meta, DeepSeek, and other open-weight labs">
+    <defs>
+      <marker id="tl-arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+        <path d="M0,0 L6,3 L0,6" fill="none" stroke="currentColor" stroke-width="1.2"></path>
+      </marker>
+    </defs>
+    <!-- year gridlines -->
+    <line x1="70" y1="48" x2="70" y2="360" stroke="currentColor" opacity="0.15"></line>
+    <line x1="242" y1="48" x2="242" y2="360" stroke="currentColor" opacity="0.15"></line>
+    <line x1="414" y1="48" x2="414" y2="360" stroke="currentColor" opacity="0.15"></line>
+    <line x1="586" y1="48" x2="586" y2="360" stroke="currentColor" opacity="0.15"></line>
+    <text x="70" y="382" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.55" text-anchor="middle">2023</text>
+    <text x="242" y="382" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.55" text-anchor="middle">2024</text>
+    <text x="414" y="382" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.55" text-anchor="middle">2025</text>
+    <text x="586" y="382" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.55" text-anchor="middle">2026</text>
+    <line x1="640" y1="368" x2="700" y2="368" stroke="currentColor" opacity="0.35" marker-end="url(#tl-arrow)"></line>
+    <text x="695" y="360" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.55" text-anchor="end">see /updates/</text>
+    <!-- OpenAI lane -->
+    <text x="12" y="74" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor">OpenAI</text>
+    <line x1="86" y1="70" x2="690" y2="70" stroke="#14b8a6" opacity="0.3"></line>
+    <circle cx="104" cy="70" r="5" fill="#14b8a6"></circle><text x="104" y="56" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="middle">GPT-4</text>
+    <circle cx="305" cy="70" r="5" fill="#14b8a6"></circle><text x="305" y="92" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="middle">4o</text>
+    <circle cx="362" cy="70" r="5" fill="#14b8a6"></circle><text x="362" y="56" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="middle">o1</text>
+    <circle cx="517" cy="70" r="5" fill="#14b8a6"></circle><text x="517" y="56" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="middle">GPT-5</text>
+    <circle cx="565" cy="70" r="5" fill="#14b8a6"></circle><text x="571" y="92" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="middle">5.1</text>
+    <!-- Anthropic lane -->
+    <text x="12" y="129" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor">Anthropic</text>
+    <line x1="86" y1="125" x2="690" y2="125" stroke="#818cf8" opacity="0.3"></line>
+    <circle cx="276" cy="125" r="5" fill="#818cf8"></circle><text x="276" y="111" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="middle">Claude 3</text>
+    <circle cx="319" cy="125" r="5" fill="#818cf8"></circle><text x="323" y="147" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="middle">3.5S</text>
+    <circle cx="434" cy="125" r="5" fill="#818cf8"></circle><text x="434" y="111" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="middle">3.7S</text>
+    <circle cx="474" cy="125" r="5" fill="#818cf8"></circle><text x="474" y="147" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="middle">Claude 4</text>
+    <circle cx="545" cy="125" r="5" fill="#818cf8"></circle><text x="545" y="111" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="middle">4.5 wave</text>
+    <circle cx="660" cy="125" r="5" fill="#818cf8"></circle><text x="655" y="147" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="middle">Fable 5</text>
+    <!-- Google lane -->
+    <text x="12" y="184" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor">Google</text>
+    <line x1="86" y1="180" x2="690" y2="180" stroke="#f59e0b" opacity="0.3"></line>
+    <circle cx="233" cy="180" r="5" fill="#f59e0b"></circle><text x="233" y="166" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="middle">1.0</text>
+    <circle cx="262" cy="180" r="5" fill="#f59e0b"></circle><text x="264" y="202" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="middle">1.5</text>
+    <circle cx="405" cy="180" r="5" fill="#f59e0b"></circle><text x="405" y="166" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="middle">2.0</text>
+    <circle cx="448" cy="180" r="5" fill="#f59e0b"></circle><text x="450" y="202" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="middle">2.5</text>
+    <circle cx="570" cy="180" r="5" fill="#f59e0b"></circle><text x="570" y="166" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="middle">Gemini 3</text>
+    <!-- Meta lane -->
+    <text x="12" y="239" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor">Meta</text>
+    <line x1="86" y1="235" x2="690" y2="235" stroke="#fb7185" opacity="0.3"></line>
+    <circle cx="165" cy="235" r="5" fill="#fb7185"></circle><text x="165" y="221" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="middle">Llama 2</text>
+    <circle cx="293" cy="235" r="5" fill="#fb7185"></circle><text x="293" y="257" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="middle">Llama 3</text>
+    <circle cx="334" cy="235" r="5" fill="#fb7185"></circle><text x="342" y="221" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="middle">3.1 405B</text>
+    <circle cx="462" cy="235" r="5" fill="#fb7185"></circle><text x="462" y="257" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="middle">Llama 4</text>
+    <!-- DeepSeek lane -->
+    <text x="12" y="294" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor">DeepSeek</text>
+    <line x1="86" y1="290" x2="690" y2="290" stroke="#38bdf8" opacity="0.3"></line>
+    <circle cx="305" cy="290" r="5" fill="#38bdf8"></circle><text x="305" y="276" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="middle">V2</text>
+    <circle cx="405" cy="290" r="5" fill="#38bdf8"></circle><text x="401" y="312" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="middle">V3</text>
+    <circle cx="424" cy="290" r="5" fill="#38bdf8"></circle><text x="430" y="276" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="middle">R1</text>
+    <circle cx="519" cy="290" r="5" fill="#38bdf8"></circle><text x="519" y="312" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="middle">V3.1</text>
+    <!-- Open others lane -->
+    <text x="12" y="349" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor">Open (other)</text>
+    <line x1="102" y1="345" x2="690" y2="345" stroke="#14b8a6" opacity="0.2"></line>
+    <circle cx="233" cy="345" r="5" fill="#14b8a6" fill-opacity="0.5" stroke="#14b8a6"></circle><text x="233" y="331" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="middle">Mixtral</text>
+    <circle cx="474" cy="345" r="5" fill="#14b8a6" fill-opacity="0.5" stroke="#14b8a6"></circle><text x="474" y="331" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="middle">Qwen3</text>
+    <circle cx="508" cy="345" r="5" fill="#14b8a6" fill-opacity="0.5" stroke="#14b8a6"></circle><text x="508" y="367" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="middle">Kimi K2</text>
+    <circle cx="530" cy="345" r="5" fill="#14b8a6" fill-opacity="0.5" stroke="#14b8a6"></circle><text x="548" y="331" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="middle">GLM-4.5</text>
+  </svg>
+  <figcaption><strong>Figure:</strong> Major releases, 2023 to mid-2026, one lane per family (selected — every lane omits point releases; "3.5S" = Claude 3.5 Sonnet). Note how the dots crowd rightward: the release cadence roughly doubled over the period. Snapshot as of August 2026; newer dots belong to the right of the frame.</figcaption>
+</figure>
+<h3 id="openai">OpenAI</h3>
+<p><strong>GPT-4</strong> (March 2023) set the frontier for over a year: the first model to
+pass a wide slice of professional exams, and — per the folklore discussed above
+— widely believed but never confirmed to be a mixture-of-experts. Its
+<a href="https://arxiv.org/abs/2303.08774">technical report</a> is also a landmark of
+<em>predictability</em>: final loss was forecast from runs using thousands of times
+less compute, exactly the scaling-law machinery of
+<a href="/groundup/book/scaling-laws/">Chapter 32</a>. <strong>GPT-4o</strong> (May 2024) made multimodality
+native — one network trained end-to-end on text, audio, and images rather than
+stitched-together pipelines — and its real-time voice mode previewed the
+interface direction (<a href="/groundup/book/multimodal-models/">Chapter 41</a> covers how this
+works). The <strong>o-series</strong> (o1 in September 2024, then o3) introduced
+reinforcement-learned chain-of-thought reasoning as a separate product line —
+the paradigm <a href="/groundup/book/reasoning-models/">Chapter 37</a> is about — at the cost of a
+confusing model picker with two incompatible naming schemes. <strong>GPT-5</strong>
+(August 2025) resolved that by unifying the lines behind a <em>router</em>: one
+product name that dispatches each query to a fast model or a deliberate
+reasoning model (more on this pattern below, and in the router figure). The
+<strong>GPT-5.x</strong> point releases continued from late 2025 (5.1 in November 2025,
+with tunable “thinking” effort); given the cadence, newer point releases
+almost certainly exist as you read this — check the
+<a href="/groundup/updates/">updates page</a>. Separately, <strong>gpt-oss</strong> (August 2025) marked
+OpenAI’s return to open weights after six years: two Apache-2.0
+mixture-of-experts models (approximately 117B and 21B total parameters, with
+roughly 5B and 4B active — figures from the release materials), competitive
+with the o-series minis.</p>
+<h3 id="anthropic">Anthropic</h3>
+<p>The <strong>Claude 3</strong> family (March 2024) established the three-tier
+small/medium/large naming — Haiku, Sonnet, Opus — that the industry quietly
+adopted as its mental model, and Opus was the first model many considered a
+true GPT-4 peer. Anthropic’s lineage differentiator is
+<a href="https://arxiv.org/abs/2212.08073">Constitutional AI</a> (<a href="/groundup/book/sft-and-rlhf/">Chapter 35</a>):
+alignment via an explicit set of principles the model critiques itself
+against, rather than purely via human preference labels. <strong>Claude 3.5 Sonnet</strong>
+(June 2024) then did something strategically interesting: a mid-tier model
+that beat the previous flagship, especially at coding — the release that made
+Claude the default among many software engineers. <strong>Claude 3.7 Sonnet</strong>
+(February 2025) was the first <em>hybrid</em> reasoner: one set of weights that
+answers instantly or “thinks” visibly at length, with a user-set thinking
+budget. <strong>Claude 4</strong> (Opus 4 and Sonnet 4, May 2025) leaned hard into
+long-horizon agentic work and shipped alongside <strong>Claude Code</strong>, a terminal
+agent that became a flagship product in its own right
+(<a href="/groundup/book/agents-and-tools/">Chapter 44</a>). The <strong>4.5 wave</strong> (Sonnet 4.5 in
+September, Haiku 4.5 in October, Opus 4.5 in November 2025) compressed the
+tiers — each new small model matching the previous large one. The <strong>Claude 5</strong>
+generation arrived in mid-2026, and not in the expected shape: instead of an
+Opus 5 (the Opus line had continued to 4.8), Anthropic introduced a new tier
+<em>above</em> Opus — the <strong>Mythos class</strong> — previewed under gated access in April
+2026 and shipped publicly in June as <strong>Fable 5</strong> (alongside the more
+restricted <strong>Mythos 5</strong>), with <strong>Sonnet 5</strong> following weeks later. Per
+Anthropic’s descriptions, Fable 5 and Mythos 5 are the same underlying
+frontier model in different <em>packaging</em> — different safeguards, access, and
+deployment arrangements — a reminder that a
+“model name” increasingly labels a product configuration, not a set of weights.</p>
+<h3 id="google-deepmind">Google DeepMind</h3>
+<p>Google’s story is a slow conversion of overwhelming structural advantages —
+tensor processing units (TPUs), data centers, YouTube, Search — into frontier products. <strong>Gemini 1.0</strong>
+(December 2023) merged the Google Brain and DeepMind efforts; <strong>Gemini 1.5</strong>
+(February 2024) was the shock: a mixture-of-experts model with a
+<strong>one-million-token context window</strong> (ten million in research settings),
+demonstrated with near-perfect recall in
+<a href="https://arxiv.org/abs/2403.05530">needle-in-a-haystack tests</a> — the release
+that made <a href="/groundup/book/long-context/">long context</a> a standard axis of competition.
+<strong>Gemini 2.0</strong> (December 2024) pushed native multimodality and agent tooling;
+<strong>2.5 Pro</strong> (March 2025) added always-on thinking with controllable budgets
+and topped many leaderboards through mid-2025. <strong>Gemini 3</strong> (late 2025)
+continued the line as the flagship. The durable point is vertical
+integration: Google is the only frontier lab training on its own silicon
+(TPUs; <a href="/groundup/book/compute-and-parallelism/">Chapter 33</a>) at its own scale, which
+insulates it from graphics processing unit (GPU) supply and pricing and shows up in aggressive
+price-per-token positioning (the Flash tier).</p>
+<h3 id="meta-and-llama">Meta and Llama</h3>
+<p>Meta chose the opposite strategy: give the weights away and let the ecosystem
+build on them. <strong>Llama 2</strong> (July 2023) made open weights commercially usable;
+<strong>Llama 3</strong> (April 2024) and especially <strong>Llama 3.1 405B</strong> (July 2024) proved
+open weights could reach the frontier — a dense 405-billion-parameter model
+whose <a href="https://arxiv.org/abs/2407.21783">report</a> remains the most complete
+public account of a frontier training run (16,000+ GPUs, hardware failure
+rates, data recipes — the reality behind <a href="/groundup/book/the-training-run/">Chapter 34</a>).
+<strong>Llama 4</strong> (April 2025) switched to mixture-of-experts and native
+multimodality (Scout and Maverick, each ~17B active parameters; a
+~2-trillion-parameter “Behemoth” teacher was announced but repeatedly
+delayed). Then came the wobbles: the LM Arena experimental-variant
+controversy, a lukewarm developer reception, and a mid-2025 reorganization
+into Meta Superintelligence Labs with heavy external hiring and public
+signals that future frontier models may not all be open. As of mid-2026 the
+open-Llama strategy’s future is uncertain — an honest unknown, and
+a major plot point for <a href="/groundup/book/open-vs-closed/">Chapter 47</a>.</p>
+<h3 id="deepseek">DeepSeek</h3>
+<p>A Chinese lab spun out of a quantitative hedge fund (High-Flyer), and the
+efficiency story of the era. <strong>DeepSeek-V2</strong> (May 2024) introduced
+multi-head latent attention (MLA) — compressing the key–value (KV) cache
+(<a href="/groundup/book/kv-cache-and-efficient-attention/">Chapter 28</a>) by an order of
+magnitude. <strong>DeepSeek-V3</strong> (December 2024) combined MLA, a 671B-total /
+37B-active mixture-of-experts, 8-bit floating-point (FP8) training, and
+multi-token prediction, and
+reported a final-run cost of ~2.79M H800-GPU-hours — about $5.6M at rental
+prices — for a model competitive with closed flagships. (The figure is
+disclosed but frequently misread: it excludes research, ablations, prior
+runs, and the cluster itself.) <strong>DeepSeek-R1</strong> (January 2025) applied
+reinforcement learning with verifiable rewards to V3 and released the result,
+reasoning traces and all, under an MIT license — the “efficiency shock” that
+briefly knocked roughly 17% off Nvidia’s market value in a day (approximate;
+the point is the magnitude of the reaction, which said more about market
+assumptions than about the model). <strong>V3.1</strong> (August 2025) merged the chat and
+reasoning lines into one hybrid-thinking model; newer releases have continued
+since — see the <a href="/groundup/updates/">updates page</a>.</p>
+<h3 id="qwen-and-the-rest-of-the-open-weight-wave">Qwen, and the rest of the open-weight wave</h3>
+<p>Alibaba’s <strong>Qwen</strong> became the most-forked open family on Hugging Face —
+by number of derivative fine-tunes, the default base for the world’s
+open-model tinkering. <strong>Qwen2.5</strong> (late 2024) shipped strong dense models at
+every size from 0.5B to 72B; <strong>Qwen3</strong> (2025) added mixture-of-experts
+flagships (235B total / 22B active) and a unified thinking toggle in one set
+of weights. <strong>Mistral</strong> (France) proved a small team could matter — Mistral
+7B (2023) and <strong>Mixtral 8×7B</strong> (December 2023, the release that mainstreamed
+open MoE) — and remains Europe’s flagship lab, mixing Apache-2.0 small models
+with closed commercial ones. <strong>xAI</strong> built differently: the Colossus cluster
+in Memphis went from zero to roughly 100,000 H100s in about 122 days (a
+figure from Nvidia’s and xAI’s own accounts, later expanded further), and
+<strong>Grok 3</strong> (February 2025) and <strong>Grok 4</strong> (July 2025) demonstrated that
+enough concentrated compute buys a seat at the frontier table quickly.
+<strong>Moonshot AI’s Kimi K2</strong> (July 2025) was a milestone twice over: the first
+trillion-parameter-class open-weight model (1.04T total / 32B active), and
+the first frontier-scale run trained with the Muon optimizer
+(<a href="/groundup/book/optimizers/">Chapter 11</a>) via its MuonClip variant — post-trained
+specifically for agentic tool use. <strong>Zhipu AI’s GLM-4.5</strong> (355B total / 32B
+active, July 2025) and successors carved out a niche as agentic-coding
+value leaders. The pattern across the wave: Chinese labs now produce the
+majority of notable open-weight releases, and every one of them is a sparse
+mixture-of-experts.</p>
+<h3 id="the-scoreboard-frozen-in-time">The scoreboard, frozen in time</h3>
+<p>Every cell below is a <strong>mid-2026 snapshot</strong> of a moving target: flagships
+change quarterly, context windows are marketing-sensitive, and “architecture”
+is only listed where disclosed. Read the table as a photograph, not a map.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Family</th><th>Flagship (mid-2026)</th><th>Open weights?</th><th>Architecture (where disclosed)</th><th>Context (approx.)</th><th>Signature strength</th></tr></thead><tbody><tr><td>OpenAI GPT</td><td>GPT-5.x</td><td>No (gpt-oss aside)</td><td>Router over fast + reasoning models; internals undisclosed</td><td>~400K</td><td>Breadth, product reach, reasoning line</td></tr><tr><td>Anthropic Claude</td><td>Fable 5 (Mythos class; Sonnet 5 below)</td><td>No</td><td>Hybrid reasoning; internals undisclosed</td><td>200K–1M</td><td>Agentic coding, long-horizon work, safety framing</td></tr><tr><td>Google Gemini</td><td>Gemini 3</td><td>No (Gemma cousins open)</td><td>Sparse MoE (1.5-era disclosure); TPU-native</td><td>1M+</td><td>Context length, multimodality, price tiers</td></tr><tr><td>Meta Llama</td><td>Llama 4 line</td><td>Yes (license-limited)</td><td>MoE, ~17B active; native multimodal</td><td>up to ~10M claimed (Scout)</td><td>Ecosystem default, most-studied open weights</td></tr><tr><td>DeepSeek</td><td>V3.x / R-series</td><td>Yes (MIT)</td><td>MoE 671B/37B active, MLA, FP8</td><td>~128K</td><td>Efficiency, open reasoning traces</td></tr><tr><td>Qwen (Alibaba)</td><td>Qwen3 line</td><td>Yes (mostly Apache-2.0)</td><td>Dense 0.6B–32B + MoE 235B/22B</td><td>128K–1M</td><td>Most-forked family, full size ladder</td></tr><tr><td>Mistral</td><td>Large/Medium line</td><td>Partly</td><td>Mixed; small models Apache-2.0</td><td>~128K</td><td>European champion, efficient mid-size</td></tr><tr><td>xAI Grok</td><td>Grok 4</td><td>Grok-1 only</td><td>MoE (Grok-1: 314B/25% active)</td><td>~256K</td><td>Raw compute scale, real-time X data</td></tr><tr><td>Moonshot Kimi</td><td>K2 line</td><td>Yes (modified MIT)</td><td>MoE 1.04T/32B active, MuonClip</td><td>~256K</td><td>Agentic tool use at open frontier</td></tr><tr><td>Zhipu GLM</td><td>GLM-4.x</td><td>Yes</td><td>MoE 355B/32B active</td><td>~200K</td><td>Agentic coding value</td></tr><tr><td>OpenAI gpt-oss</td><td>gpt-oss-120b</td><td>Yes (Apache-2.0)</td><td>MoE ~117B/5B active</td><td>~128K</td><td>Closed-lab pedigree, open license</td></tr></tbody></table>
+<h2 id="theme-everything-at-the-frontier-is-a-mixture-of-experts">Theme: everything at the frontier is a mixture-of-experts</h2>
+<p>Strip away the branding and one architectural fact organizes the whole table
+above: <strong>every frontier-scale model whose architecture is public is a sparse
+mixture-of-experts</strong>, and the closed ones are widely inferred to be too. The
+reasons were built in <a href="/groundup/book/mixture-of-experts/">Chapter 29</a>; here is why the
+economics made it universal.</p>
+<aside class="box box-intuition" data-box="intuition"><div class="box-title"><span class="box-icon" aria-hidden="true">💡</span>Intuition</div><p>A dense model spends its entire parameter count on every token — the token
+“the” activates the same 405 billion parameters as a hard math step. A
+mixture-of-experts (MoE) model keeps a large library of parameters (capacity
+to store knowledge) but consults only a small, input-dependent fraction per
+token (compute to process it). Since serving cost scales with <em>active</em>
+parameters and knowledge scales more with <em>total</em> parameters, MoE lets labs
+buy capacity and compute separately — and once one lab does that, everyone
+competing on price-per-capability has to.</p></aside>
+<aside class="box box-math" data-box="math"><div class="box-title"><span class="box-icon" aria-hidden="true">∑</span>The math</div><p>Recall from <a href="/groundup/book/scaling-laws/">Chapter 32</a> that a forward pass costs about
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mi>N</mi></mrow><annotation encoding="application/x-tex">2N</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.109em;">N</span></span></span></span> floating-point operations (FLOPs) per token and training costs about
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>C</mi><mo>≈</mo><mn>6</mn><mi>N</mi><mi>D</mi></mrow><annotation encoding="application/x-tex">C \approx 6ND</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord">6</span><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="mord mathnormal" style="margin-right:0.0278em;">D</span></span></span></span>, where <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi></mrow><annotation encoding="application/x-tex">N</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">N</span></span></span></span> is the <em>active</em> parameter count and <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi></mrow><annotation encoding="application/x-tex">D</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">D</span></span></span></span> the number
+of training tokens. For an MoE, total parameters <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mtext>total</mtext></msub></mrow><annotation encoding="application/x-tex">N_{\text{total}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">total</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> and active
+parameters <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mtext>act</mtext></msub></mrow><annotation encoding="application/x-tex">N_{\text{act}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">act</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> separate, so per-token compute is
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>≈</mo><mn>2</mn><msub><mi>N</mi><mtext>act</mtext></msub></mrow><annotation encoding="application/x-tex">\approx 2N_{\text{act}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4831em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord">2</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">act</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>, independent of <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mtext>total</mtext></msub></mrow><annotation encoding="application/x-tex">N_{\text{total}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">total</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> (ignoring
+routing overhead and the attention term). The design freedom is the sparsity
+ratio <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mtext>act</mtext></msub><mi mathvariant="normal">/</mi><msub><mi>N</mi><mtext>total</mtext></msub></mrow><annotation encoding="application/x-tex">N_{\text{act}}/N_{\text{total}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">act</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">/</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">total</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> — and the trend has been toward more
+aggressive sparsity: Mixtral ran at 2-of-8 experts (<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>≈</mo><mn>25</mn><mi mathvariant="normal">%</mi></mrow><annotation encoding="application/x-tex">\approx 25\%</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4831em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8056em;vertical-align:-0.0556em;"></span><span class="mord">25%</span></span></span></span>),
+DeepSeek-V3 at <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>37</mn><mi mathvariant="normal">/</mi><mn>671</mn><mo>≈</mo><mn>5.5</mn><mi mathvariant="normal">%</mi></mrow><annotation encoding="application/x-tex">37/671 \approx 5.5\%</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">37/671</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8056em;vertical-align:-0.0556em;"></span><span class="mord">5.5%</span></span></span></span>, Kimi K2 at <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>32</mn><mi mathvariant="normal">/</mi><mn>1040</mn><mo>≈</mo><mn>3</mn><mi mathvariant="normal">%</mi></mrow><annotation encoding="application/x-tex">32/1040 \approx 3\%</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">32/1040</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8056em;vertical-align:-0.0556em;"></span><span class="mord">3%</span></span></span></span>.</p></aside>
+<aside class="box box-example" data-box="example"><div class="box-title"><span class="box-icon" aria-hidden="true">✏️</span>Worked example</div><p>Compare Llama 3.1 405B (dense) with DeepSeek-V3 (671B total, 37B active).
+Per generated token, the dense model’s expert-and-attention stack costs about
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mo>×</mo><mn>405</mn><mo>×</mo><msup><mn>10</mn><mn>9</mn></msup><mo>=</mo><mn>8.1</mn><mo>×</mo><msup><mn>10</mn><mn>11</mn></msup></mrow><annotation encoding="application/x-tex">2 \times 405\times10^9 = 8.1\times10^{11}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">405</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">9</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">8.1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">11</span></span></span></span></span></span></span></span></span></span></span></span> FLOPs; V3 costs about
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mo>×</mo><mn>37</mn><mo>×</mo><msup><mn>10</mn><mn>9</mn></msup><mo>=</mo><mn>7.4</mn><mo>×</mo><msup><mn>10</mn><mn>10</mn></msup></mrow><annotation encoding="application/x-tex">2 \times 37\times10^9 = 7.4\times10^{10}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">37</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">9</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">7.4</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">10</span></span></span></span></span></span></span></span></span></span></span></span> — roughly <strong>11× less compute per
+token</strong> despite holding <strong>1.7× more total parameters</strong>. Training tells the
+same story: V3 trained on <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mo>=</mo><mn>14.8</mn></mrow><annotation encoding="application/x-tex">D = 14.8</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">D</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">14.8</span></span></span></span>T tokens, so
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>C</mi><mo>≈</mo><mn>6</mn><mo>×</mo><mn>37</mn><mo>×</mo><msup><mn>10</mn><mn>9</mn></msup><mo>×</mo><mn>14.8</mn><mo>×</mo><msup><mn>10</mn><mn>12</mn></msup><mo>≈</mo><mn>3.3</mn><mo>×</mo><msup><mn>10</mn><mn>24</mn></msup></mrow><annotation encoding="application/x-tex">C \approx 6 \times 37\times10^9 \times 14.8\times10^{12} \approx 3.3\times10^{24}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">6</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">37</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8974em;vertical-align:-0.0833em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">9</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">14.8</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">12</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">3.3</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">24</span></span></span></span></span></span></span></span></span></span></span></span>
+FLOPs. Spread over the reported 2.788M H800-hours, that is
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>3.3</mn><mo>×</mo><msup><mn>10</mn><mn>24</mn></msup><mi mathvariant="normal">/</mi><mo stretchy="false">(</mo><mn>2.788</mn><mo>×</mo><msup><mn>10</mn><mn>6</mn></msup><mo>×</mo><mn>3600</mn><mtext> </mtext><mtext>s</mtext><mo stretchy="false">)</mo><mo>≈</mo><mn>3.3</mn><mo>×</mo><msup><mn>10</mn><mn>14</mn></msup></mrow><annotation encoding="application/x-tex">3.3\times10^{24} / (2.788\times10^6 \times 3600\,\text{s}) \approx 3.3\times10^{14}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">3.3</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">24</span></span></span></span></span></span></span></span></span><span class="mord">/</span><span class="mopen">(</span><span class="mord">2.788</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8974em;vertical-align:-0.0833em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">6</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">3600</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord text"><span class="mord">s</span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">3.3</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">14</span></span></span></span></span></span></span></span></span></span></span></span>
+FLOP/s per GPU — about a sixth of an H800’s dense FP8 peak, a believable
+utilization given that <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>6</mn><mi>N</mi><mi>D</mi></mrow><annotation encoding="application/x-tex">6ND</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord">6</span><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="mord mathnormal" style="margin-right:0.0278em;">D</span></span></span></span> ignores attention FLOPs
+(<a href="/groundup/book/compute-and-parallelism/">Chapter 33</a>). The
+arithmetic checks out; the “$5.6M model” was not magic, it was sparsity plus
+FP8 plus engineering.</p></aside>
+<aside class="box box-practice" data-box="practice"><div class="box-title"><span class="box-icon" aria-hidden="true">⚙️</span>In practice</div><p>As of mid-2026 the public frontier MoE recipe has converged on: many small
+experts (64–384) rather than a few large ones, a handful routed per token
+plus one always-on shared expert, fine-grained expert segmentation
+(DeepSeek’s contribution), and auxiliary-loss-free load balancing. Dense
+models survive below ~100B parameters, where deployment simplicity and
+fine-tunability (<a href="/groundup/book/fine-tuning/">Chapter 38</a>) outweigh serving
+efficiency — which is why Qwen ships a dense ladder <em>and</em> MoE flagships.</p></aside>
+<h2 id="theme-thinking-modes-and-routers-as-product-architecture">Theme: thinking modes and routers as product architecture</h2>
+<p>The second structural shift of the period is that “a model” stopped being one
+forward pass. <a href="/groundup/book/reasoning-models/">Chapter 37</a> covered the training side
+— reinforcement learning on verifiable rewards teaching models to reason in
+long chains of thought. The landscape consequence is a <em>product</em> pattern:
+every major provider now sells a fast mode and a thinking mode, and
+increasingly a <strong>router</strong> that chooses between them per query.</p>
+<p>The economics force the pattern. Thinking tokens cost the same to generate as
+answer tokens, and a hard problem may burn tens of thousands of them
+(<a href="/groundup/book/inference-and-serving/">Chapter 39</a> priced this out); spending that on
+“write a haiku” is waste, and <em>not</em> spending it on “find the bug in this
+concurrency code” is failure. The three responses visible in mid-2026: a
+<strong>user toggle</strong> (Claude’s extended thinking, Qwen3’s thinking mode — one set
+of hybrid weights, budget exposed to the caller), an <strong>automatic router</strong>
+(GPT-5’s headline design: a dispatcher sends each query to a fast model or a
+reasoning model, with escalation on demand), and <strong>separate products</strong>
+(the pre-GPT-5 o-series). Routers also quietly explain otherwise-baffling
+user reports of the “same” model varying in quality: two calls to one product
+name may hit different underlying models depending on load, query, and
+subscription tier.</p>
+<figure class="fig">
+  <svg viewBox="0 0 720 300" role="img" aria-label="Diagram of a router-based product: a prompt enters a router, which dispatches to a fast model or a thinking model, both feeding one response stream">
+    <defs>
+      <marker id="rt-arrow" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto">
+        <path d="M0,0 L7,3.5 L0,7" fill="none" stroke="currentColor" stroke-width="1.3"></path>
+      </marker>
+    </defs>
+    <!-- prompt -->
+    <rect x="24" y="120" width="118" height="60" rx="10" fill="#38bdf8" fill-opacity="0.15" stroke="#38bdf8"></rect>
+    <text x="83" y="146" font-family="Inter Variable, sans-serif" font-size="14" fill="currentColor" text-anchor="middle">user query</text>
+    <text x="83" y="166" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.55" text-anchor="middle">one product name</text>
+    <!-- router -->
+    <rect x="205" y="120" width="110" height="60" rx="10" fill="#f59e0b" fill-opacity="0.15" stroke="#f59e0b"></rect>
+    <text x="260" y="146" font-family="Inter Variable, sans-serif" font-size="14" fill="currentColor" text-anchor="middle">router</text>
+    <text x="260" y="166" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.55" text-anchor="middle">difficulty, intent, load</text>
+    <line x1="142" y1="150" x2="198" y2="150" stroke="currentColor" opacity="0.5" marker-end="url(#rt-arrow)"></line>
+    <!-- fast branch -->
+    <rect x="390" y="48" width="160" height="62" rx="10" fill="#14b8a6" fill-opacity="0.15" stroke="#14b8a6"></rect>
+    <text x="470" y="74" font-family="Inter Variable, sans-serif" font-size="14" fill="currentColor" text-anchor="middle">fast model</text>
+    <text x="470" y="94" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.55" text-anchor="middle">low latency, cheap</text>
+    <line x1="315" y1="138" x2="383" y2="86" stroke="currentColor" opacity="0.5" marker-end="url(#rt-arrow)"></line>
+    <!-- thinking branch -->
+    <rect x="390" y="188" width="160" height="62" rx="10" fill="#818cf8" fill-opacity="0.15" stroke="#818cf8"></rect>
+    <text x="470" y="214" font-family="Inter Variable, sans-serif" font-size="14" fill="currentColor" text-anchor="middle">thinking model</text>
+    <text x="470" y="234" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.55" text-anchor="middle">long chain of thought</text>
+    <line x1="315" y1="162" x2="383" y2="214" stroke="currentColor" opacity="0.5" marker-end="url(#rt-arrow)"></line>
+    <path d="M 470 250 C 452 274, 488 274, 470 252" fill="none" stroke="#818cf8" opacity="0.7" marker-end="url(#rt-arrow)"></path>
+    <text x="560" y="272" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.55" text-anchor="middle">thousands of hidden tokens</text>
+    <!-- response -->
+    <rect x="596" y="120" width="100" height="60" rx="10" fill="#fb7185" fill-opacity="0.15" stroke="#fb7185"></rect>
+    <text x="646" y="154" font-family="Inter Variable, sans-serif" font-size="14" fill="currentColor" text-anchor="middle">response</text>
+    <line x1="550" y1="86" x2="590" y2="132" stroke="currentColor" opacity="0.5" marker-end="url(#rt-arrow)"></line>
+    <line x1="550" y1="214" x2="590" y2="168" stroke="currentColor" opacity="0.5" marker-end="url(#rt-arrow)"></line>
+    <text x="360" y="24" font-family="Inter Variable, sans-serif" font-size="14" fill="currentColor" opacity="0.55" text-anchor="middle">"the model" is now a system: one name, several sets of weights</text>
+  </svg>
+  <figcaption><strong>Figure:</strong> Router-as-product, the GPT-5-style design (schematic). A dispatcher classifies each query and routes it to a cheap fast path or an expensive reasoning path; user signals ("think hard about this") and load can override. Hybrid-weight designs (Claude, Qwen3) fold both paths into one network with a thinking budget instead.</figcaption>
+</figure>
+<aside class="box box-warning" data-box="warning"><div class="box-title"><span class="box-icon" aria-hidden="true">⚠️</span>Careful</div><p>Routers break naive evaluation. If you benchmark “GPT-5” or any routed
+product, you are benchmarking the router’s dispatch decisions as much as any
+underlying network — and dispatch can change silently between your runs.
+Serious evaluations pin explicit model variants and thinking budgets via the
+API; <a href="/groundup/book/benchmarks-and-evaluation/">Chapter 46</a> returns to this.</p></aside>
+<h2 id="theme-the-open-weight-gap-closed-to-months">Theme: the open-weight gap closed to months</h2>
+<p>In March 2023 the question “how far are open models behind?” had a
+depressing answer: roughly a year and a half, and the gap looked structural.
+By 2026 the honest answer is <em>months, sometimes weeks</em>, on measurable
+benchmarks — with real caveats.</p>
+<p>Two dated anchor pairs make the trend concrete. GPT-4 (March 2023) scored
+86.4% on MMLU (Massive Multitask Language Understanding), the multi-subject
+exam benchmark from <a href="/groundup/book/evaluating-language-models/">Chapter 21</a>; the first open-weight model
+to unambiguously match it was Llama 3.1 405B (July 2024, 87.3% in the same
+five-shot setting) — a <strong>~16-month lag</strong>. For reasoning: o1-preview landed September 2024;
+DeepSeek-R1 matched its class on competition math from the American
+Invitational Mathematics Examination (AIME) by January 2025, scoring 79.8%
+on AIME 2024 versus o1’s reported 79.2%: a <strong>~4-month lag</strong>.
+On agentic-coding evaluations in 2025, releases like Kimi K2 and GLM-4.6
+landed within weeks-to-months of closed peers on the same public benchmarks.</p>
+<figure class="fig">
+  <svg viewBox="0 0 720 330" role="img" aria-label="Schematic of closed-frontier and best-open-weight capability curves converging between 2023 and 2026, with the lag shrinking from about sixteen months to a few months">
+    <defs>
+      <marker id="gap-arrow" markerWidth="8" markerHeight="8" refX="4" refY="3" orient="auto">
+        <path d="M0,0 L6,3 L0,6" fill="none" stroke="currentColor" stroke-width="1.2"></path>
+      </marker>
+    </defs>
+    <!-- axes -->
+    <line x1="70" y1="260" x2="680" y2="260" stroke="currentColor" opacity="0.35"></line>
+    <line x1="70" y1="260" x2="70" y2="40" stroke="currentColor" opacity="0.35"></line>
+    <text x="66" y="36" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.55" text-anchor="start">capability (schematic — no real units)</text>
+    <text x="140" y="284" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.55" text-anchor="middle">2023</text>
+    <text x="310" y="284" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.55" text-anchor="middle">2024</text>
+    <text x="480" y="284" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.55" text-anchor="middle">2025</text>
+    <text x="650" y="284" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.55" text-anchor="middle">2026</text>
+    <!-- closed curve -->
+    <path d="M 90 210 C 250 170, 420 130, 660 66" fill="none" stroke="#818cf8" stroke-width="2.5"></path>
+    <text x="600" y="52" font-family="Inter Variable, sans-serif" font-size="14" fill="#818cf8" text-anchor="middle">closed frontier</text>
+    <!-- open curve -->
+    <path d="M 90 252 C 260 230, 430 160, 660 84" fill="none" stroke="#14b8a6" stroke-width="2.5"></path>
+    <text x="470" y="198" font-family="Inter Variable, sans-serif" font-size="14" fill="#14b8a6" text-anchor="middle">best open weights</text>
+    <!-- anchors -->
+    <circle cx="140" cy="198" r="4" fill="#818cf8"></circle>
+    <text x="98" y="178" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.55">GPT-4, Mar 23</text>
+    <circle cx="392" cy="196" r="4" fill="#14b8a6"></circle>
+    <text x="392" y="222" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.55" text-anchor="middle">Llama 3.1 405B, Jul 24</text>
+    <circle cx="422" cy="128" r="4" fill="#818cf8"></circle>
+    <text x="418" y="118" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.55" text-anchor="end">o1, Sep 24</text>
+    <circle cx="480" cy="146" r="4" fill="#14b8a6"></circle>
+    <text x="492" y="162" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.55">R1, Jan 25</text>
+    <!-- gap annotations -->
+    <line x1="150" y1="204" x2="150" y2="246" stroke="currentColor" opacity="0.5" marker-end="url(#gap-arrow)"></line>
+    <text x="162" y="234" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor">lag ≈ 12–18 months</text>
+    <line x1="620" y1="76" x2="620" y2="90" stroke="currentColor" opacity="0.5" marker-end="url(#gap-arrow)"></line>
+    <text x="606" y="76" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="end">lag ≈ weeks–months</text>
+  </svg>
+  <figcaption><strong>Figure:</strong> The open-weight lag, schematically. Curves are illustrative, not measured; the dated dots are real benchmark-parity events (GPT-4 → Llama 3.1 405B on MMLU, ~16 months; o1 → DeepSeek-R1 on AIME-class math, ~4 months). The vertical gap in "capability" is unmeasurable; the horizontal gap in *time to parity on public benchmarks* is what shrank.</figcaption>
+</figure>
+<p>Three caveats keep this honest. First, benchmark parity is not product
+parity: closed systems bundle routing, tools, multimodal polish, and
+long-tail reliability that public benchmarks miss
+(<a href="/groundup/book/benchmarks-and-evaluation/">Chapter 46</a>). Second, open models can
+train on distilled outputs of closed ones — some convergence is
+followership, not independent capability (R1’s own paper distills R1 into
+Qwen and Llama checkpoints; the direction of idea-flow reversed too, with
+closed labs adopting open innovations like MLA). Third, the <em>source</em> of open
+weights shifted decisively toward Chinese labs during 2025, which entangles
+the open-vs-closed question with export controls and geopolitics.
+<a href="/groundup/book/open-vs-closed/">Chapter 47</a> takes up all three threads properly.</p>
+<h2 id="theme-agents-multimodality-and-the-falling-price-of-intelligence">Theme: agents, multimodality, and the falling price of intelligence</h2>
+<p>Three more trends complete the durable picture; two get their own chapters,
+so we treat them briefly, and the third gets a worked example.</p>
+<p><strong>The agentic turn.</strong> Between 2024 and 2026 the unit of product value shifted
+from <em>answers</em> to <em>work</em>: models that call tools, browse, write and run code,
+and sustain multi-hour tasks with checkpoints. Benchmarks followed (SWE-bench
+for real GitHub issues; τ-bench and successors for tool use), post-training
+followed (trajectory-level reinforcement learning, as in Kimi K2’s agentic
+pipeline), and
+interfaces followed (Claude Code, OpenAI’s Operator-then-agent modes, the
+Model Context Protocol (MCP) as an emerging tool-connection standard).
+<a href="/groundup/book/agents-and-tools/">Chapter 44</a> builds this stack in detail. One
+durable observation: agentic capability improved faster than single-response
+quality in 2025–2026, because reinforcement learning on verifiable
+long-horizon tasks (<a href="/groundup/book/reasoning-models/">Chapter 37</a>) turned out to
+transfer better to work than to chat.</p>
+<p><strong>Multimodality as default.</strong> In 2023 image input was a flagship feature; by
+2026 text-only frontier models are effectively gone — vision input is
+table stakes, audio in/out is standard on consumer tiers, and generation
+(image, increasingly video) ships alongside. The architectural story —
+early-fusion versus adapters, native audio tokens, unified tokenizers — is
+<a href="/groundup/book/multimodal-models/">Chapter 41</a>, the next chapter.</p>
+<p><strong>The falling price of intelligence.</strong> The least appreciated trend, because
+it is invisible in any single announcement. At <em>fixed</em> capability, the price
+of tokens collapsed continuously across the period.</p>
+<aside class="box box-example" data-box="example"><div class="box-title"><span class="box-icon" aria-hidden="true">✏️</span>Worked example</div><p>Take a task of 10,000 input tokens and 1,000 output tokens — a long document
+plus a summary. At GPT-4’s launch pricing (March 2023: $30 per million
+input tokens, $60 per million output), it cost
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>10,000</mn><mo>×</mo><mfrac><mn>30</mn><msup><mn>10</mn><mn>6</mn></msup></mfrac><mo>+</mo><mn>1,000</mn><mo>×</mo><mfrac><mn>60</mn><msup><mn>10</mn><mn>6</mn></msup></mfrac><mo>=</mo><mn>0.30</mn><mo>+</mo><mn>0.06</mn><mo>=</mo><mstyle mathcolor="#cc0000"><mtext>\textdollar</mtext></mstyle><mn>0.36</mn></mrow><annotation encoding="application/x-tex">10{,}000 \times \frac{30}{10^6} + 1{,}000 \times \frac{60}{10^6} = 0.30 + 0.06 = \textdollar 0.36</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">10</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">000</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1.1901em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span><span class="mord mtight"><span class="mord mtight">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7463em;"><span style="top:-2.786em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight">6</span></span></span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">30</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">1</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">000</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1.1901em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span><span class="mord mtight"><span class="mord mtight">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7463em;"><span style="top:-2.786em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight">6</span></span></span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">60</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">0.30</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0.06</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord text" style="color:#cc0000;"><span class="mord" style="color:#cc0000;">\textdollar</span></span><span class="mord">0.36</span></span></span></span>.
+On GPT-4o (launched May 2024 at $5 / $15, cut to $2.50 / $10 per million
+by late 2024): <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0.025</mn><mo>+</mo><mn>0.010</mn><mo>=</mo><mstyle mathcolor="#cc0000"><mtext>\textdollar</mtext></mstyle><mn>0.035</mn></mrow><annotation encoding="application/x-tex">0.025 + 0.010 = \textdollar 0.035</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">0.025</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0.010</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord text" style="color:#cc0000;"><span class="mord" style="color:#cc0000;">\textdollar</span></span><span class="mord">0.035</span></span></span></span> — about <strong>10× cheaper in roughly a
+year and a half</strong>, on a more capable model. On DeepSeek-V3’s API (2025 list price ≈ $0.27 / $1.10 per
+million): <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0.0027</mn><mo>+</mo><mn>0.0011</mn><mo>≈</mo><mstyle mathcolor="#cc0000"><mtext>\textdollar</mtext></mstyle><mn>0.004</mn></mrow><annotation encoding="application/x-tex">0.0027 + 0.0011 \approx \textdollar 0.004</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">0.0027</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0.0011</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord text" style="color:#cc0000;"><span class="mord" style="color:#cc0000;">\textdollar</span></span><span class="mord">0.004</span></span></span></span> — roughly <strong>95× below GPT-4
+launch pricing</strong> for GPT-4-class output. All prices are snapshots and change
+frequently; the ratio, not any absolute number, is the lesson.</p></aside>
+<p>Analysts who track this systematically (Epoch AI, among others) estimate that
+the price of achieving a fixed benchmark score has fallen by somewhere between
+roughly 10× and several hundred× <em>per year</em>, depending on the capability
+level measured — an approximate, fast-moving figure, but robust in sign and
+startling in magnitude. The drivers are everything this book has covered:
+sparsity (this chapter), distillation into small models, quantization and
+serving optimization (<a href="/groundup/book/inference-and-serving/">Chapter 39</a>), cheaper
+compute per FLOP (<a href="/groundup/book/compute-and-parallelism/">Chapter 33</a>), and
+competition. The strategic consequence: <em>frontier capability is a wasting
+asset</em>. Whatever a flagship can do today, something 20× cheaper does within
+a year or two — which is why labs race for capabilities that compound (agents,
+research automation) rather than resting on any single model.</p>
+<figure class="fig">
+  <svg viewBox="0 0 720 320" role="img" aria-label="Schematic log-scale chart of the price per million tokens at roughly GPT-4-level capability falling from tens of dollars in 2023 to cents by 2025 and 2026">
+    <defs>
+      <marker id="pr-arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+        <path d="M0,0 L6,3 L0,6" fill="none" stroke="currentColor" stroke-width="1.2"></path>
+      </marker>
+    </defs>
+    <line x1="90" y1="252" x2="680" y2="252" stroke="currentColor" opacity="0.35"></line>
+    <line x1="90" y1="252" x2="90" y2="40" stroke="currentColor" opacity="0.35"></line>
+    <!-- log gridlines -->
+    <line x1="90" y1="76" x2="680" y2="76" stroke="currentColor" opacity="0.12"></line>
+    <line x1="90" y1="134" x2="680" y2="134" stroke="currentColor" opacity="0.12"></line>
+    <line x1="90" y1="192" x2="680" y2="192" stroke="currentColor" opacity="0.12"></line>
+    <text x="82" y="80" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.55" text-anchor="end">$30</text>
+    <text x="82" y="138" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.55" text-anchor="end">$3</text>
+    <text x="82" y="196" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.55" text-anchor="end">$0.30</text>
+    <text x="82" y="248" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.55" text-anchor="end">$0.03</text>
+    <text x="96" y="34" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.55">price per 1M input tokens at ≈GPT-4-level capability (log scale, schematic)</text>
+    <text x="160" y="276" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.55" text-anchor="middle">2023</text>
+    <text x="330" y="276" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.55" text-anchor="middle">2024</text>
+    <text x="500" y="276" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.55" text-anchor="middle">2025</text>
+    <text x="655" y="276" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.55" text-anchor="middle">2026</text>
+    <!-- trend band -->
+    <path d="M 150 70 C 300 100, 440 190, 660 238 L 660 210 C 440 160, 300 66, 150 52 Z" fill="#f59e0b" fill-opacity="0.15"></path>
+    <path d="M 150 61 C 300 84, 440 176, 660 224" fill="none" stroke="#f59e0b" stroke-width="2.5" marker-end="url(#pr-arrow)"></path>
+    <!-- anchor points -->
+    <circle cx="160" cy="76" r="4.5" fill="#fb7185"></circle>
+    <text x="172" y="70" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor">GPT-4 launch, $30</text>
+    <circle cx="358" cy="137" r="4.5" fill="#fb7185"></circle>
+    <text x="370" y="131" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor">GPT-4o, $2.50</text>
+    <circle cx="510" cy="195" r="4.5" fill="#fb7185"></circle>
+    <text x="522" y="189" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor">DeepSeek-V3, $0.27</text>
+  </svg>
+  <figcaption><strong>Figure:</strong> Price per million input tokens at roughly GPT-4-level capability (schematic; log scale). Anchor points are real list prices at the dates shown — snapshots that will be stale by the time you read this. The band, a fall of about two orders of magnitude in about two years, is the durable fact.</figcaption>
+</figure>
+<h2 id="theme-safety-frameworks-grew-up-alongside-capability">Theme: safety frameworks grew up alongside capability</h2>
+<p>The last durable trend is procedural rather than technical, and this section
+sticks to the factual record. Between 2023 and 2026, the major labs converted
+informal safety talk into published, versioned policy frameworks that gate
+releases on evaluation results.</p>
+<p>Anthropic published its <strong>Responsible Scaling Policy (RSP)</strong> in September
+2023: a commitment to classify models into AI Safety Levels (ASL) — modeled
+loosely on biosafety levels — with capability evaluations for risks like
+bioweapons uplift and autonomous replication, and required security and
+deployment safeguards at each level. Claude Opus 4 (May 2025) became the
+first model Anthropic shipped under <strong>ASL-3</strong> protections. OpenAI published
+its <strong>Preparedness Framework</strong> (December 2023, revised since), scoring
+models on tracked risk categories with capability thresholds that trigger
+mitigations or halt deployment. Google DeepMind published its <strong>Frontier
+Safety Framework</strong> (May 2024, revised since) around “critical capability
+levels.” At the 2024 Seoul AI summit, over a dozen companies signed
+<strong>Frontier AI Safety Commitments</strong> promising published frameworks of this
+kind; the EU AI Act’s general-purpose-model obligations began phasing in
+during 2025, giving parts of this regime legal force in Europe.</p>
+<p>Two honest observations, both factual. These frameworks are voluntary
+self-regulation (outside the EU’s reach), and critics note they can be
+revised by the same organizations they constrain — as several were, in both
+tightening and loosening directions. And they matter anyway: system cards
+now routinely report dangerous-capability evaluations (the empirical study
+of which connects directly to
+<a href="/groundup/book/why-interpretability/">Part VII</a> — you cannot evaluate what you
+cannot measure, and interpretability aims at what evaluation misses). The
+safety-framework genre, whatever its enforcement gaps, made frontier risk
+assessment a public, criticizable artifact instead of a private judgment.
+That is a real change from 2023, and it is likely to persist.</p>
+<aside class="box box-note" data-box="note"><div class="box-title"><span class="box-icon" aria-hidden="true">✎</span>Note</div><p>This chapter’s snapshot date matters more than most. Model names, prices,
+context windows, and leaderboard positions in this chapter were checked
+against sources available in mid-2026 and will drift fastest; the themes were
+chosen precisely because they have already survived three years of releases.
+Where a post-snapshot development matters to this book’s story, it will
+appear as a dated <strong>Update</strong> block here or on the <a href="/groundup/updates/">updates page</a>.</p></aside>
+<h2 id="where-this-leaves-us">Where this leaves us</h2>
+<ul>
+<li>You can classify any frontier claim as <strong>disclosed, inferred, or folklore</strong>
+— and you know to read system cards and technical reports before
+leaderboards, and to distrust version-number arithmetic.</li>
+<li>You can sketch the <strong>genealogies</strong>: OpenAI’s route to a unified router
+(GPT-4 → 4o → o-series → GPT-5.x), Anthropic’s tiered families ending in
+the Mythos class above Opus, Gemini’s context-and-TPU story, Llama’s
+open bet and its wobbles, DeepSeek’s efficiency shock, and the Qwen/Kimi/GLM
+open wave — all stamped <em>mid-2026 snapshot</em>.</li>
+<li>You can explain <strong>why every frontier model is a mixture-of-experts</strong>, and
+verify the economics yourself: DeepSeek-V3’s 37B active parameters buy
+~11× cheaper tokens than a 405B dense model, and <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>6</mn><mi>N</mi><mi>D</mi></mrow><annotation encoding="application/x-tex">6ND</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord">6</span><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="mord mathnormal" style="margin-right:0.0278em;">D</span></span></span></span> reproduces its
+reported training budget within a plausible utilization factor.</li>
+<li>You can describe <strong>thinking modes and routers</strong> as product architecture,
+and say why routed products complicate evaluation.</li>
+<li>You can quantify the <strong>open-weight lag</strong> with dated parity events
+(~16 months on MMLU in 2023–24; ~4 months on competition math in 2024–25)
+and state the three caveats that keep that story honest.</li>
+<li>You can compute the <strong>falling price of intelligence</strong> on a napkin and say
+why frontier capability is a wasting asset.</li>
+<li>You can name the major <strong>safety frameworks</strong> (RSP/ASL, Preparedness,
+Frontier Safety) and what kind of commitment each represents.</li>
+</ul>
+<p>The rest of Part VI zooms into the pieces this chapter waved at: first up,
+how one network learns to see and hear —
+<a href="/groundup/book/multimodal-models/">Next: Multimodal Models</a>.</p> <div class="papers-card" id="papers-card"> <div class="pc-title">Key papers &amp; readings in this chapter</div> <ul> <li> <div> <a href="https://arxiv.org/abs/2303.08774" target="_blank" rel="noopener">GPT-4 Technical Report</a> <span class="p-meta"> — OpenAI, 2023</span> <span class="p-note">Famous as much for what it withholds as what it reports — the moment frontier disclosure norms changed.</span> </div> </li><li> <div> <a href="https://arxiv.org/abs/2403.05530" target="_blank" rel="noopener">Gemini 1.5: Unlocking Multimodal Understanding Across Millions of Tokens of Context</a> <span class="p-meta"> — Gemini Team, Google, 2024</span> <span class="p-note">The million-token context report; Section 4 has the needle-in-a-haystack results that reset expectations.</span> </div> </li><li> <div> <a href="https://arxiv.org/abs/2407.21783" target="_blank" rel="noopener">The Llama 3 Herd of Models</a> <span class="p-meta"> — Grattafiori et al., Meta, 2024</span> <span class="p-note">The most complete public description of a frontier-scale dense training run — data, infrastructure, failures and all.</span> </div> </li><li> <div> <a href="https://arxiv.org/abs/2412.19437" target="_blank" rel="noopener">DeepSeek-V3 Technical Report</a> <span class="p-meta"> — DeepSeek-AI, 2024</span> <span class="p-note">The efficiency landmark: 671B-total/37B-active MoE, MLA, FP8 training, and the famous ~2.79M-GPU-hour cost table.</span> </div> </li><li> <div> <a href="https://arxiv.org/abs/2501.12948" target="_blank" rel="noopener">DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning</a> <span class="p-meta"> — DeepSeek-AI, 2025</span> <span class="p-note">The open reasoning model that triggered the January 2025 &quot;efficiency shock&quot; — read alongside Chapter 37.</span> </div> </li><li> <div> <a href="https://arxiv.org/abs/2505.09388" target="_blank" rel="noopener">Qwen3 Technical Report</a> <span class="p-meta"> — Qwen Team, Alibaba, 2025</span> <span class="p-note">Dense and MoE variants with a unified thinking/non-thinking mode — the most-forked open family.</span> </div> </li><li> <div> <a href="https://arxiv.org/abs/2507.20534" target="_blank" rel="noopener">Kimi K2: Open Agentic Intelligence</a> <span class="p-meta"> — Kimi Team, Moonshot AI, 2025</span> <span class="p-note">A trillion-parameter open MoE trained with the Muon optimizer (Chapter 11) and post-trained for agentic tool use.</span> </div> </li><li> <div> <a href="https://www.anthropic.com/news/claude-3-family" target="_blank" rel="noopener">Introducing the Claude 3 Family</a> <span class="p-meta"> — Anthropic, 2024</span> <span class="p-note">The announcement that established the small/medium/large tiering (Haiku/Sonnet/Opus) the industry then copied.</span> </div> </li> </ul> </div> <nav class="chapter-nav"> <a href="/groundup/book/inference-and-serving/" class="prev"> <span class="dir">← Previous</span> <span class="t">Inference: Sampling, Quantization, Serving</span> </a> <a href="/groundup/book/multimodal-models/" class="next"> <span class="dir">Next →</span> <span class="t">Multimodal Models</span> </a> </nav> <div class="chapter-foot"> <span>Last updated 2026-08-24</span> <a href="https://github.com/joewilbert/aisite/edit/main/src/content/book/40-the-frontier.md" target="_blank" rel="noopener">Edit this chapter</a> <a href="https://github.com/joewilbert/aisite/issues/new" target="_blank" rel="noopener">Report an issue</a> </div> </article> </div>  </main> </div> <!-- Right panel: papers / tutor / notes --> <aside class="panel-host" id="panel" aria-label="Side panel"> <div class="panel-resizer" id="panel-resizer"></div> <div class="panel-tabs"> <button class="panel-tab" data-tab="paper">Paper</button> <button class="panel-tab" data-tab="tutor">AI tutor</button> <button class="panel-tab" data-tab="notes">Notes</button> <button class="hbtn panel-close" id="panel-close" aria-label="Close panel"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg> </button> </div> <div class="panel-body"> <div class="panel-view" data-view="paper" id="view-paper"></div> <div class="panel-view" data-view="tutor" id="view-tutor"></div> <div class="panel-view" data-view="notes" id="view-notes"></div> </div> </aside> <!-- Selection toolbar --> <div class="sel-toolbar" id="sel-toolbar"> <div class="swatches"> <button class="sw" data-color="yellow" style="background:var(--hl-yellow)" aria-label="Highlight yellow"></button> <button class="sw" data-color="green" style="background:var(--hl-green)" aria-label="Highlight green"></button> <button class="sw" data-color="blue" style="background:var(--hl-blue)" aria-label="Highlight blue"></button> <button class="sw" data-color="pink" style="background:var(--hl-pink)" aria-label="Highlight pink"></button> </div> <div class="divider"></div> <button id="sel-note">✎ Note</button> <button id="sel-explain">✦ Explain</button> <button id="sel-remove" style="display:none">✕ Remove</button> </div> <!-- Settings modal --> <div class="modal-scrim" id="settings-scrim"> <div class="modal" role="dialog" aria-label="Settings" id="settings-modal"></div> </div> <!-- Search modal --> <div class="modal-scrim" id="search-scrim"> <div class="modal search-modal" role="dialog" aria-label="Search"> <input class="q" id="search-input" type="text" placeholder="Search the book…" autocomplete="off"> <div class="search-results" id="search-results"></div> </div> </div> <script>(function(){const base = "/groundup";
+const slug = "the-frontier";
+const pageTitle = "The Frontier Landscape (2023–2026) · Ground Up";
+
+      window.__GU__ = { base, slug, pageTitle };
+    })();</script> <script type="module" src="/groundup/_astro/Base.astro_astro_type_script_index_0_lang.65xM_WgJ.js"></script>  </body></html>

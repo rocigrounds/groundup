@@ -1,0 +1,779 @@
+<!DOCTYPE html><html lang="en"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Benchmarks and How to Read Them · Ground Up</title><meta name="description" content="A field guide to MMLU, GPQA, SWE-bench, ARC-AGI, and the arena — and the contamination, saturation, and fine-print pathologies you must check before believing any launch-post number."><meta name="theme-color" content="#faf9f6"><meta property="og:title" content="Benchmarks and How to Read Them · Ground Up"><meta property="og:description" content="A field guide to MMLU, GPQA, SWE-bench, ARC-AGI, and the arena — and the contamination, saturation, and fine-print pathologies you must check before believing any launch-post number."><meta property="og:type" content="article"><meta property="og:site_name" content="Ground Up"><link rel="icon" href="/groundup/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="/groundup/apple-touch-icon.png"><link rel="manifest" href="/groundup/manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Ground Up"><script>
+      (function () {
+        try {
+          var t = localStorage.getItem('gu:theme');
+          var dark = t ? t === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+          if (dark) document.documentElement.classList.add('dark');
+          var fs = localStorage.getItem('gu:fontScale');
+          if (fs) document.documentElement.style.setProperty('--font-scale', fs);
+        } catch (e) {}
+      })();
+    </script><link rel="stylesheet" href="/groundup/_astro/_slug_.BCpHWCuJ.css"></head> <body> <header class="site-header"> <button class="hbtn" id="btn-toc" aria-label="Table of contents" title="Contents"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"></path></svg> </button> <a class="brand" href="/groundup/"> <span class="logo">G</span> <span class="brand-name">Ground&nbsp;Up</span> </a> <span class="header-crumb">Part VI · The Modern AI Landscape · Chapter 46</span> <div class="header-actions"> <button class="hbtn" id="btn-search" aria-label="Search" title="Search (/)"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg> </button> <button class="hbtn" id="btn-notes" aria-label="My notes" title="My notes & highlights"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg> </button> <button class="hbtn" id="btn-tutor" aria-label="AI tutor" title="AI tutor"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 1 1-4-6.9"></path><path d="M21 3v6h-6"></path><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"></circle><circle cx="8.5" cy="12" r="1.2" fill="currentColor" stroke="none"></circle><circle cx="15.5" cy="12" r="1.2" fill="currentColor" stroke="none"></circle></svg> </button> <button class="hbtn" id="btn-theme" aria-label="Toggle theme" title="Light / dark"> <svg class="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.5"></circle><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M19.4 4.6l-1.8 1.8M6.4 17.6l-1.8 1.8"></path></svg> </button> <button class="hbtn" id="btn-settings" aria-label="Settings" title="Settings"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.01a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.01a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.01a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"></path></svg> </button> </div> </header> <div class="shell"> <nav class="toc-rail" id="toc-rail" aria-label="Table of contents">  <div class="toc-part">Start here</div> <a class="toc-link" data-slug="how-to-read-this-book" href="/groundup/book/how-to-read-this-book/"> <span class="n">·</span> <span>How to Read This Book</span> </a><a class="toc-link" data-slug="the-whole-machine" href="/groundup/book/the-whole-machine/"> <span class="n">·</span> <span>Frontier AI In One Sitting</span> </a> <div class="toc-part">Part I · Mathematical Foundations</div> <a class="toc-link" data-slug="vectors-and-spaces" href="/groundup/book/vectors-and-spaces/"> <span class="n">1</span> <span>Vectors and Spaces</span> </a><a class="toc-link" data-slug="matrices-as-transformations" href="/groundup/book/matrices-as-transformations/"> <span class="n">2</span> <span>Matrices as Transformations</span> </a><a class="toc-link" data-slug="high-dimensional-geometry" href="/groundup/book/high-dimensional-geometry/"> <span class="n">3</span> <span>High-Dimensional Geometry</span> </a><a class="toc-link" data-slug="derivatives-and-gradients" href="/groundup/book/derivatives-and-gradients/"> <span class="n">4</span> <span>Derivatives and Gradients</span> </a><a class="toc-link" data-slug="chain-rule-and-jacobians" href="/groundup/book/chain-rule-and-jacobians/"> <span class="n">5</span> <span>The Chain Rule, Jacobians, and Curvature</span> </a><a class="toc-link" data-slug="probability" href="/groundup/book/probability/"> <span class="n">6</span> <span>Probability for Deep Learning</span> </a><a class="toc-link" data-slug="information-theory" href="/groundup/book/information-theory/"> <span class="n">7</span> <span>Information Theory: Surprise, Entropy, and KL</span> </a> <div class="toc-part">Part II · Deep Learning Foundations</div> <a class="toc-link" data-slug="neurons-and-mlps" href="/groundup/book/neurons-and-mlps/"> <span class="n">8</span> <span>Neurons, Layers, and MLPs</span> </a><a class="toc-link" data-slug="loss-functions" href="/groundup/book/loss-functions/"> <span class="n">9</span> <span>Loss Functions</span> </a><a class="toc-link" data-slug="gradient-descent-and-backprop" href="/groundup/book/gradient-descent-and-backprop/"> <span class="n">10</span> <span>Gradient Descent and Backpropagation</span> </a><a class="toc-link" data-slug="optimizers" href="/groundup/book/optimizers/"> <span class="n">11</span> <span>Optimizers: From SGD to AdamW and Muon</span> </a><a class="toc-link" data-slug="initialization-and-stability" href="/groundup/book/initialization-and-stability/"> <span class="n">12</span> <span>Initialization and Gradient Pathologies</span> </a><a class="toc-link" data-slug="regularization-and-generalization" href="/groundup/book/regularization-and-generalization/"> <span class="n">13</span> <span>Regularization and Generalization</span> </a><a class="toc-link" data-slug="normalization" href="/groundup/book/normalization/"> <span class="n">14</span> <span>Normalization: BatchNorm to RMSNorm</span> </a><a class="toc-link" data-slug="activation-functions" href="/groundup/book/activation-functions/"> <span class="n">15</span> <span>Activation Functions</span> </a><a class="toc-link" data-slug="residual-connections" href="/groundup/book/residual-connections/"> <span class="n">16</span> <span>Residual Connections and the Residual Stream</span> </a><a class="toc-link" data-slug="cnns-and-rnns" href="/groundup/book/cnns-and-rnns/"> <span class="n">17</span> <span>CNNs and RNNs: The World Before Transformers</span> </a> <div class="toc-part">Part III · Language Modeling</div> <a class="toc-link" data-slug="what-is-a-language-model" href="/groundup/book/what-is-a-language-model/"> <span class="n">18</span> <span>What a Language Model Is</span> </a><a class="toc-link" data-slug="tokenization" href="/groundup/book/tokenization/"> <span class="n">19</span> <span>Tokenization</span> </a><a class="toc-link" data-slug="embeddings" href="/groundup/book/embeddings/"> <span class="n">20</span> <span>Embeddings</span> </a><a class="toc-link" data-slug="evaluating-language-models" href="/groundup/book/evaluating-language-models/"> <span class="n">21</span> <span>Evaluating Language Models</span> </a> <div class="toc-part">Part IV · Attention &amp; Transformers</div> <a class="toc-link" data-slug="seq2seq-and-attention" href="/groundup/book/seq2seq-and-attention/"> <span class="n">22</span> <span>From seq2seq to Attention</span> </a><a class="toc-link" data-slug="scaled-dot-product-attention" href="/groundup/book/scaled-dot-product-attention/"> <span class="n">23</span> <span>Scaled Dot-Product Attention</span> </a><a class="toc-link" data-slug="multi-head-attention" href="/groundup/book/multi-head-attention/"> <span class="n">24</span> <span>Multi-Head Attention</span> </a><a class="toc-link" data-slug="transformer-architecture" href="/groundup/book/transformer-architecture/"> <span class="n">25</span> <span>The Transformer, Piece by Piece</span> </a><a class="toc-link" data-slug="positional-encodings" href="/groundup/book/positional-encodings/"> <span class="n">26</span> <span>Positional Information and RoPE</span> </a><a class="toc-link" data-slug="architecture-families" href="/groundup/book/architecture-families/"> <span class="n">27</span> <span>Architecture Families: BERT to Decoder-Only</span> </a><a class="toc-link" data-slug="kv-cache-and-efficient-attention" href="/groundup/book/kv-cache-and-efficient-attention/"> <span class="n">28</span> <span>The KV Cache and Efficient Attention</span> </a><a class="toc-link" data-slug="mixture-of-experts" href="/groundup/book/mixture-of-experts/"> <span class="n">29</span> <span>Mixture-of-Experts</span> </a><a class="toc-link" data-slug="state-space-models" href="/groundup/book/state-space-models/"> <span class="n">30</span> <span>State-Space Models and Hybrids</span> </a> <div class="toc-part">Part V · Training LLMs in Practice</div> <a class="toc-link" data-slug="pretraining-data" href="/groundup/book/pretraining-data/"> <span class="n">31</span> <span>Pretraining Data</span> </a><a class="toc-link" data-slug="scaling-laws" href="/groundup/book/scaling-laws/"> <span class="n">32</span> <span>Scaling Laws</span> </a><a class="toc-link" data-slug="compute-and-parallelism" href="/groundup/book/compute-and-parallelism/"> <span class="n">33</span> <span>Compute: GPUs, Precision, and Parallelism</span> </a><a class="toc-link" data-slug="the-training-run" href="/groundup/book/the-training-run/"> <span class="n">34</span> <span>The Training Run</span> </a><a class="toc-link" data-slug="sft-and-rlhf" href="/groundup/book/sft-and-rlhf/"> <span class="n">35</span> <span>Post-Training I: SFT, Reward Models, RLHF</span> </a><a class="toc-link" data-slug="dpo-and-friends" href="/groundup/book/dpo-and-friends/"> <span class="n">36</span> <span>Post-Training II: DPO and Its Family</span> </a><a class="toc-link" data-slug="reasoning-models" href="/groundup/book/reasoning-models/"> <span class="n">37</span> <span>Reasoning Training: RLVR, GRPO, and the o1/R1 Era</span> </a><a class="toc-link" data-slug="fine-tuning" href="/groundup/book/fine-tuning/"> <span class="n">38</span> <span>Fine-Tuning You Can Actually Do: LoRA and Friends</span> </a><a class="toc-link" data-slug="inference-and-serving" href="/groundup/book/inference-and-serving/"> <span class="n">39</span> <span>Inference: Sampling, Quantization, Serving</span> </a> <div class="toc-part">Part VI · The Modern AI Landscape</div> <a class="toc-link" data-slug="the-frontier" href="/groundup/book/the-frontier/"> <span class="n">40</span> <span>The Frontier Landscape (2023–2026)</span> </a><a class="toc-link" data-slug="multimodal-models" href="/groundup/book/multimodal-models/"> <span class="n">41</span> <span>Multimodal Models</span> </a><a class="toc-link" data-slug="diffusion-models" href="/groundup/book/diffusion-models/"> <span class="n">42</span> <span>Diffusion and Image/Video Generation</span> </a><a class="toc-link" data-slug="long-context" href="/groundup/book/long-context/"> <span class="n">43</span> <span>Long Context</span> </a><a class="toc-link" data-slug="agents-and-tools" href="/groundup/book/agents-and-tools/"> <span class="n">44</span> <span>Agents, Tool Use, and MCP</span> </a><a class="toc-link" data-slug="retrieval-augmented-generation" href="/groundup/book/retrieval-augmented-generation/"> <span class="n">45</span> <span>Retrieval-Augmented Generation</span> </a><a class="toc-link active" data-slug="benchmarks-and-evaluation" href="/groundup/book/benchmarks-and-evaluation/"> <span class="n">46</span> <span>Benchmarks and How to Read Them</span> </a><a class="toc-link" data-slug="open-vs-closed" href="/groundup/book/open-vs-closed/"> <span class="n">47</span> <span>Open vs Closed Models</span> </a> <div class="toc-part">Part VII · Interpretability</div> <a class="toc-link" data-slug="why-interpretability" href="/groundup/book/why-interpretability/"> <span class="n">48</span> <span>Why Interpretability</span> </a><a class="toc-link" data-slug="features-and-probes" href="/groundup/book/features-and-probes/"> <span class="n">49</span> <span>Features, Directions, and Probes</span> </a><a class="toc-link" data-slug="superposition" href="/groundup/book/superposition/"> <span class="n">50</span> <span>Superposition and Polysemanticity</span> </a><a class="toc-link" data-slug="sparse-autoencoders" href="/groundup/book/sparse-autoencoders/"> <span class="n">51</span> <span>Sparse Autoencoders</span> </a><a class="toc-link" data-slug="circuits" href="/groundup/book/circuits/"> <span class="n">52</span> <span>Circuits: Induction Heads to Attribution Graphs</span> </a><a class="toc-link" data-slug="causal-methods" href="/groundup/book/causal-methods/"> <span class="n">53</span> <span>Causal Methods: Patching, Ablation, and Lenses</span> </a><a class="toc-link" data-slug="steering-and-editing" href="/groundup/book/steering-and-editing/"> <span class="n">54</span> <span>Steering and Model Editing</span> </a><a class="toc-link" data-slug="cot-faithfulness" href="/groundup/book/cot-faithfulness/"> <span class="n">55</span> <span>Chain-of-Thought Faithfulness</span> </a><a class="toc-link" data-slug="frontier-interpretability" href="/groundup/book/frontier-interpretability/"> <span class="n">56</span> <span>Interpretability at the Frontier</span> </a> <div class="toc-part">Part VIII · Reference</div> <a class="toc-link" data-slug="where-to-go-next" href="/groundup/book/where-to-go-next/"> <span class="n">57</span> <span>Where to Go Next</span> </a><a class="toc-link" data-slug="glossary" href="/groundup/book/glossary/"> <span class="n">58</span> <span>Glossary</span> </a><a class="toc-link" data-slug="notation" href="/groundup/book/notation/"> <span class="n">59</span> <span>Notation Reference</span> </a> </nav> <div class="scrim" id="toc-scrim"></div> <main class="main-col">  <div class="article-wrap"> <article class="chapter" id="article" data-slug="benchmarks-and-evaluation" data-title="Benchmarks and How to Read Them" data-file="46-benchmarks-and-evaluation.md" data-pagefind-body> <div class="chapter-kicker">Part VI · The Modern AI Landscape · Chapter 46</div> <h1>Benchmarks and How to Read Them</h1> <p class="chapter-desc">A field guide to MMLU, GPQA, SWE-bench, ARC-AGI, and the arena — and the contamination, saturation, and fine-print pathologies you must check before believing any launch-post number.</p> <details class="section-nav"> <summary>In this chapter</summary> <ol> <li><a href="#what-a-benchmark-number-actually-is">What a benchmark number actually is</a></li><li><a href="#a-field-guide-to-the-2026-benchmark-landscape">A field guide to the 2026 benchmark landscape</a></li><li><a href="#the-arena-measuring-preference-instead-of-capability">The arena: measuring preference instead of capability</a></li><li><a href="#the-pathology-section">The pathology section</a></li><li><a href="#evaluating-for-your-own-use-case">Evaluating for your own use case</a></li><li><a href="#what-benchmarks-cannot-see">What benchmarks cannot see</a></li><li><a href="#where-this-leaves-us">Where this leaves us</a></li> </ol> </details> <p>A frontier lab publishes a launch post. There is a bar chart. The new model
+scores 93.1 on something called GPQA Diamond, 87.4 on SWE-bench Verified, and
+“achieves a new state of the art” on four other acronyms, each bar a few
+pixels taller than the competitor’s bar next to it. Beneath the chart, in
+six-point gray type, a footnote says <em>“with parallel test-time compute and
+consensus@64; competitor scores taken from their respective reports.”</em></p>
+<p>That footnote changes everything, and most readers never see it.</p>
+<p>This chapter is consumer protection. <a href="/groundup/book/evaluating-language-models/">Chapter 21</a>
+built the machinery of evaluation from the inside — perplexity, contamination
+mechanics, large language model (LLM) judges. This chapter faces outward: it is a field guide to the
+benchmarks you will encounter in launch posts and leaderboards in
+2026, organized by what each one measures, followed by the pathology section —
+the ways benchmark numbers mislead — and ending with the two things that
+matter most in practice: how to run an evaluation for <em>your</em> use case, and
+what no benchmark can see at all. By the end you should be able to read that
+launch post the way an accountant reads a company’s earnings release: aware
+that the numbers are real, and aware of exactly where the flattery is
+happening.</p>
+<h2 id="what-a-benchmark-number-actually-is">What a benchmark number actually is</h2>
+<p>Strip away the leaderboard and a benchmark is three design decisions: a <strong>task
+distribution</strong> (which questions, drawn from where), a <strong>protocol</strong> (how the
+model is prompted, how many attempts it gets, what tools it may use), and a
+<strong>grader</strong> (how an answer is scored). Change any of the three and the number
+changes — often by more than the gap between the top five models.</p>
+<p>The deeper issue is what statisticians call <strong>construct validity</strong>: does the
+thing you can measure (accuracy on these 500 questions, under this protocol)
+track the thing you care about (is this model good at graduate-level
+science)? Every pathology in this chapter is a way for a benchmark score to
+detach from its construct — contamination detaches it by leaking answers,
+saturation by running out of headroom, scaffold sensitivity by making the
+protocol matter more than the model, selective reporting by quietly changing
+the protocol between the bars of one chart.</p>
+<aside class="box box-intuition" data-box="intuition"><div class="box-title"><span class="box-icon" aria-hidden="true">💡</span>Intuition</div><p>Treat every benchmark score as a <strong>proxy under adversarial pressure</strong>. The
+moment a number becomes the thing labs compete on, everyone optimizes toward
+it — sometimes legitimately (training models that reason better), sometimes
+not (training on the test, tuning the scaffold, cherry-picking the metric).
+This is Goodhart’s law: when a measure becomes a target, it ceases to be a
+good measure. Nothing about benchmarks makes sense except in the light of
+Goodhart.</p></aside>
+<p>With that lens fixed, here is the landscape.</p>
+<h2 id="a-field-guide-to-the-2026-benchmark-landscape">A field guide to the 2026 benchmark landscape</h2>
+<h3 id="knowledge-mmlu-and-its-successor">Knowledge: MMLU and its successor</h3>
+<p><strong>MMLU</strong> (<a href="https://arxiv.org/abs/2009.03300">Measuring Massive Multitask Language Understanding</a>,
+Hendrycks et al., 2020) is roughly 14,000 four-choice multiple-choice
+questions across 57 subjects — high-school chemistry, professional law,
+college medicine, moral scenarios. When it appeared, GPT-3 scored about 44%
+five-shot against a random baseline of 25%, and the authors estimated expert
+human performance near 90%. For four years MMLU was <em>the</em> headline number:
+the one-score summary of “how much does this model know.”</p>
+<p>By 2024 it was over. Frontier models clustered above 88%, and — the part that
+matters — audits of the questions themselves (the MMLU-Redux line of work;
+see <a href="https://scholar.google.com/scholar?q=%22Are+We+Done+with+MMLU%22">this analysis</a>)
+found that a meaningful fraction of questions in some subjects are simply
+wrong: mis-keyed answers, ambiguous wording, missing context. If a few
+percent of the answer key is broken, then the difference between 88.7 and
+89.5 is not a difference in knowledge; it is a difference in which errors the
+model happens to agree with. A benchmark whose remaining headroom is mostly
+label noise has stopped measuring.</p>
+<p>The successor, <a href="https://arxiv.org/abs/2406.01574"><strong>MMLU-Pro</strong></a> (Wang et al.,
+2024), made two fixes: ten answer options instead of four (dropping the
+guessing floor from 25% to 10%, which alone re-spreads the field), and
+questions filtered toward genuine multi-step reasoning rather than fact
+recall. Frontier models that were indistinguishable on MMLU separated again
+on MMLU-Pro — for a while. As we will see, “for a while” is the natural
+lifespan of every benchmark in this chapter.</p>
+<h3 id="graduate-science-gpqa">Graduate science: GPQA</h3>
+<p><a href="https://arxiv.org/abs/2311.12022"><strong>GPQA</strong></a> (Rein et al., 2023) — the
+Graduate-Level Google-Proof Q&#x26;A benchmark — is worth understanding for its
+<em>construction protocol</em> as much as its content. PhD-level experts in biology,
+physics, and chemistry wrote questions; other experts in the same field
+validated them; then skilled <em>non</em>-experts were given half an hour per
+question <strong>with full internet access</strong> and still scored only about 34%,
+against roughly 65% for the in-domain experts. That is what “Google-proof”
+means operationally: the questions cannot be answered by lookup, so a model
+answering them is doing something more than retrieval. The <strong>Diamond</strong> subset
+— 198 questions where the experts agreed and the non-experts failed — became
+the standard headline split.</p>
+<p>When GPQA appeared, GPT-4 scored around 36–39% — barely above the skilled
+non-experts. Reasoning models blew through the expert baseline during
+2024–2025, and by 2026 frontier scores on Diamond sit in the low-to-mid 90s
+(approximate and moving). Notice the pattern: a benchmark designed in
+2023 to be brutally hard had roughly three years of useful life. Also notice
+the sample size — with 198 questions, a single question is half a point, a
+theme we return to in the statistics section.</p>
+<h3 id="math-the-moving-frontier-in-four-acts">Math: the moving frontier, in four acts</h3>
+<p>No domain shows the benchmark treadmill more cleanly than math, because math
+benchmarks have a built-in difficulty dial: you can always ask harder
+questions, and answers can be checked mechanically.</p>
+<p><strong>Act one: MATH</strong> (<a href="https://arxiv.org/abs/2103.03874">Hendrycks et al., 2021</a>)
+— 12,500 competition problems from AMC/AIME-adjacent sources (the American
+high-school competition-math circuit). GPT-3-era
+models scored in the single digits, and the paper mused that progress might
+require ideas beyond scaling. By 2024, frontier models exceeded 90% and the
+benchmark retired into training data.</p>
+<p><strong>Act two: AIME.</strong> With MATH saturated, attention moved to the American
+Invitational Mathematics Examination — the real qualifying contest taken by
+strong American high-schoolers, 15 problems per paper, each with an integer
+answer from 000 to 999. AIME had two attractions: it is hard
+(qualifying humans typically solve a handful of problems), and each year’s
+exam is <em>new</em>, so the current year’s paper cannot be in anyone’s training
+data. AIME became the signature benchmark of the reasoning-model era
+(<a href="/groundup/book/reasoning-models/">Chapter 37</a>): OpenAI’s o-series and DeepSeek-R1
+reported AIME as a primary result. By 2025–2026, frontier reasoning models
+solve most or all AIME problems, and the field moved on again.</p>
+<p><strong>Act three: FrontierMath</strong> (<a href="https://arxiv.org/abs/2411.04872">Glazer et al., 2024</a>,
+from Epoch AI) — problems written by research mathematicians, at a level
+where even Fields-medalist commentary described them as extremely difficult,
+with numerically checkable answers and a <strong>private problem set</strong>
+never published. At release, every frontier model scored under 2%. In
+December 2024 OpenAI reported o3 solving roughly 25% (with heavy test-time
+compute) — a jump that stunned the math community. Then the governance
+footnote arrived: it emerged in early 2025 that OpenAI had funded
+FrontierMath’s creation and had access to a large portion of the problems
+and solutions, a fact not disclosed to most contributing mathematicians or
+the public until after the o3 announcement. Epoch acknowledged the
+communication failure and pointed to a held-out subset OpenAI could not
+access. The episode did not show the score was wrong — but it showed that a
+“private” benchmark is only as trustworthy as its funding and access
+arrangements, and it permanently changed how careful readers treat
+lab-reported scores on third-party evals.</p>
+<p><strong>Act four: Humanity’s Last Exam</strong> (<a href="https://arxiv.org/abs/2501.14249">Phan et al., 2025</a>)
+— roughly 2,500 questions contributed by nearly a thousand domain experts across
+more than a hundred fields, explicitly framed as “the final closed-ended
+academic benchmark”: if models saturate this, the multiple-choice/short-answer
+format itself is exhausted. Frontier models scored in the single digits at
+release; scores have climbed steadily since (mid-double-digits by 2026,
+approximate and fast-moving), and — repeating the MMLU story at higher
+difficulty — subsequent expert audits have disputed the answer keys of a
+nontrivial fraction of questions. The treadmill does not stop; it just gets
+more expensive to run.</p>
+<figure class="fig">
+  <svg viewBox="0 0 720 340" role="img" aria-label="Schematic curves showing successive benchmarks rising to saturation between 2019 and 2026">
+    <defs>
+      <marker id="arr-sat" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+        <path d="M0,0 L6,3 L0,6" fill="none" stroke="currentColor" stroke-width="1.4"></path>
+      </marker>
+    </defs>
+    <!-- axes -->
+    <line x1="80" y1="270" x2="690" y2="270" stroke="currentColor" opacity="0.35" marker-end="url(#arr-sat)"></line>
+    <line x1="80" y1="270" x2="80" y2="30" stroke="currentColor" opacity="0.35" marker-end="url(#arr-sat)"></line>
+    <text x="384" y="302" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.55" text-anchor="middle">year (schematic)</text>
+    <text x="30" y="150" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.55" text-anchor="middle" transform="rotate(-90 30 150)">score (%)</text>
+    <!-- x ticks -->
+    <text x="80" y="288" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55" text-anchor="middle">2019</text>
+    <text x="251" y="288" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55" text-anchor="middle">2021</text>
+    <text x="423" y="288" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55" text-anchor="middle">2023</text>
+    <text x="594" y="288" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55" text-anchor="middle">2025</text>
+    <!-- y ticks -->
+    <text x="70" y="274" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55" text-anchor="end">0</text>
+    <text x="70" y="159" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55" text-anchor="end">50</text>
+    <text x="70" y="44" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55" text-anchor="end">100</text>
+    <!-- ceiling band -->
+    <line x1="80" y1="63" x2="690" y2="63" stroke="currentColor" opacity="0.3" stroke-dasharray="5 5"></line>
+    <text x="88" y="55" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55" text-anchor="start">effective ceiling (label noise)</text>
+    <!-- MMLU: teal -->
+    <path d="M 80 201 C 130 190, 150 175, 166 169 C 250 135, 290 122, 337 105 C 390 85, 400 78, 423 74 C 470 66, 490 65, 509 64 L 690 62" fill="none" stroke="#14b8a6" stroke-width="2.5"></path>
+    <text x="120" y="180" font-family="Inter Variable, sans-serif" font-size="13" fill="#14b8a6">MMLU</text>
+    <!-- MATH: indigo -->
+    <path d="M 251 252 C 280 245, 310 195, 337 155 C 370 105, 420 80, 466 68 C 500 60, 560 52, 690 49" fill="none" stroke="#818cf8" stroke-width="2.5"></path>
+    <text x="273" y="228" font-family="Inter Variable, sans-serif" font-size="13" fill="#818cf8">MATH</text>
+    <!-- GPQA: amber -->
+    <path d="M 423 200 C 450 185, 480 155, 509 132 C 545 104, 570 82, 609 72 C 640 65, 665 63, 690 62" fill="none" stroke="#f59e0b" stroke-width="2.5"></path>
+    <text x="435" y="176" font-family="Inter Variable, sans-serif" font-size="13" fill="#f59e0b">GPQA-D</text>
+    <!-- SWE-bench Verified: sky -->
+    <path d="M 480 240 C 510 228, 540 175, 570 140 C 600 108, 650 92, 690 86" fill="none" stroke="#38bdf8" stroke-width="2.5"></path>
+    <text x="513" y="230" font-family="Inter Variable, sans-serif" font-size="13" fill="#38bdf8">SWE-V</text>
+    <!-- HLE: rose -->
+    <path d="M 594 253 C 620 248, 650 228, 690 205" fill="none" stroke="#fb7185" stroke-width="2.5"></path>
+    <text x="655" y="240" font-family="Inter Variable, sans-serif" font-size="13" fill="#fb7185">HLE</text>
+  </svg>
+  <figcaption><strong>Figure:</strong> the saturation waterfall (schematic, not
+  to scale). Each benchmark is born hard, climbs for two to four years, and
+  flattens near a ceiling set partly by label errors — at which point a harder
+  successor launches and the cycle restarts. Reading a 2026 leaderboard means
+  knowing where each benchmark sits on its own curve.</figcaption>
+</figure>
+<h3 id="code-from-puzzles-to-pull-requests">Code: from puzzles to pull requests</h3>
+<p><strong>HumanEval</strong> (<a href="https://arxiv.org/abs/2107.03374">Chen et al., 2021</a>, the
+Codex paper) was 164 hand-written Python functions with docstrings and unit
+tests; the model writes the body, the tests grade it. It gave the field the
+<strong>pass@k</strong> metric and served honorably — and it is now obsolete twice over:
+frontier models exceed 90% (saturation), and after five years its problems
+and countless near-clones permeate every training corpus (contamination).
+A 2026 launch post still citing HumanEval is itself a signal.</p>
+<p>Two replacements took its place, embodying two different philosophies.
+<a href="https://arxiv.org/abs/2403.07974"><strong>LiveCodeBench</strong></a> (Jain et al., 2024)
+fights contamination with <em>time</em>: it continuously harvests new problems from
+live contest sites (LeetCode, AtCoder, Codeforces), each stamped with its
+release date, so you can evaluate a model only on problems published after
+its training cutoff. When a model’s score drops sharply on post-cutoff
+problems relative to pre-cutoff ones — a pattern LiveCodeBench documented for
+several models — you are looking at contamination measured directly.</p>
+<p><a href="https://arxiv.org/abs/2310.06770"><strong>SWE-bench</strong></a> (Jimenez et al., 2023)
+changed what is being measured. Each instance is a <em>real</em> GitHub issue from a
+real Python repository, paired with the repository state at the time; the
+model must produce a patch, and the patch is graded by running the
+repository’s own test suite (tests the fixing human wrote must newly pass;
+existing tests must not break). When it launched, the best unassisted systems
+resolved under 2% of issues. OpenAI’s 2024 <strong>SWE-bench Verified</strong> release —
+500 instances filtered by human annotators to remove unsolvable or
+under-specified issues — became the standard split, and resolve rates climbed
+from roughly 20% in mid-2024 to the high 80s and 90s by 2026 (approximate
+and fast-moving). The
+important shift: SWE-bench is an <strong>agentic</strong> eval. The model runs in a
+scaffold — reading files, editing, executing tests, iterating
+(<a href="/groundup/book/agents-and-tools/">Chapter 44</a>) — so a “SWE-bench Verified” score is
+a score for a <em>model-plus-scaffold system</em>, a fact with consequences we will
+quantify in the pathology section. This is the direction all serious
+evaluation moved: less “answer this question,” more “complete this job.”</p>
+<h3 id="abstraction-arc-agi-and-the-price-of-a-task">Abstraction: ARC-AGI and the price of a task</h3>
+<p><a href="https://arxiv.org/abs/1911.01547"><strong>ARC-AGI</strong></a> began as the Abstraction and
+Reasoning Corpus in François Chollet’s 2019 essay <em>On the Measure of
+Intelligence</em>, whose central claim is worth restating: skill at a task is not
+evidence of intelligence unless you account for how much prior experience
+produced the skill. ARC’s tasks are small colored-grid puzzles: you see two
+or three input→output examples of some transformation (“objects fall until
+they land,” “count the colors and paint that many cells”) and must apply the
+rule to a new input. Each task uses a <em>novel</em> rule, so there is nothing to
+memorize; ordinary people solve the large majority; and for five years —
+through GPT-3, GPT-4, and everything between — LLMs scored close to zero
+while every other benchmark in this chapter soared. ARC was the standing
+counterexample, the benchmark skeptics pointed to.</p>
+<p>Then came the <strong>o3 moment</strong>. In December 2024, OpenAI’s o3, evaluated on
+ARC-AGI’s semi-private set, scored about 76% in its efficient configuration —
+and about 88% in a high-compute configuration that used on the order of
+170× more test-time compute, at a cost estimated in the thousands of dollars
+<em>per task</em> (figures approximate; the efficient configuration was roughly
+tens of dollars per task). Two lessons, both important. First, the wall was
+real but not permanent: search-like test-time reasoning
+(<a href="/groundup/book/reasoning-models/">Chapter 37</a>) broke a barrier that
+pattern-matching could not. Second, the ARC Prize team’s decision to publish
+<strong>cost per task</strong> next to every score was a landmark in honest evaluation —
+“88% at $X,000 per puzzle a human solves in a minute” is a very different
+claim from “88%.” <strong>ARC-AGI-2</strong> (2025) rebalanced the deck with tasks that
+remain easy for human panels but dropped the same frontier reasoning models
+back to single digits, restarting the cycle at higher difficulty. When you
+see any ARC number, ask which version and at what cost per task.</p>
+<h3 id="long-context-agents-and-safety--briefly">Long context, agents, and safety — briefly</h3>
+<p><strong>Long context.</strong> Needle-in-a-haystack, RULER, and their successors get a
+full treatment in <a href="/groundup/book/long-context/">Chapter 43</a>; the one-line summary is
+that retrieval of a planted fact is nearly saturated and trivially gameable,
+while <em>using</em> information spread across a long context remains far from
+solved — so treat “perfect recall at 1M tokens” charts as the weakest claim
+in any launch post.</p>
+<p><strong>Agentic benchmarks.</strong> <a href="https://arxiv.org/abs/2406.12045"><strong>τ-bench</strong></a>
+(Yao et al., 2024) tests a customer-service agent (airline, retail domains)
+that must follow policy rules while conversing with a <em>simulated user</em> and
+calling tools — and its signature metric, <strong>pass^k</strong>, asks whether the agent
+succeeds on <em>all</em> <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi></mrow><annotation encoding="application/x-tex">k</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span></span></span></span> independent runs of the same task, measuring the
+reliability that single-run pass rates hide (a model with 60% pass@1 might
+have 25% pass^8). Terminal-based suites (Terminal-Bench and kin) score
+end-to-end jobs in a shell; browser suites like
+<a href="https://arxiv.org/abs/2307.13854">WebArena</a> score task completion on
+realistic websites. And the memorable outlier:
+<a href="https://scholar.google.com/scholar?q=%22Vending-Bench%22+long-term+coherence+autonomous+agents">Vending-Bench</a>
+(Andon Labs, 2025) has the model <em>run a simulated vending-machine business</em>
+over millions of tokens — ordering stock, setting prices, paying fees — and
+measures long-horizon coherence in net worth. Its famous finding is the
+variance: the same model may run a tidy profit for simulated months in one
+rollout and, in another, spiral into hallucinated supplier disputes and
+attempts to email the FBI. That variance <em>is</em> the measurement: benchmarks
+built from long-horizon jobs expose reliability failures that ten-minute
+tasks never touch.</p>
+<p><strong>Safety evals.</strong> A parallel ecosystem measures what models will <em>refuse</em> and
+what dangerous capabilities they possess: jailbreak-robustness suites,
+over-refusal tests, and — increasingly consequential — the pre-deployment
+dangerous-capability evaluations (biosecurity, cybersecurity, autonomy) run
+internally under frameworks like Anthropic’s Responsible Scaling Policy and
+OpenAI’s Preparedness Framework, and externally by government AI safety/
+security institutes. These rarely appear as leaderboard bars, but they gate
+releases; the frontier chapters (<a href="/groundup/book/the-frontier/">Chapter 40</a>) return to
+them.</p>
+<h2 id="the-arena-measuring-preference-instead-of-capability">The arena: measuring preference instead of capability</h2>
+<p>Everything above scores answers against a key. <strong>LMArena</strong> (originally
+Chatbot Arena, <a href="https://arxiv.org/abs/2403.04132">Chiang et al., 2024</a>) does
+something categorically different: it measures <em>which model people like</em>.
+The mechanics are simple. A visitor types any prompt; two anonymous models
+answer side by side; the visitor votes for the better response (or a tie);
+only then are the model names revealed. Millions of such blind pairwise
+battles are aggregated into ratings.</p>
+<figure class="fig">
+  <svg viewBox="0 0 720 320" role="img" aria-label="Flow diagram of arena evaluation from user prompt through blind pairwise vote to Bradley-Terry ratings">
+    <defs>
+      <marker id="arr-arena" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+        <path d="M0,0 L6,3 L0,6" fill="none" stroke="currentColor" stroke-width="1.4"></path>
+      </marker>
+    </defs>
+    <!-- prompt -->
+    <rect x="30" y="120" width="130" height="60" rx="8" fill="#38bdf8" fill-opacity="0.15" stroke="#38bdf8" stroke-width="1.5"></rect>
+    <text x="95" y="145" font-family="Inter Variable, sans-serif" font-size="14" fill="currentColor" text-anchor="middle">user prompt</text>
+    <text x="95" y="165" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55" text-anchor="middle">(anything at all)</text>
+    <!-- models -->
+    <rect x="220" y="45" width="140" height="60" rx="8" fill="#14b8a6" fill-opacity="0.15" stroke="#14b8a6" stroke-width="1.5"></rect>
+    <text x="290" y="70" font-family="Inter Variable, sans-serif" font-size="14" fill="currentColor" text-anchor="middle">Model A</text>
+    <text x="290" y="90" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55" text-anchor="middle">name hidden</text>
+    <rect x="220" y="195" width="140" height="60" rx="8" fill="#818cf8" fill-opacity="0.15" stroke="#818cf8" stroke-width="1.5"></rect>
+    <text x="290" y="220" font-family="Inter Variable, sans-serif" font-size="14" fill="currentColor" text-anchor="middle">Model B</text>
+    <text x="290" y="240" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55" text-anchor="middle">name hidden</text>
+    <!-- vote -->
+    <rect x="420" y="120" width="130" height="60" rx="8" fill="#f59e0b" fill-opacity="0.15" stroke="#f59e0b" stroke-width="1.5"></rect>
+    <text x="485" y="145" font-family="Inter Variable, sans-serif" font-size="14" fill="currentColor" text-anchor="middle">blind vote</text>
+    <text x="485" y="165" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55" text-anchor="middle">A / B / tie</text>
+    <!-- ratings -->
+    <rect x="590" y="105" width="110" height="90" rx="8" fill="#fb7185" fill-opacity="0.15" stroke="#fb7185" stroke-width="1.5"></rect>
+    <text x="645" y="132" font-family="Inter Variable, sans-serif" font-size="14" fill="currentColor" text-anchor="middle">Bradley–</text>
+    <text x="645" y="150" font-family="Inter Variable, sans-serif" font-size="14" fill="currentColor" text-anchor="middle">Terry fit</text>
+    <text x="645" y="176" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55" text-anchor="middle">→ ratings ± CI</text>
+    <!-- arrows -->
+    <line x1="160" y1="135" x2="212" y2="85" stroke="currentColor" opacity="0.35" stroke-width="1.5" marker-end="url(#arr-arena)"></line>
+    <line x1="160" y1="165" x2="212" y2="215" stroke="currentColor" opacity="0.35" stroke-width="1.5" marker-end="url(#arr-arena)"></line>
+    <line x1="360" y1="85" x2="412" y2="135" stroke="currentColor" opacity="0.35" stroke-width="1.5" marker-end="url(#arr-arena)"></line>
+    <line x1="360" y1="215" x2="412" y2="165" stroke="currentColor" opacity="0.35" stroke-width="1.5" marker-end="url(#arr-arena)"></line>
+    <line x1="550" y1="150" x2="582" y2="150" stroke="currentColor" opacity="0.35" stroke-width="1.5" marker-end="url(#arr-arena)"></line>
+    <!-- caveat strip -->
+    <text x="365" y="300" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.55" text-anchor="middle">votes reward what voters notice: length, formatting, confidence, flattery — not correctness they cannot check</text>
+  </svg>
+  <figcaption><strong>Figure:</strong> arena mechanics. Blind pairwise battles
+  become ratings through a Bradley–Terry fit. The design removes brand bias;
+  it cannot remove the biases of the voters themselves.</figcaption>
+</figure>
+<aside class="box box-math" data-box="math"><div class="box-title"><span class="box-icon" aria-hidden="true">∑</span>The math</div><p>The aggregation model is <strong>Bradley–Terry</strong> — the same pairwise-preference
+model that trains reward models in <a href="/groundup/book/sft-and-rlhf/">Chapter 35</a> and
+aggregates human evaluations in <a href="/groundup/book/evaluating-language-models/">Chapter 21</a>.
+Each model <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi></mrow><annotation encoding="application/x-tex">i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6595em;"></span><span class="mord mathnormal">i</span></span></span></span> gets a strength
+parameter <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>ξ</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">\xi_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.046em;">ξ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.046em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>, and the probability that <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi></mrow><annotation encoding="application/x-tex">i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6595em;"></span><span class="mord mathnormal">i</span></span></span></span> beats <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>j</mi></mrow><annotation encoding="application/x-tex">j</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.854em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0572em;">j</span></span></span></span> in a battle is
+modeled as</p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi mathvariant="double-struck">P</mi><mo stretchy="false">(</mo><mi>i</mi><mtext> beats </mtext><mi>j</mi><mo stretchy="false">)</mo><mtext>  </mtext><mo>=</mo><mtext>  </mtext><mfrac><msup><mi>e</mi><msub><mi>ξ</mi><mi>i</mi></msub></msup><mrow><msup><mi>e</mi><msub><mi>ξ</mi><mi>i</mi></msub></msup><mo>+</mo><msup><mi>e</mi><msub><mi>ξ</mi><mi>j</mi></msub></msup></mrow></mfrac><mtext>  </mtext><mo>=</mo><mtext>  </mtext><mfrac><mn>1</mn><mrow><mn>1</mn><mo>+</mo><msup><mi>e</mi><mrow><mo>−</mo><mo stretchy="false">(</mo><msub><mi>ξ</mi><mi>i</mi></msub><mo>−</mo><msub><mi>ξ</mi><mi>j</mi></msub><mo stretchy="false">)</mo></mrow></msup></mrow></mfrac><mo separator="true">,</mo></mrow><annotation encoding="application/x-tex">\P(i \text{ beats } j) \;=\; \frac{e^{\xi_i}}{e^{\xi_i} + e^{\xi_j}}
+\;=\; \frac{1}{1 + e^{-(\xi_i - \xi_j)}},</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathbb">P</span><span class="mopen">(</span><span class="mord mathnormal">i</span><span class="mord text"><span class="mord"> beats </span></span><span class="mord mathnormal" style="margin-right:0.0572em;">j</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.2954em;vertical-align:-0.7693em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.5261em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal">e</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7751em;"><span style="top:-2.989em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.046em;">ξ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3281em;"><span style="top:-2.357em;margin-left:-0.046em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.143em;"><span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mord mathnormal">e</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7912em;"><span style="top:-3.0051em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.046em;">ξ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3281em;"><span style="top:-2.357em;margin-left:-0.046em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0572em;">j</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2819em;"><span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal">e</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8491em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.046em;">ξ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3281em;"><span style="top:-2.357em;margin-left:-0.046em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.143em;"><span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.7693em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.1248em;vertical-align:-0.8034em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.2799em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mord mathnormal">e</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8301em;"><span style="top:-3.0051em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mopen mtight">(</span><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.046em;">ξ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3281em;"><span style="top:-2.357em;margin-left:-0.046em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.143em;"><span></span></span></span></span></span></span><span class="mbin mtight">−</span><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.046em;">ξ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3281em;"><span style="top:-2.357em;margin-left:-0.046em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0572em;">j</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2819em;"><span></span></span></span></span></span></span><span class="mclose mtight">)</span></span></span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.8034em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mpunct">,</span></span></span></span></span><p>a sigmoid of the strength <em>difference</em> — only gaps matter, not absolute
+values. The <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>ξ</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">\xi_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.046em;">ξ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.046em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> are fit by maximum likelihood on the recorded battles
+(logistic regression, <a href="/groundup/book/loss-functions/">Chapter 9</a>), then rescaled for
+display to the chess <strong>Elo</strong> convention, where a gap of 400 rating points
+means 10-to-1 odds:</p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi mathvariant="double-struck">P</mi><mo stretchy="false">(</mo><mi>i</mi><mtext> beats </mtext><mi>j</mi><mo stretchy="false">)</mo><mtext>  </mtext><mo>=</mo><mtext>  </mtext><mfrac><mn>1</mn><mrow><mn>1</mn><mo>+</mo><msup><mn>10</mn><mrow><mtext> </mtext><mo stretchy="false">(</mo><msub><mi>R</mi><mi>j</mi></msub><mo>−</mo><msub><mi>R</mi><mi>i</mi></msub><mo stretchy="false">)</mo><mi mathvariant="normal">/</mi><mn>400</mn></mrow></msup></mrow></mfrac><mi mathvariant="normal">.</mi></mrow><annotation encoding="application/x-tex">\P(i \text{ beats } j) \;=\; \frac{1}{1 + 10^{\,(R_j - R_i)/400}}.</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathbb">P</span><span class="mopen">(</span><span class="mord mathnormal">i</span><span class="mord text"><span class="mord"> beats </span></span><span class="mord mathnormal" style="margin-right:0.0572em;">j</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.1248em;vertical-align:-0.8034em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.2799em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8301em;"><span style="top:-3.0051em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mspace mtight" style="margin-right:0.1952em;"></span><span class="mopen mtight">(</span><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0077em;">R</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3281em;"><span style="top:-2.357em;margin-left:-0.0077em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0572em;">j</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2819em;"><span></span></span></span></span></span></span><span class="mbin mtight">−</span><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0077em;">R</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3281em;"><span style="top:-2.357em;margin-left:-0.0077em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.143em;"><span></span></span></span></span></span></span><span class="mclose mtight">)</span><span class="mord mtight">/400</span></span></span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.8034em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mord">.</span></span></span></span></span><p>Because ratings are estimates from finite, noisy votes, honest leaderboards
+publish confidence intervals, and models whose intervals overlap share a
+rank.</p></aside>
+<aside class="box box-example" data-box="example"><div class="box-title"><span class="box-icon" aria-hidden="true">✏️</span>Worked example</div><p>Model A is rated <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>R</mi><mi>A</mi></msub><mo>=</mo><mn>1310</mn></mrow><annotation encoding="application/x-tex">R_A = 1310</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.0077em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">A</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1310</span></span></span></span>, model B <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>R</mi><mi>B</mi></msub><mo>=</mo><mn>1285</mn></mrow><annotation encoding="application/x-tex">R_B = 1285</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.0077em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0502em;">B</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1285</span></span></span></span> — a 25-point gap, which
+looks decisive on a leaderboard. Predicted win probability:
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>10</mn><mrow><mo stretchy="false">(</mo><mn>1285</mn><mo>−</mo><mn>1310</mn><mo stretchy="false">)</mo><mi mathvariant="normal">/</mi><mn>400</mn></mrow></msup><mo>=</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>0.0625</mn></mrow></msup><mo>≈</mo><mn>0.866</mn></mrow><annotation encoding="application/x-tex">10^{(1285-1310)/400} = 10^{-0.0625} \approx 0.866</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.888em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.888em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mopen mtight">(</span><span class="mord mtight">1285</span><span class="mbin mtight">−</span><span class="mord mtight">1310</span><span class="mclose mtight">)</span><span class="mord mtight">/400</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">0.0625</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0.866</span></span></span></span>, so
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="double-struck">P</mi><mo stretchy="false">(</mo><mi>A</mi><mtext> beats </mtext><mi>B</mi><mo stretchy="false">)</mo><mo>=</mo><mn>1</mn><mi mathvariant="normal">/</mi><mo stretchy="false">(</mo><mn>1</mn><mo>+</mo><mn>0.866</mn><mo stretchy="false">)</mo><mo>≈</mo><mn>0.536</mn></mrow><annotation encoding="application/x-tex">\P(A \text{ beats } B) = 1/(1+0.866) \approx 0.536</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathbb">P</span><span class="mopen">(</span><span class="mord mathnormal">A</span><span class="mord text"><span class="mord"> beats </span></span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1/</span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">0.866</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0.536</span></span></span></span>. The “clearly better”
+model wins about 54 battles in 100 — barely better than a coin flip. And
+detecting a true 54% rate versus 50% at high confidence requires on the
+order of a couple thousand head-to-head votes (<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>≈</mo><mo stretchy="false">(</mo><mn>1.96</mn><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mo>⋅</mo><mn>0.25</mn><mi mathvariant="normal">/</mi><msup><mn>0.02</mn><mn>2</mn></msup><mo>≈</mo><mn>2,400</mn></mrow><annotation encoding="application/x-tex">n \approx (1.96)^2 \cdot
+0.25/0.02^2 \approx 2{,}400</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4831em;"></span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">1.96</span><span class="mclose"><span class="mclose">)</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord">0.25/0.0</span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">2</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">400</span></span></span></span> for a ±2-point margin). Adjacent leaderboard
+ranks are usually statistical mush.</p></aside>
+<p>What does the arena <em>measure</em>? Preference — which is valuable
+(models people prefer are, other things equal, more useful) and not
+the same as capability. A voter can check whether a response <em>feels</em> good in
+thirty seconds; they usually cannot check whether it is <em>correct</em>. Analyses
+by the arena team and outside researchers repeatedly found that longer
+responses, heavier markdown formatting, confident tone, and agreement with
+the voter all raise win rates independent of accuracy — which is why the
+leaderboard added a <strong>style-controlled</strong> variant (regressing out length and
+formatting effects) in 2024. The gap between the raw and style-controlled
+rankings of a model is itself informative: it is a crude sycophancy-and-
+polish detector.</p>
+<p>Then came the 2025 controversies. In April, Meta’s Llama 4 launch cited a
+top-tier arena rating — earned by an <em>experimental chat-optimized variant</em>
+that was not the model actually released; the arena organization updated its
+policies in response. Weeks later,
+<a href="https://arxiv.org/abs/2504.20879"><strong>“The Leaderboard Illusion”</strong></a>
+(Singh et al., 2025 — researchers from Cohere Labs and several universities)
+documented the systemic version of the problem: large labs privately tested
+many model variants on the arena and publicized only the best (a best-of-N
+selection that inflates expected rating even under pure noise), proprietary
+models received a disproportionate share of battles and of the resulting
+vote data, and open models were retired from the platform at higher rates.
+The arena’s operators disputed parts of the framing — private testing of
+unreleased checkpoints had defensible purposes, and some sampling asymmetry
+reflects user demand — but tightened rules on variant testing and
+transparency. The fair summary: the arena remains the best broad measurement
+of human preference we have, <em>and</em> it is a measurement whose recent history
+shows exactly the Goodhart dynamics this chapter warns about, run by a small
+team refereeing the most-watched scoreboard in the industry.</p>
+<h2 id="the-pathology-section">The pathology section</h2>
+<p>This is the core of the chapter: the five recurring ways a benchmark number
+detaches from reality. Launch posts rarely commit more than two of these at
+once, but you must check for all five.</p>
+<h3 id="contamination">Contamination</h3>
+<p>The mechanics were built in <a href="/groundup/book/evaluating-language-models/">Chapter 21</a>
+and are quickly recapped: benchmark test sets live on the public web; the
+public web is the training corpus (<a href="/groundup/book/pretraining-data/">Chapter 31</a>);
+therefore, absent heroic filtering, models have <em>seen the test</em>. N-gram
+decontamination catches verbatim copies but not paraphrases — and the
+Rephrased Samples result showed a 13B model “matching GPT-4” by training on
+reworded test sets that n-gram filters sail past. Detection tools (membership
+inference, canary strings, comparing scores on pre- versus post-cutoff
+problems as LiveCodeBench does) help, but the structural fix is benchmark
+design: private or continuously refreshed test sets. Every benchmark born
+after 2023 that expects to be taken seriously — GPQA’s held-back validation
+apparatus, FrontierMath’s private set, ARC’s semi-private eval, HLE’s
+held-out split, LiveCodeBench’s date-stamping — is built around
+contamination resistance the way post-2010 cryptography is built around
+adversaries. The FrontierMath funding episode adds the governance corollary:
+“private” must also mean <em>private from the labs being evaluated</em>, verifiably.</p>
+<h3 id="saturation-and-ceiling-effects">Saturation and ceiling effects</h3>
+<p>A benchmark stops discriminating before it reaches 100%, because its
+effective ceiling is set by label errors and ambiguity. If ~3% of questions
+are mis-keyed and ~2% are ambiguous, then differences above ~95%
+are noise, and even at 88–92% much of the remaining gap between models is
+disagreement-with-broken-labels rather than capability. Worse, near the
+ceiling, <em>ranking inverts randomly between runs</em>: with 198 GPQA Diamond
+questions, one question is worth half a point, so two models three questions
+apart are statistically indistinguishable (we do this arithmetic properly
+below). The practical rule: when frontier models cluster within a few points
+of each other near a benchmark’s top, the benchmark has retired itself,
+whatever the leaderboard still says.</p>
+<h3 id="prompt-and-scaffold-sensitivity">Prompt and scaffold sensitivity</h3>
+<p>The same weights can score very differently depending on everything <em>around</em>
+the model. <a href="https://arxiv.org/abs/2310.11324">Sclar et al. (2023)</a> showed
+that trivial prompt-formatting changes — separators, casing, whitespace —
+swing task accuracy by double digits on smaller models. Beyond formatting:
+zero-shot versus few-shot, chain-of-thought instructions or not, sampling
+temperature, how strictly the answer is parsed (“Answer: (B)” versus a
+paragraph ending in “so B”), and — dominating everything for agentic evals —
+the <strong>scaffold</strong>: the tools, retry logic, and iteration budget wrapped
+around the model. Early SWE-bench history made this vivid: the same
+underlying model moved from single-digit resolve rates with a basic
+retrieval harness to several times that with an agentic scaffold. A
+SWE-bench bar chart comparing “our model in our scaffold” against
+“competitor as reported (different scaffold)” is comparing systems, not
+models.</p>
+<figure class="fig">
+  <svg viewBox="0 0 720 300" role="img" aria-label="Bar chart showing one model scoring between 58 and 76 percent depending on evaluation harness choices">
+    <!-- title -->
+    <text x="80" y="34" font-family="Inter Variable, sans-serif" font-size="14" fill="currentColor">One model, one benchmark, five harnesses (illustrative)</text>
+    <!-- baseline axis -->
+    <line x1="260" y1="55" x2="260" y2="255" stroke="currentColor" opacity="0.35"></line>
+    <!-- bars: x scale 260 + score*5.2 ; height 26, gap 12 -->
+    <rect x="260" y="62" width="302" height="26" fill="#14b8a6" fill-opacity="0.15" stroke="#14b8a6" stroke-width="1.5"></rect>
+    <text x="252" y="80" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="end">0-shot, strict parsing</text>
+    <text x="570" y="80" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor">58</text>
+    <rect x="260" y="100" width="333" height="26" fill="#14b8a6" fill-opacity="0.15" stroke="#14b8a6" stroke-width="1.5"></rect>
+    <text x="252" y="118" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="end">0-shot, lenient parsing</text>
+    <text x="601" y="118" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor">64</text>
+    <rect x="260" y="138" width="343" height="26" fill="#38bdf8" fill-opacity="0.15" stroke="#38bdf8" stroke-width="1.5"></rect>
+    <text x="252" y="156" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="end">5-shot</text>
+    <text x="611" y="156" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor">66</text>
+    <rect x="260" y="176" width="374" height="26" fill="#818cf8" fill-opacity="0.15" stroke="#818cf8" stroke-width="1.5"></rect>
+    <text x="252" y="194" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="end">5-shot + chain of thought</text>
+    <text x="642" y="194" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor">72</text>
+    <rect x="260" y="214" width="395" height="26" fill="#f59e0b" fill-opacity="0.15" stroke="#f59e0b" stroke-width="1.5"></rect>
+    <text x="252" y="232" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="end">+ majority vote of 8</text>
+    <text x="663" y="232" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor">76</text>
+    <!-- bracket showing spread -->
+    <text x="80" y="282" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.55">The 18-point spread is larger than most gaps between frontier models.</text>
+  </svg>
+  <figcaption><strong>Figure:</strong> scaffold sensitivity, illustrated with
+  representative (not measured) numbers. Identical weights; the harness alone
+  moves the score from 58 to 76. Any cross-model comparison is meaningless
+  unless the harness is held fixed — which is exactly what launch-post bar
+  charts often do not do.</figcaption>
+</figure>
+<h3 id="selective-reporting-reading-the-footnotes">Selective reporting: reading the footnotes</h3>
+<p>The subtlest pathology, because every individual number is true. The degrees
+of freedom: <strong>pass@1 versus pass@k</strong> (does the model get one attempt or its
+best of <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi></mrow><annotation encoding="application/x-tex">k</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span></span></span></span>?), <strong>consensus/majority voting</strong> (sample <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi></mrow><annotation encoding="application/x-tex">k</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span></span></span></span> answers, submit the
+most common — usually written cons@k or maj@k), tools on or off, thinking
+budget, which benchmark <em>version</em> and <em>split</em>, and whose harness produced
+the competitor’s number. None of these is dishonest in isolation — DeepSeek’s
+R1 report, to its credit, printed both pass@1 and cons@64 side by side
+(79.8% versus 86.7% on AIME 2024) — the sin is comparing <em>your</em> enhanced
+configuration against <em>their</em> plain one in a single chart.</p>
+<aside class="box box-example" data-box="example"><div class="box-title"><span class="box-icon" aria-hidden="true">✏️</span>Worked example</div><p>A realistic composite of the genre. The chart says: <strong>Our model: AIME 92.0.
+Competitor: AIME 83.3.</strong> The footnote says: <em>“Our results use extended
+thinking with parallel sampling, cons@32; competitor results as reported
+(pass@1).”</em> Decode it. AIME has 15 problems, so 92.0% means ~13.8 → the
+score is averaged over both 2025 exam papers, 30 problems; fine. Cons@32
+means each problem was attempted 32 times and the modal answer submitted —
+worth several points on AIME-style integer answers (in R1’s published
+numbers, the cons@64 bonus was ~7 points). The competitor’s 83.3 is
+single-attempt. Convert to matching conditions and the honest comparison is
+roughly “our pass@1 ≈ 85–87 versus their 83.3”: a real but small lead, not
+the 9-point rout the chart displays. Also note what the footnote does <em>not</em>
+say: whether the competitor number used the same answer-extraction rules.
+You cannot recover a fair comparison from the launch post alone — which is
+precisely why third-party reruns under one harness exist.</p></aside>
+<aside class="box box-warning" data-box="warning"><div class="box-title"><span class="box-icon" aria-hidden="true">⚠️</span>Careful</div><p><strong>The best-of-N submission trick works on entire benchmarks, not just
+problems.</strong> Evaluate 20 internal checkpoints, publish the one whose scores
+came out best, and you have silently added a max-over-noise bonus of a point
+or two on <em>every</em> benchmark simultaneously — no contamination, no lying,
+just selection. This is the same mechanism The Leaderboard Illusion
+documented on the arena, and the same reason a replication under someone
+else’s harness (lm-evaluation-harness, HELM, Epoch AI’s reruns, Artificial
+Analysis) is worth ten first-party charts.</p></aside>
+<h3 id="the-lifecycle-and-private-holdouts-as-the-partial-fix">The lifecycle, and private holdouts as the partial fix</h3>
+<p>Put the pathologies together and a benchmark’s biography writes itself.</p>
+<figure class="fig">
+  <svg viewBox="0 0 720 330" role="img" aria-label="Circular lifecycle of a benchmark: release, optimize, saturate, replace, repeating">
+    <defs>
+      <marker id="arr-cycle" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto">
+        <path d="M0,0 L7,3.5 L0,7" fill="none" stroke="currentColor" stroke-width="1.5"></path>
+      </marker>
+    </defs>
+    <!-- four nodes on a loop -->
+    <rect x="290" y="30" width="140" height="52" rx="8" fill="#14b8a6" fill-opacity="0.15" stroke="#14b8a6" stroke-width="1.5"></rect>
+    <text x="360" y="52" font-family="Inter Variable, sans-serif" font-size="14" fill="currentColor" text-anchor="middle">1. Release</text>
+    <text x="360" y="70" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55" text-anchor="middle">hard; scores low</text>
+    <rect x="540" y="140" width="150" height="52" rx="8" fill="#38bdf8" fill-opacity="0.15" stroke="#38bdf8" stroke-width="1.5"></rect>
+    <text x="615" y="162" font-family="Inter Variable, sans-serif" font-size="14" fill="currentColor" text-anchor="middle">2. Optimize</text>
+    <text x="615" y="180" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55" text-anchor="middle">labs target it; climb</text>
+    <rect x="290" y="250" width="140" height="52" rx="8" fill="#f59e0b" fill-opacity="0.15" stroke="#f59e0b" stroke-width="1.5"></rect>
+    <text x="360" y="272" font-family="Inter Variable, sans-serif" font-size="14" fill="currentColor" text-anchor="middle">3. Saturate</text>
+    <text x="360" y="290" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55" text-anchor="middle">ceiling ≈ label noise</text>
+    <rect x="30" y="140" width="150" height="52" rx="8" fill="#fb7185" fill-opacity="0.15" stroke="#fb7185" stroke-width="1.5"></rect>
+    <text x="105" y="162" font-family="Inter Variable, sans-serif" font-size="14" fill="currentColor" text-anchor="middle">4. Replace</text>
+    <text x="105" y="180" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55" text-anchor="middle">harder successor</text>
+    <!-- arrows around the loop (clockwise) -->
+    <path d="M 438 70 C 520 85, 570 105, 605 132" fill="none" stroke="currentColor" opacity="0.35" stroke-width="1.5" marker-end="url(#arr-cycle)"></path>
+    <path d="M 605 200 C 570 230, 500 258, 438 272" fill="none" stroke="currentColor" opacity="0.35" stroke-width="1.5" marker-end="url(#arr-cycle)"></path>
+    <path d="M 282 272 C 220 258, 150 230, 115 200" fill="none" stroke="currentColor" opacity="0.35" stroke-width="1.5" marker-end="url(#arr-cycle)"></path>
+    <path d="M 115 132 C 150 105, 200 85, 282 70" fill="none" stroke="currentColor" opacity="0.35" stroke-width="1.5" marker-end="url(#arr-cycle)"></path>
+    <!-- center annotations -->
+    <text x="360" y="152" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.55" text-anchor="middle">contamination accumulates</text>
+    <text x="360" y="172" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.55" text-anchor="middle">the whole way around</text>
+    <text x="360" y="192" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.55" text-anchor="middle">(typical lap: 2–4 years)</text>
+  </svg>
+  <figcaption><strong>Figure:</strong> the benchmark lifecycle. MMLU, MATH,
+  HumanEval, GSM8K, and needle-in-a-haystack have each completed the loop;
+  GPQA and SWE-bench Verified are late in stage 3; HLE and ARC-AGI-2 are in
+  stage 2. Knowing a benchmark's stage tells you how much a score on it can
+  mean.</figcaption>
+</figure>
+<p>The best structural defense the field has found is the <strong>private holdout</strong>:
+keep some or all of the test set off the internet, grade submissions on a
+server, and publish only aggregate scores. GPQA’s design makes questions
+worthless to memorize even when public (Google-proof construction);
+FrontierMath and ARC-AGI keep problems physically private; HLE holds back a
+split to <em>detect</em> overfitting to the public portion (if a model’s public-set
+score races ahead of its private-set score, something is being gamed).
+Private holdouts trade one problem for others — you must trust the
+gatekeeper’s independence (the FrontierMath lesson), scores arrive slowly,
+and the community cannot audit question quality — which is why they
+complement rather than replace refresh-based designs like LiveCodeBench and
+this-year’s-AIME. There is no free lunch; there is only a portfolio.</p>
+<h2 id="evaluating-for-your-own-use-case">Evaluating for your own use case</h2>
+<p>Here is the uncomfortable truth the leaderboard economy obscures: for
+deciding <em>which model should power your application</em>, public benchmarks are
+weak evidence. They measure the wrong distribution (competition math is not
+your customer-support queue), under the wrong protocol (your app has one
+attempt, no majority voting), with the wrong grader. The single
+highest-leverage evaluation practice in 2026 is embarrassingly unglamorous:
+<strong>build a private eval set from your own real tasks.</strong></p>
+<p>The recipe, condensed from what working teams converge on:</p>
+<ol>
+<li><strong>Collect 30–200 real examples</strong> from your actual workload — real user
+queries, real documents, including the ugly ones. Twenty carefully chosen
+examples beat zero; two hundred beat almost any public benchmark <em>for
+your decision</em>.</li>
+<li><strong>Write down what “good” means per example</strong> — an exact expected answer
+where one exists, otherwise a short rubric (“must cite the correct
+section; must not invent a deadline”). The discipline of writing rubrics
+will teach you more about your task than the scores will.</li>
+<li><strong>Grade mechanically where possible</strong> (string/number match, tests
+passing, JSON schema validity); use an LLM judge for the rest, with the
+bias caveats from <a href="/groundup/book/evaluating-language-models/">Chapter 21</a> —
+position-swap the comparisons, spot-check ~20% by hand, and never let a
+model judge its own family without checking for self-preference.</li>
+<li><strong>Hold the harness fixed</strong> across models: same prompts, same temperature,
+same parsing, same tool access. You are now avoiding the scaffold
+pathology that afflicts billion-dollar launch posts.</li>
+<li><strong>Version it and keep it private.</strong> Never paste your eval set into
+prompts you share, or a future model may have trained on your test.</li>
+</ol>
+<p>Then comes the part almost everyone gets wrong: deciding whether a
+difference is real.</p>
+<aside class="box box-math" data-box="math"><div class="box-title"><span class="box-icon" aria-hidden="true">∑</span>The math</div><p>Accuracy on <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span> independent test items is a binomial proportion. If the true
+success rate is <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi></mrow><annotation encoding="application/x-tex">p</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">p</span></span></span></span>, the standard error of the measured rate <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>p</mi><mo>^</mo></mover></mrow><annotation encoding="application/x-tex">\hat{p}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.6944em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">p</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1667em;"><span class="mord">^</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1944em;"><span></span></span></span></span></span></span></span></span> is</p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mrow><mi mathvariant="normal">S</mi><mi mathvariant="normal">E</mi></mrow><mtext>  </mtext><mo>=</mo><mtext>  </mtext><msqrt><mfrac><mrow><mi>p</mi><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>p</mi><mo stretchy="false">)</mo></mrow><mi>n</mi></mfrac></msqrt><mo separator="true">,</mo></mrow><annotation encoding="application/x-tex">\mathrm{SE} \;=\; \sqrt{\frac{p(1-p)}{n}},</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord"><span class="mord mathrm">SE</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.44em;vertical-align:-0.7356em;"></span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.7044em;"><span class="svg-align" style="top:-4.4em;"><span class="pstrut" style="height:4.4em;"></span><span class="mord" style="padding-left:1em;"><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.427em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">n</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal">p</span><span class="mclose">)</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span><span style="top:-3.6644em;"><span class="pstrut" style="height:4.4em;"></span><span class="hide-tail" style="min-width:1.02em;height:2.48em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="2.48em" viewBox="0 0 400000 2592" preserveAspectRatio="xMinYMin slice"><path d="M424,2478
+c-1.3,-0.7,-38.5,-172,-111.5,-514c-73,-342,-109.8,-513.3,-110.5,-514
+c0,-2,-10.7,14.3,-32,49c-4.7,7.3,-9.8,15.7,-15.5,25c-5.7,9.3,-9.8,16,-12.5,20
+s-5,7,-5,7c-4,-3.3,-8.3,-7.7,-13,-13s-13,-13,-13,-13s76,-122,76,-122s77,-121,77,-121
+s209,968,209,968c0,-2,84.7,-361.7,254,-1079c169.3,-717.3,254.7,-1077.7,256,-1081
+l0 -0c4,-6.7,10,-10,18,-10 H400000
+v40H1014.6
+s-87.3,378.7,-272.6,1166c-185.3,787.3,-279.3,1182.3,-282,1185
+c-2,6,-10,9,-24,9
+c-8,0,-12,-0.7,-12,-2z M1001 80
+h400000v40h-400000z"></path></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.7356em;"><span></span></span></span></span></span><span class="mpunct">,</span></span></span></span></span><p>and an approximate 95% confidence interval is <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>p</mi><mo>^</mo></mover><mo>±</mo><mn>1.96</mn><mtext> </mtext><mrow><mi mathvariant="normal">S</mi><mi mathvariant="normal">E</mi></mrow></mrow><annotation encoding="application/x-tex">\hat{p} \pm 1.96\,\mathrm{SE}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.6944em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">p</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1667em;"><span class="mord">^</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1944em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">±</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord">1.96</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathrm">SE</span></span></span></span></span>.
+Two useful consequences. First, error shrinks with <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msqrt><mi>n</mi></msqrt></mrow><annotation encoding="application/x-tex">\sqrt{n}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.04em;vertical-align:-0.2397em;"></span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8003em;"><span class="svg-align" style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord" style="padding-left:0.833em;"><span class="mord mathnormal">n</span></span></span><span style="top:-2.7603em;"><span class="pstrut" style="height:3em;"></span><span class="hide-tail" style="min-width:0.853em;height:1.08em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="1.08em" viewBox="0 0 400000 1080" preserveAspectRatio="xMinYMin slice"><path d="M95,702
+c-2.7,0,-7.17,-2.7,-13.5,-8c-5.8,-5.3,-9.5,-10,-9.5,-14
+c0,-2,0.3,-3.3,1,-4c1.3,-2.7,23.83,-20.7,67.5,-54
+c44.2,-33.3,65.8,-50.3,66.5,-51c1.3,-1.3,3,-2,5,-2c4.7,0,8.7,3.3,12,10
+s173,378,173,378c0.7,0,35.3,-71,104,-213c68.7,-142,137.5,-285,206.5,-429
+c69,-144,104.5,-217.7,106.5,-221
+l0 -0
+c5.3,-9.3,12,-14,20,-14
+H400000v40H845.2724
+s-225.272,467,-225.272,467s-235,486,-235,486c-2.7,4.7,-9,7,-19,7
+c-6,0,-10,-1,-12,-3s-194,-422,-194,-422s-65,47,-65,47z
+M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2397em;"><span></span></span></span></span></span></span></span></span>: to <em>halve</em>
+your error bars you must <em>quadruple</em> your eval set. Second, when comparing
+two models on the <strong>same</strong> items, the honest test is paired: only the items
+where the models <em>disagree</em> carry information (this is McNemar’s test). If
+model A wins on <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi></mrow><annotation encoding="application/x-tex">a</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">a</span></span></span></span> items, model B on <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>b</mi></mrow><annotation encoding="application/x-tex">b</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">b</span></span></span></span>, and they agree elsewhere, the
+comparison is a coin-flip test on <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi><mo>+</mo><mi>b</mi></mrow><annotation encoding="application/x-tex">a+b</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">a</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">b</span></span></span></span> trials — often shockingly few.</p></aside>
+<aside class="box box-example" data-box="example"><div class="box-title"><span class="box-icon" aria-hidden="true">✏️</span>Worked example</div><p>You evaluate two models on your 50-item eval set. Model A scores 35/50
+(70%), model B scores 32/50 (64%). Is A better? The standard error is
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msqrt><mrow><mn>0.7</mn><mo>×</mo><mn>0.3</mn><mi mathvariant="normal">/</mi><mn>50</mn></mrow></msqrt><mo>=</mo><msqrt><mn>0.0042</mn></msqrt><mo>≈</mo><mn>0.065</mn></mrow><annotation encoding="application/x-tex">\sqrt{0.7 \times 0.3 / 50} = \sqrt{0.0042} \approx 0.065</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.24em;vertical-align:-0.305em;"></span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.935em;"><span class="svg-align" style="top:-3.2em;"><span class="pstrut" style="height:3.2em;"></span><span class="mord" style="padding-left:1em;"><span class="mord">0.7</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">0.3/50</span></span></span><span style="top:-2.895em;"><span class="pstrut" style="height:3.2em;"></span><span class="hide-tail" style="min-width:1.02em;height:1.28em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="1.28em" viewBox="0 0 400000 1296" preserveAspectRatio="xMinYMin slice"><path d="M263,681c0.7,0,18,39.7,52,119
+c34,79.3,68.167,158.7,102.5,238c34.3,79.3,51.8,119.3,52.5,120
+c340,-704.7,510.7,-1060.3,512,-1067
+l0 -0
+c4.7,-7.3,11,-11,19,-11
+H40000v40H1012.3
+s-271.3,567,-271.3,567c-38.7,80.7,-84,175,-136,283c-52,108,-89.167,185.3,-111.5,232
+c-22.3,46.7,-33.8,70.3,-34.5,71c-4.7,4.7,-12.3,7,-23,7s-12,-1,-12,-1
+s-109,-253,-109,-253c-72.7,-168,-109.3,-252,-110,-252c-10.7,8,-22,16.7,-34,26
+c-22,17.3,-33.3,26,-34,26s-26,-26,-26,-26s76,-59,76,-59s76,-60,76,-60z
+M1001 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.305em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.04em;vertical-align:-0.1328em;"></span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9072em;"><span class="svg-align" style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord" style="padding-left:0.833em;"><span class="mord">0.0042</span></span></span><span style="top:-2.8672em;"><span class="pstrut" style="height:3em;"></span><span class="hide-tail" style="min-width:0.853em;height:1.08em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="1.08em" viewBox="0 0 400000 1080" preserveAspectRatio="xMinYMin slice"><path d="M95,702
+c-2.7,0,-7.17,-2.7,-13.5,-8c-5.8,-5.3,-9.5,-10,-9.5,-14
+c0,-2,0.3,-3.3,1,-4c1.3,-2.7,23.83,-20.7,67.5,-54
+c44.2,-33.3,65.8,-50.3,66.5,-51c1.3,-1.3,3,-2,5,-2c4.7,0,8.7,3.3,12,10
+s173,378,173,378c0.7,0,35.3,-71,104,-213c68.7,-142,137.5,-285,206.5,-429
+c69,-144,104.5,-217.7,106.5,-221
+l0 -0
+c5.3,-9.3,12,-14,20,-14
+H400000v40H845.2724
+s-225.272,467,-225.272,467s-235,486,-235,486c-2.7,4.7,-9,7,-19,7
+c-6,0,-10,-1,-12,-3s-194,-422,-194,-422s-65,47,-65,47z
+M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1328em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0.065</span></span></span></span> — six and a half
+points. The 95% interval for A is roughly <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>70</mn><mo>±</mo><mn>12.7</mn></mrow><annotation encoding="application/x-tex">70 \pm 12.7</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">70</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">±</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">12.7</span></span></span></span>, i.e. <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">[</mo><mn>57</mn><mo separator="true">,</mo><mn>83</mn><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">[57, 83]</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord">57</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">83</span><span class="mclose">]</span></span></span></span>.
+The six-point gap is half a standard error’s worth of nothing. Pairing
+sharpens it: suppose A and B agree on 41 items and disagree on 9, with A
+winning 6 of those 9. The question is now “is 6-of-9 different from
+chance?” — and the two-sided binomial probability of a split at least that
+lopsided is about 0.51. You have learned <em>nothing</em> about which model is
+better, despite a gap that would headline a launch post. To reliably detect
+a true 6-point difference you need roughly 400–500 paired items. The honest
+conclusions available from 50 items: “both are clearly above 50%,” and
+“neither is clearly above 80%.” Small evals answer coarse questions only —
+which is fine, because coarse questions (“is this model good enough to
+ship?”) are usually the real ones.</p></aside>
+<p>Now reread the GPQA Diamond situation from earlier with this lens: 198
+questions means <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">S</mi><mi mathvariant="normal">E</mi></mrow><mo>≈</mo><msqrt><mrow><mn>0.9</mn><mo>×</mo><mn>0.1</mn><mi mathvariant="normal">/</mi><mn>198</mn></mrow></msqrt><mo>≈</mo><mn>2.1</mn></mrow><annotation encoding="application/x-tex">\mathrm{SE} \approx \sqrt{0.9 \times 0.1/198} \approx 2.1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord"><span class="mord mathrm">SE</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.24em;vertical-align:-0.305em;"></span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.935em;"><span class="svg-align" style="top:-3.2em;"><span class="pstrut" style="height:3.2em;"></span><span class="mord" style="padding-left:1em;"><span class="mord">0.9</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">0.1/198</span></span></span><span style="top:-2.895em;"><span class="pstrut" style="height:3.2em;"></span><span class="hide-tail" style="min-width:1.02em;height:1.28em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="1.28em" viewBox="0 0 400000 1296" preserveAspectRatio="xMinYMin slice"><path d="M263,681c0.7,0,18,39.7,52,119
+c34,79.3,68.167,158.7,102.5,238c34.3,79.3,51.8,119.3,52.5,120
+c340,-704.7,510.7,-1060.3,512,-1067
+l0 -0
+c4.7,-7.3,11,-11,19,-11
+H40000v40H1012.3
+s-271.3,567,-271.3,567c-38.7,80.7,-84,175,-136,283c-52,108,-89.167,185.3,-111.5,232
+c-22.3,46.7,-33.8,70.3,-34.5,71c-4.7,4.7,-12.3,7,-23,7s-12,-1,-12,-1
+s-109,-253,-109,-253c-72.7,-168,-109.3,-252,-110,-252c-10.7,8,-22,16.7,-34,26
+c-22,17.3,-33.3,26,-34,26s-26,-26,-26,-26s76,-59,76,-59s76,-60,76,-60z
+M1001 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.305em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">2.1</span></span></span></span>
+points near the top of the range. Two frontier models reported at 89.1 and
+91.3 are one standard error apart — statistically indistinguishable even
+before contamination, scaffolds, and checkpoint selection enter the room.
+Most of the drama on any given week’s leaderboard is sampling noise wearing
+a press release.</p>
+<h2 id="what-benchmarks-cannot-see">What benchmarks cannot see</h2>
+<p>Suppose every pathology were fixed — clean sets, fixed harnesses, honest
+footnotes, error bars everywhere. Scored benchmarks would <em>still</em> miss most
+of what separates a useful model from an impressive one, because a scored
+question is a small, self-contained, verifiable unit, and most valuable work
+is none of those things.</p>
+<p><strong>Reliability over long horizons.</strong> A model that is 95% reliable per step
+completes a 50-step job about 8% of the time (<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>0.95</mn><mn>50</mn></msup><mo>≈</mo><mn>0.077</mn></mrow><annotation encoding="application/x-tex">0.95^{50} \approx 0.077</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord">0.9</span><span class="mord"><span class="mord">5</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">50</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0.077</span></span></span></span> — the
+compounding-error arithmetic from <a href="/groundup/book/agents-and-tools/">Chapter 44</a>).
+Per-question benchmarks measure the 95%; the product experience is the 8%.
+This is exactly the gap τ-bench’s pass^k and Vending-Bench’s rollout variance
+were designed to expose, and it is why two models with identical MMLU-Pro
+scores can be night and day as agents.</p>
+<p><strong>Taste and judgment.</strong> Which of three correct architectural approaches will
+be maintainable? When should the model push back on the user’s framing?
+What tone does this apology need? Un-benchmarkable in closed form, partially
+visible in arenas (with all the preference caveats above), and — ask any
+heavy user — where much of the real difference between frontier models now
+lives. This is why the model character and writing-quality evals of 2025–2026
+lean on rubric-graded LLM judges and expert panels rather than answer keys,
+and why those numbers deserve extra skepticism <em>and</em> extra attention.</p>
+<p><strong>Calibration.</strong> Two models with 75% accuracy are not equal if one <em>knows
+which</em> 25% it gets wrong. A well-calibrated model says “I’m not sure” in
+proportion to its actual error rate (<a href="/groundup/book/probability/">Chapter 6</a> built
+the machinery: calibration curves, Brier scores). Almost no launch post
+reports calibration; hallucination-rate evals gesture at it; for deployment
+it routinely matters more than three points of accuracy.</p>
+<p><strong>Real-world value.</strong> The number a business wants — how much time or
+money does this model save on our work — is confounded by scaffolds, user
+experience, latency, cost, and the humans in the loop. Randomized trials of developer
+productivity exist and have produced results in both directions (including a
+widely discussed 2025 trial by METR — Model Evaluation and Threat Research —
+where experienced open-source developers
+<em>felt</em> about 20% faster with AI tools while measuring as ~19% <em>slower</em> on
+their own repositories — one study, specific setting, but a permanent caution
+against trusting perceived usefulness).</p>
+<p>The most interesting attempt to measure what scores miss is METR’s
+<strong>time-horizon methodology</strong>
+(<a href="https://arxiv.org/abs/2503.14499">Kwa et al., 2025</a>). Instead of asking
+“what fraction of questions does the model answer,” it asks: <strong>how long a
+task can the model do?</strong> Take a large suite of tasks (mostly software and
+research engineering), measure how long each takes skilled <em>humans</em>, run
+models against them, and fit a curve of success probability versus
+human-task-length. Define the model’s <strong>50% time horizon</strong> as the task
+length at which it succeeds half the time. The headline findings: the 50%
+horizon of frontier models has doubled roughly every seven months since
+2019 — from seconds (GPT-2) to minutes (GPT-4) to around an hour by early
+2025 — with the most recent segment of the trend running faster (doubling
+times closer to four months in 2024–2025 data), and horizons measured in
+multiple hours claimed for 2026 models. Treat the specifics cautiously, as
+the authors themselves do: the task suite is software-flavored, “human time”
+depends on which humans, success is binary, and the 80%-reliability horizon
+is <em>far</em> shorter than the 50% horizon (roughly 5× shorter in their data) —
+a model that “can do one-hour tasks” half the time is a coin-flip intern,
+not an employee. But the <em>shape</em> of the metric is right: it measures the
+thing that per-question accuracy structurally cannot, it has a clear unit
+(human-minutes), and it produced a trend line that — if it continues —
+matters more than any leaderboard in this chapter. If it continues. Plot
+extrapolation is how every AI forecast, bullish and bearish alike, has
+embarrassed itself; the honest statement is that the measured trend has
+held for six years and nobody knows its ceiling.</p>
+<aside class="box box-practice" data-box="practice"><div class="box-title"><span class="box-icon" aria-hidden="true">⚙️</span>In practice</div><p>A working heuristic stack for reading any 2026 launch post, in order:</p><ol>
+<li><strong>Find the footnotes first.</strong> Attempts (pass@1?), consensus, tools,
+thinking budget, benchmark version, whose harness produced competitor
+numbers. If the conditions differ across a chart’s bars, discard the chart.</li>
+<li><strong>Locate each benchmark on its lifecycle.</strong> Gaps on saturated benchmarks
+(MMLU, HumanEval, needle-in-haystack) mean nothing; gaps on stage-2
+benchmarks (HLE, ARC-AGI-2, live agentic suites) mean something.</li>
+<li><strong>Do the error-bar arithmetic.</strong> <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msqrt><mrow><mi>p</mi><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>p</mi><mo stretchy="false">)</mo><mi mathvariant="normal">/</mi><mi>n</mi></mrow></msqrt></mrow><annotation encoding="application/x-tex">\sqrt{p(1-p)/n}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.24em;vertical-align:-0.305em;"></span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.935em;"><span class="svg-align" style="top:-3.2em;"><span class="pstrut" style="height:3.2em;"></span><span class="mord" style="padding-left:1em;"><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal">p</span><span class="mclose">)</span><span class="mord">/</span><span class="mord mathnormal">n</span></span></span><span style="top:-2.895em;"><span class="pstrut" style="height:3.2em;"></span><span class="hide-tail" style="min-width:1.02em;height:1.28em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="1.28em" viewBox="0 0 400000 1296" preserveAspectRatio="xMinYMin slice"><path d="M263,681c0.7,0,18,39.7,52,119
+c34,79.3,68.167,158.7,102.5,238c34.3,79.3,51.8,119.3,52.5,120
+c340,-704.7,510.7,-1060.3,512,-1067
+l0 -0
+c4.7,-7.3,11,-11,19,-11
+H40000v40H1012.3
+s-271.3,567,-271.3,567c-38.7,80.7,-84,175,-136,283c-52,108,-89.167,185.3,-111.5,232
+c-22.3,46.7,-33.8,70.3,-34.5,71c-4.7,4.7,-12.3,7,-23,7s-12,-1,-12,-1
+s-109,-253,-109,-253c-72.7,-168,-109.3,-252,-110,-252c-10.7,8,-22,16.7,-34,26
+c-22,17.3,-33.3,26,-34,26s-26,-26,-26,-26s76,-59,76,-59s76,-60,76,-60z
+M1001 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.305em;"><span></span></span></span></span></span></span></span></span> takes ten seconds; a
+2-point gap on a 200-question benchmark never survives it.</li>
+<li><strong>Wait for third-party reruns</strong> (Epoch AI, Artificial Analysis, academic
+harnesses, the arena’s style-controlled board) before updating hard.</li>
+<li><strong>Then ignore most of it and run your own eval</strong> — 50 real tasks from
+your workload, fixed harness, paired comparison. It is the only benchmark
+whose construct validity you control.</li>
+</ol></aside>
+<h2 id="where-this-leaves-us">Where this leaves us</h2>
+<ul>
+<li>A benchmark score is three choices — task distribution, protocol, grader —
+and Goodhart’s law guarantees that all three come under pressure the
+moment the score matters.</li>
+<li>You can now place the landscape: MMLU→MMLU-Pro (knowledge, saturated→
+refreshed), GPQA Diamond (Google-proof science, late-lifecycle), the math
+treadmill MATH→AIME→FrontierMath→HLE, code’s move from HumanEval puzzles
+to SWE-bench Verified’s real repositories, ARC-AGI’s abstraction test and
+the o3 cost-per-task moment, and the agentic suites (τ-bench’s pass^k,
+Vending-Bench’s long-horizon variance) that measure reliability rather
+than brilliance.</li>
+<li>Arenas measure <em>preference</em>, aggregated by Bradley–Terry into Elo-scale
+ratings; preference is real but rewards length, polish, and agreement, and
+the 2025 private-variant controversies showed the leaderboard itself can
+be gamed by best-of-N submission.</li>
+<li>The five pathologies — contamination, saturation/ceiling effects,
+prompt-and-scaffold sensitivity, selective reporting, and gamed-holdout
+governance — plus the lifecycle loop, are the checklist you run against
+any number before believing it.</li>
+<li>You can do the statistics: binomial standard errors, why adjacent
+leaderboard ranks are noise, and why a 6-point gap on a 50-item eval —
+or a 2-point gap on GPQA Diamond — supports no conclusion at all.</li>
+<li>The strongest evaluation you can run costs nothing: your own tasks, a
+fixed harness, paired grading, honest error bars.</li>
+<li>And the frontier of measurement is shifting from “what fraction correct”
+to “how long a task, how reliably” — METR-style horizons, agentic suites,
+and cost-per-task reporting — because that is where the remaining
+differences between models live.</li>
+</ul>
+<p>Benchmark numbers are one of the two currencies models compete in; the other
+is openness itself — weights, licenses, and who gets to verify any of these
+claims. That fight is next: <a href="/groundup/book/open-vs-closed/">Open vs Closed Models</a>.</p> <div class="papers-card" id="papers-card"> <div class="pc-title">Key papers &amp; readings in this chapter</div> <ul> <li> <div> <a href="https://arxiv.org/abs/2009.03300" target="_blank" rel="noopener">Measuring Massive Multitask Language Understanding</a> <span class="p-meta"> — Hendrycks et al., 2020</span> <span class="p-note">MMLU — the benchmark that defined the &quot;knowledge&quot; axis for five years, and the cleanest case study in saturation.</span> </div> </li><li> <div> <a href="https://arxiv.org/abs/2311.12022" target="_blank" rel="noopener">GPQA: A Graduate-Level Google-Proof Q&amp;A Benchmark</a> <span class="p-meta"> — Rein et al., 2023</span> <span class="p-note">The construction protocol (experts write, experts validate, non-experts fail even with Google) is the template for post-contamination benchmark design.</span> </div> </li><li> <div> <a href="https://arxiv.org/abs/2310.06770" target="_blank" rel="noopener">SWE-bench: Can Language Models Resolve Real-World GitHub Issues?</a> <span class="p-meta"> — Jimenez et al., 2023</span> <span class="p-note">The benchmark that moved coding evals from puzzles to real repositories — read Section 2 for how instances are built and graded.</span> </div> </li><li> <div> <a href="https://arxiv.org/abs/1911.01547" target="_blank" rel="noopener">On the Measure of Intelligence</a> <span class="p-meta"> — Chollet, 2019</span> <span class="p-note">The essay behind ARC-AGI — the argument that skill at a task is not intelligence unless you account for how the skill was acquired.</span> </div> </li><li> <div> <a href="https://arxiv.org/abs/2403.04132" target="_blank" rel="noopener">Chatbot Arena: An Open Platform for Evaluating LLMs by Human Preference</a> <span class="p-meta"> — Chiang et al., 2024</span> <span class="p-note">How blind pairwise votes become a leaderboard via the Bradley–Terry model; the statistics sections repay careful reading.</span> </div> </li><li> <div> <a href="https://arxiv.org/abs/2504.20879" target="_blank" rel="noopener">The Leaderboard Illusion</a> <span class="p-meta"> — Singh et al., 2025</span> <span class="p-note">The critique of arena practice — private variant testing, unequal sampling, data access — that made &quot;arena score&quot; a contested number in 2025.</span> </div> </li><li> <div> <a href="https://arxiv.org/abs/2503.14499" target="_blank" rel="noopener">Measuring AI Ability to Complete Long Tasks</a> <span class="p-meta"> — Kwa et al. (METR), 2025</span> <span class="p-note">The time-horizon methodology and the ~7-month doubling result — the most interesting alternative to score-based evaluation.</span> </div> </li><li> <div> <a href="https://arxiv.org/abs/2411.04872" target="_blank" rel="noopener">FrontierMath: A Benchmark for Evaluating Advanced Mathematical Reasoning in AI</a> <span class="p-meta"> — Glazer et al., 2024</span> <span class="p-note">Research-level math with a private answer set — both the promise of held-out benchmarks and (via its funding controversy) their governance problem.</span> </div> </li><li> <div> <a href="https://arxiv.org/abs/2406.01574" target="_blank" rel="noopener">MMLU-Pro: A More Robust and Challenging Multi-Task Language Understanding Benchmark</a> <span class="p-meta"> — Wang et al., 2024</span> <span class="p-note">What a &quot;v2&quot; benchmark looks like: more options, harder questions, reasoning required — a direct response to MMLU saturation.</span> </div> </li> </ul> </div> <nav class="chapter-nav"> <a href="/groundup/book/retrieval-augmented-generation/" class="prev"> <span class="dir">← Previous</span> <span class="t">Retrieval-Augmented Generation</span> </a> <a href="/groundup/book/open-vs-closed/" class="next"> <span class="dir">Next →</span> <span class="t">Open vs Closed Models</span> </a> </nav> <div class="chapter-foot"> <span>Last updated 2026-08-24</span> <a href="https://github.com/joewilbert/aisite/edit/main/src/content/book/46-benchmarks-and-evaluation.md" target="_blank" rel="noopener">Edit this chapter</a> <a href="https://github.com/joewilbert/aisite/issues/new" target="_blank" rel="noopener">Report an issue</a> </div> </article> </div>  </main> </div> <!-- Right panel: papers / tutor / notes --> <aside class="panel-host" id="panel" aria-label="Side panel"> <div class="panel-resizer" id="panel-resizer"></div> <div class="panel-tabs"> <button class="panel-tab" data-tab="paper">Paper</button> <button class="panel-tab" data-tab="tutor">AI tutor</button> <button class="panel-tab" data-tab="notes">Notes</button> <button class="hbtn panel-close" id="panel-close" aria-label="Close panel"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg> </button> </div> <div class="panel-body"> <div class="panel-view" data-view="paper" id="view-paper"></div> <div class="panel-view" data-view="tutor" id="view-tutor"></div> <div class="panel-view" data-view="notes" id="view-notes"></div> </div> </aside> <!-- Selection toolbar --> <div class="sel-toolbar" id="sel-toolbar"> <div class="swatches"> <button class="sw" data-color="yellow" style="background:var(--hl-yellow)" aria-label="Highlight yellow"></button> <button class="sw" data-color="green" style="background:var(--hl-green)" aria-label="Highlight green"></button> <button class="sw" data-color="blue" style="background:var(--hl-blue)" aria-label="Highlight blue"></button> <button class="sw" data-color="pink" style="background:var(--hl-pink)" aria-label="Highlight pink"></button> </div> <div class="divider"></div> <button id="sel-note">✎ Note</button> <button id="sel-explain">✦ Explain</button> <button id="sel-remove" style="display:none">✕ Remove</button> </div> <!-- Settings modal --> <div class="modal-scrim" id="settings-scrim"> <div class="modal" role="dialog" aria-label="Settings" id="settings-modal"></div> </div> <!-- Search modal --> <div class="modal-scrim" id="search-scrim"> <div class="modal search-modal" role="dialog" aria-label="Search"> <input class="q" id="search-input" type="text" placeholder="Search the book…" autocomplete="off"> <div class="search-results" id="search-results"></div> </div> </div> <script>(function(){const base = "/groundup";
+const slug = "benchmarks-and-evaluation";
+const pageTitle = "Benchmarks and How to Read Them · Ground Up";
+
+      window.__GU__ = { base, slug, pageTitle };
+    })();</script> <script type="module" src="/groundup/_astro/Base.astro_astro_type_script_index_0_lang.65xM_WgJ.js"></script>  </body></html>

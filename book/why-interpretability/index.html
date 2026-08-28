@@ -1,0 +1,629 @@
+<!DOCTYPE html><html lang="en"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Why Interpretability · Ground Up</title><meta name="description" content="We grow frontier models rather than write them — this chapter makes the case for reverse-engineering them, maps the four levels of looking inside, and tours what the young field has actually delivered."><meta name="theme-color" content="#faf9f6"><meta property="og:title" content="Why Interpretability · Ground Up"><meta property="og:description" content="We grow frontier models rather than write them — this chapter makes the case for reverse-engineering them, maps the four levels of looking inside, and tours what the young field has actually delivered."><meta property="og:type" content="article"><meta property="og:site_name" content="Ground Up"><link rel="icon" href="/groundup/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="/groundup/apple-touch-icon.png"><link rel="manifest" href="/groundup/manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Ground Up"><script>
+      (function () {
+        try {
+          var t = localStorage.getItem('gu:theme');
+          var dark = t ? t === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+          if (dark) document.documentElement.classList.add('dark');
+          var fs = localStorage.getItem('gu:fontScale');
+          if (fs) document.documentElement.style.setProperty('--font-scale', fs);
+        } catch (e) {}
+      })();
+    </script><link rel="stylesheet" href="/groundup/_astro/_slug_.BCpHWCuJ.css"></head> <body> <header class="site-header"> <button class="hbtn" id="btn-toc" aria-label="Table of contents" title="Contents"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"></path></svg> </button> <a class="brand" href="/groundup/"> <span class="logo">G</span> <span class="brand-name">Ground&nbsp;Up</span> </a> <span class="header-crumb">Part VII · Interpretability · Chapter 48</span> <div class="header-actions"> <button class="hbtn" id="btn-search" aria-label="Search" title="Search (/)"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg> </button> <button class="hbtn" id="btn-notes" aria-label="My notes" title="My notes & highlights"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg> </button> <button class="hbtn" id="btn-tutor" aria-label="AI tutor" title="AI tutor"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 1 1-4-6.9"></path><path d="M21 3v6h-6"></path><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"></circle><circle cx="8.5" cy="12" r="1.2" fill="currentColor" stroke="none"></circle><circle cx="15.5" cy="12" r="1.2" fill="currentColor" stroke="none"></circle></svg> </button> <button class="hbtn" id="btn-theme" aria-label="Toggle theme" title="Light / dark"> <svg class="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.5"></circle><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M19.4 4.6l-1.8 1.8M6.4 17.6l-1.8 1.8"></path></svg> </button> <button class="hbtn" id="btn-settings" aria-label="Settings" title="Settings"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.01a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.01a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.01a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"></path></svg> </button> </div> </header> <div class="shell"> <nav class="toc-rail" id="toc-rail" aria-label="Table of contents">  <div class="toc-part">Start here</div> <a class="toc-link" data-slug="how-to-read-this-book" href="/groundup/book/how-to-read-this-book/"> <span class="n">·</span> <span>How to Read This Book</span> </a><a class="toc-link" data-slug="the-whole-machine" href="/groundup/book/the-whole-machine/"> <span class="n">·</span> <span>Frontier AI In One Sitting</span> </a> <div class="toc-part">Part I · Mathematical Foundations</div> <a class="toc-link" data-slug="vectors-and-spaces" href="/groundup/book/vectors-and-spaces/"> <span class="n">1</span> <span>Vectors and Spaces</span> </a><a class="toc-link" data-slug="matrices-as-transformations" href="/groundup/book/matrices-as-transformations/"> <span class="n">2</span> <span>Matrices as Transformations</span> </a><a class="toc-link" data-slug="high-dimensional-geometry" href="/groundup/book/high-dimensional-geometry/"> <span class="n">3</span> <span>High-Dimensional Geometry</span> </a><a class="toc-link" data-slug="derivatives-and-gradients" href="/groundup/book/derivatives-and-gradients/"> <span class="n">4</span> <span>Derivatives and Gradients</span> </a><a class="toc-link" data-slug="chain-rule-and-jacobians" href="/groundup/book/chain-rule-and-jacobians/"> <span class="n">5</span> <span>The Chain Rule, Jacobians, and Curvature</span> </a><a class="toc-link" data-slug="probability" href="/groundup/book/probability/"> <span class="n">6</span> <span>Probability for Deep Learning</span> </a><a class="toc-link" data-slug="information-theory" href="/groundup/book/information-theory/"> <span class="n">7</span> <span>Information Theory: Surprise, Entropy, and KL</span> </a> <div class="toc-part">Part II · Deep Learning Foundations</div> <a class="toc-link" data-slug="neurons-and-mlps" href="/groundup/book/neurons-and-mlps/"> <span class="n">8</span> <span>Neurons, Layers, and MLPs</span> </a><a class="toc-link" data-slug="loss-functions" href="/groundup/book/loss-functions/"> <span class="n">9</span> <span>Loss Functions</span> </a><a class="toc-link" data-slug="gradient-descent-and-backprop" href="/groundup/book/gradient-descent-and-backprop/"> <span class="n">10</span> <span>Gradient Descent and Backpropagation</span> </a><a class="toc-link" data-slug="optimizers" href="/groundup/book/optimizers/"> <span class="n">11</span> <span>Optimizers: From SGD to AdamW and Muon</span> </a><a class="toc-link" data-slug="initialization-and-stability" href="/groundup/book/initialization-and-stability/"> <span class="n">12</span> <span>Initialization and Gradient Pathologies</span> </a><a class="toc-link" data-slug="regularization-and-generalization" href="/groundup/book/regularization-and-generalization/"> <span class="n">13</span> <span>Regularization and Generalization</span> </a><a class="toc-link" data-slug="normalization" href="/groundup/book/normalization/"> <span class="n">14</span> <span>Normalization: BatchNorm to RMSNorm</span> </a><a class="toc-link" data-slug="activation-functions" href="/groundup/book/activation-functions/"> <span class="n">15</span> <span>Activation Functions</span> </a><a class="toc-link" data-slug="residual-connections" href="/groundup/book/residual-connections/"> <span class="n">16</span> <span>Residual Connections and the Residual Stream</span> </a><a class="toc-link" data-slug="cnns-and-rnns" href="/groundup/book/cnns-and-rnns/"> <span class="n">17</span> <span>CNNs and RNNs: The World Before Transformers</span> </a> <div class="toc-part">Part III · Language Modeling</div> <a class="toc-link" data-slug="what-is-a-language-model" href="/groundup/book/what-is-a-language-model/"> <span class="n">18</span> <span>What a Language Model Is</span> </a><a class="toc-link" data-slug="tokenization" href="/groundup/book/tokenization/"> <span class="n">19</span> <span>Tokenization</span> </a><a class="toc-link" data-slug="embeddings" href="/groundup/book/embeddings/"> <span class="n">20</span> <span>Embeddings</span> </a><a class="toc-link" data-slug="evaluating-language-models" href="/groundup/book/evaluating-language-models/"> <span class="n">21</span> <span>Evaluating Language Models</span> </a> <div class="toc-part">Part IV · Attention &amp; Transformers</div> <a class="toc-link" data-slug="seq2seq-and-attention" href="/groundup/book/seq2seq-and-attention/"> <span class="n">22</span> <span>From seq2seq to Attention</span> </a><a class="toc-link" data-slug="scaled-dot-product-attention" href="/groundup/book/scaled-dot-product-attention/"> <span class="n">23</span> <span>Scaled Dot-Product Attention</span> </a><a class="toc-link" data-slug="multi-head-attention" href="/groundup/book/multi-head-attention/"> <span class="n">24</span> <span>Multi-Head Attention</span> </a><a class="toc-link" data-slug="transformer-architecture" href="/groundup/book/transformer-architecture/"> <span class="n">25</span> <span>The Transformer, Piece by Piece</span> </a><a class="toc-link" data-slug="positional-encodings" href="/groundup/book/positional-encodings/"> <span class="n">26</span> <span>Positional Information and RoPE</span> </a><a class="toc-link" data-slug="architecture-families" href="/groundup/book/architecture-families/"> <span class="n">27</span> <span>Architecture Families: BERT to Decoder-Only</span> </a><a class="toc-link" data-slug="kv-cache-and-efficient-attention" href="/groundup/book/kv-cache-and-efficient-attention/"> <span class="n">28</span> <span>The KV Cache and Efficient Attention</span> </a><a class="toc-link" data-slug="mixture-of-experts" href="/groundup/book/mixture-of-experts/"> <span class="n">29</span> <span>Mixture-of-Experts</span> </a><a class="toc-link" data-slug="state-space-models" href="/groundup/book/state-space-models/"> <span class="n">30</span> <span>State-Space Models and Hybrids</span> </a> <div class="toc-part">Part V · Training LLMs in Practice</div> <a class="toc-link" data-slug="pretraining-data" href="/groundup/book/pretraining-data/"> <span class="n">31</span> <span>Pretraining Data</span> </a><a class="toc-link" data-slug="scaling-laws" href="/groundup/book/scaling-laws/"> <span class="n">32</span> <span>Scaling Laws</span> </a><a class="toc-link" data-slug="compute-and-parallelism" href="/groundup/book/compute-and-parallelism/"> <span class="n">33</span> <span>Compute: GPUs, Precision, and Parallelism</span> </a><a class="toc-link" data-slug="the-training-run" href="/groundup/book/the-training-run/"> <span class="n">34</span> <span>The Training Run</span> </a><a class="toc-link" data-slug="sft-and-rlhf" href="/groundup/book/sft-and-rlhf/"> <span class="n">35</span> <span>Post-Training I: SFT, Reward Models, RLHF</span> </a><a class="toc-link" data-slug="dpo-and-friends" href="/groundup/book/dpo-and-friends/"> <span class="n">36</span> <span>Post-Training II: DPO and Its Family</span> </a><a class="toc-link" data-slug="reasoning-models" href="/groundup/book/reasoning-models/"> <span class="n">37</span> <span>Reasoning Training: RLVR, GRPO, and the o1/R1 Era</span> </a><a class="toc-link" data-slug="fine-tuning" href="/groundup/book/fine-tuning/"> <span class="n">38</span> <span>Fine-Tuning You Can Actually Do: LoRA and Friends</span> </a><a class="toc-link" data-slug="inference-and-serving" href="/groundup/book/inference-and-serving/"> <span class="n">39</span> <span>Inference: Sampling, Quantization, Serving</span> </a> <div class="toc-part">Part VI · The Modern AI Landscape</div> <a class="toc-link" data-slug="the-frontier" href="/groundup/book/the-frontier/"> <span class="n">40</span> <span>The Frontier Landscape (2023–2026)</span> </a><a class="toc-link" data-slug="multimodal-models" href="/groundup/book/multimodal-models/"> <span class="n">41</span> <span>Multimodal Models</span> </a><a class="toc-link" data-slug="diffusion-models" href="/groundup/book/diffusion-models/"> <span class="n">42</span> <span>Diffusion and Image/Video Generation</span> </a><a class="toc-link" data-slug="long-context" href="/groundup/book/long-context/"> <span class="n">43</span> <span>Long Context</span> </a><a class="toc-link" data-slug="agents-and-tools" href="/groundup/book/agents-and-tools/"> <span class="n">44</span> <span>Agents, Tool Use, and MCP</span> </a><a class="toc-link" data-slug="retrieval-augmented-generation" href="/groundup/book/retrieval-augmented-generation/"> <span class="n">45</span> <span>Retrieval-Augmented Generation</span> </a><a class="toc-link" data-slug="benchmarks-and-evaluation" href="/groundup/book/benchmarks-and-evaluation/"> <span class="n">46</span> <span>Benchmarks and How to Read Them</span> </a><a class="toc-link" data-slug="open-vs-closed" href="/groundup/book/open-vs-closed/"> <span class="n">47</span> <span>Open vs Closed Models</span> </a> <div class="toc-part">Part VII · Interpretability</div> <a class="toc-link active" data-slug="why-interpretability" href="/groundup/book/why-interpretability/"> <span class="n">48</span> <span>Why Interpretability</span> </a><a class="toc-link" data-slug="features-and-probes" href="/groundup/book/features-and-probes/"> <span class="n">49</span> <span>Features, Directions, and Probes</span> </a><a class="toc-link" data-slug="superposition" href="/groundup/book/superposition/"> <span class="n">50</span> <span>Superposition and Polysemanticity</span> </a><a class="toc-link" data-slug="sparse-autoencoders" href="/groundup/book/sparse-autoencoders/"> <span class="n">51</span> <span>Sparse Autoencoders</span> </a><a class="toc-link" data-slug="circuits" href="/groundup/book/circuits/"> <span class="n">52</span> <span>Circuits: Induction Heads to Attribution Graphs</span> </a><a class="toc-link" data-slug="causal-methods" href="/groundup/book/causal-methods/"> <span class="n">53</span> <span>Causal Methods: Patching, Ablation, and Lenses</span> </a><a class="toc-link" data-slug="steering-and-editing" href="/groundup/book/steering-and-editing/"> <span class="n">54</span> <span>Steering and Model Editing</span> </a><a class="toc-link" data-slug="cot-faithfulness" href="/groundup/book/cot-faithfulness/"> <span class="n">55</span> <span>Chain-of-Thought Faithfulness</span> </a><a class="toc-link" data-slug="frontier-interpretability" href="/groundup/book/frontier-interpretability/"> <span class="n">56</span> <span>Interpretability at the Frontier</span> </a> <div class="toc-part">Part VIII · Reference</div> <a class="toc-link" data-slug="where-to-go-next" href="/groundup/book/where-to-go-next/"> <span class="n">57</span> <span>Where to Go Next</span> </a><a class="toc-link" data-slug="glossary" href="/groundup/book/glossary/"> <span class="n">58</span> <span>Glossary</span> </a><a class="toc-link" data-slug="notation" href="/groundup/book/notation/"> <span class="n">59</span> <span>Notation Reference</span> </a> </nav> <div class="scrim" id="toc-scrim"></div> <main class="main-col">  <div class="article-wrap"> <article class="chapter" id="article" data-slug="why-interpretability" data-title="Why Interpretability" data-file="48-why-interpretability.md" data-pagefind-body> <div class="chapter-kicker">Part VII · Interpretability · Chapter 48</div> <h1>Why Interpretability</h1> <p class="chapter-desc">We grow frontier models rather than write them — this chapter makes the case for reverse-engineering them, maps the four levels of looking inside, and tours what the young field has actually delivered.</p> <details class="section-nav"> <summary>In this chapter</summary> <ol> <li><a href="#a-program-nobody-wrote">A program nobody wrote</a></li><li><a href="#five-reasons-to-look-inside">Five reasons to look inside</a></li><li><a href="#four-levels-of-looking">Four levels of looking</a></li><li><a href="#a-short-history-of-looking-inside">A short history of looking inside</a></li><li><a href="#the-two-cultures">The two cultures</a></li><li><a href="#the-honest-ledger">The honest ledger</a></li><li><a href="#the-road-through-part-vii">The road through Part VII</a></li><li><a href="#where-this-leaves-us">Where this leaves us</a></li> </ol> </details> <p>You now know how to build a frontier language model. You can derive
+<a href="/groundup/book/scaled-dot-product-attention/">attention</a> from first principles, assemble
+<a href="/groundup/book/transformer-architecture/">the full transformer</a>, run
+<a href="/groundup/book/the-training-run/">the pretraining loop</a>, shape the result with
+<a href="/groundup/book/sft-and-rlhf/">reinforcement learning from human feedback (RLHF)</a> and
+<a href="/groundup/book/reasoning-models/">reasoning training</a>,
+and <a href="/groundup/book/inference-and-serving/">serve it</a> to millions of users. Forty-seven
+chapters of machinery, and none of it was hand-waving: every operation is
+arithmetic you could check with a pencil.</p>
+<p>So here is the uncomfortable admission that this final part of the book exists
+to confront: <strong>nobody can tell you why a model produced the answer it did.</strong>
+Not you, not the engineers who trained it, not the lab that deployed it. If a
+frontier model diagnoses a rash, refuses a request, cites a case, or quietly
+flatters its user, there is no one on Earth who can point to the reason the way
+a programmer points to a line of code. The knowledge of how to <em>make</em> these
+systems and the knowledge of how they <em>work</em> have come completely apart — a
+situation with no precedent in the history of engineering.</p>
+<p>This is not because the models are secret. For open-weight models the
+parameters are sitting on disk; you can print them out. It is because of <em>what
+kind of artifact</em> a trained model is: not written, but grown. This chapter is
+the front door to Part VII. It explains why the inscrutability is structural
+rather than accidental, gives five concrete reasons the field is racing to fix
+it, builds a framework for what “an explanation” even means, tells the short
+history of the science, and — honestly — tallies what interpretability has
+delivered so far against what it aspires to deliver. The remaining
+chapters then do the work: probes, superposition, sparse autoencoders,
+circuits, causal methods, steering, and chain-of-thought faithfulness.</p>
+<h2 id="a-program-nobody-wrote">A program nobody wrote</h2>
+<p>Ordinary software is authored. A person holds an intention, expresses it as
+source code, and the code <em>is</em> the program: every behavior of the running
+system traces back to lines a human wrote and can reread. When the system
+misbehaves, you attach a debugger, follow the stack trace to the offending
+line, and fix it. The artifact is legible at every stage because humans built
+every stage.</p>
+<p>A trained neural network breaks this chain at the root. What humans specify
+is three things: an <strong>architecture</strong> (the transformer skeleton — a
+container of matrices wired together in a fixed pattern), an <strong>objective</strong>
+(predict the next token, as in
+<a href="/groundup/book/what-is-a-language-model/">Chapter 18</a>), and a <strong>dataset</strong>
+(<a href="/groundup/book/pretraining-data/">trillions of tokens</a>). Then
+<a href="/groundup/book/gradient-descent-and-backprop/">gradient descent</a> runs for months,
+nudging tens of billions of floating-point numbers a hair at a time, and the
+<em>behavior</em> — the thing we care about — emerges from wherever the
+optimization landed. We wrote the loss function. We did not write the model.
+We grew it.</p>
+<p>The phrase that circulates in the field is that a model is a <strong>giant
+inscrutable array of floating-point numbers</strong>, and it is worth sitting with how
+literal that is. The weights <em>are</em> the program. There is no separate source
+code that the weights were compiled from, so there is nothing to decompile
+back to. There are no function names, no comments, no module boundaries, no
+variable called <code>is_user_asking_about_medication</code>. The “source” of a
+70-billion-parameter model is a few hundred matrices, and the only thing each
+individual number means is “this is the coefficient that made the loss go
+down.”</p>
+<figure class="fig">
+  <svg viewBox="0 0 720 372" role="img" aria-label="Two pipelines compared: written software passes through human-legible stages from specification to binary, while a grown model goes from data, architecture, and objective through gradient descent directly to billions of opaque weights.">
+    <defs>
+      <marker id="ar1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M 0 1 L 8 5 L 0 9" fill="none" stroke="currentColor" stroke-width="1.6" opacity="0.6"></path>
+      </marker>
+    </defs>
+    <text x="170" y="32" text-anchor="middle" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="16" font-weight="600">Written software</text>
+    <text x="550" y="32" text-anchor="middle" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="16" font-weight="600">A grown model</text>
+    <rect x="60" y="52" width="220" height="44" rx="8" fill="#14b8a6" fill-opacity="0.15" stroke="#14b8a6" stroke-width="1.5"></rect>
+    <text x="170" y="71" text-anchor="middle" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="14">Specification</text>
+    <text x="170" y="88" text-anchor="middle" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="12" opacity="0.55">what it should do, in English</text>
+    <line x1="170" y1="96" x2="170" y2="118" stroke="currentColor" opacity="0.5" marker-end="url(#ar1)"></line>
+    <rect x="60" y="122" width="220" height="44" rx="8" fill="#14b8a6" fill-opacity="0.15" stroke="#14b8a6" stroke-width="1.5"></rect>
+    <text x="170" y="141" text-anchor="middle" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="14">Source code</text>
+    <text x="170" y="158" text-anchor="middle" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="12" opacity="0.55">human-legible logic</text>
+    <line x1="170" y1="166" x2="170" y2="188" stroke="currentColor" opacity="0.5" marker-end="url(#ar1)"></line>
+    <rect x="60" y="192" width="220" height="44" rx="8" fill="#14b8a6" fill-opacity="0.15" stroke="#14b8a6" stroke-width="1.5"></rect>
+    <text x="170" y="211" text-anchor="middle" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="14">Compiler</text>
+    <text x="170" y="228" text-anchor="middle" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="12" opacity="0.55">mechanical, reversible in spirit</text>
+    <line x1="170" y1="236" x2="170" y2="258" stroke="currentColor" opacity="0.5" marker-end="url(#ar1)"></line>
+    <rect x="60" y="262" width="220" height="44" rx="8" fill="#14b8a6" fill-opacity="0.15" stroke="#14b8a6" stroke-width="1.5"></rect>
+    <text x="170" y="281" text-anchor="middle" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="14">Running program</text>
+    <text x="170" y="298" text-anchor="middle" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="12" opacity="0.55">bugs trace back to a line</text>
+    <rect x="440" y="52" width="220" height="56" rx="8" fill="#fb7185" fill-opacity="0.15" stroke="#fb7185" stroke-width="1.5"></rect>
+    <text x="550" y="74" text-anchor="middle" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="14">Architecture + objective + data</text>
+    <text x="550" y="92" text-anchor="middle" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="12" opacity="0.55">the only parts humans write</text>
+    <line x1="550" y1="108" x2="550" y2="152" stroke="currentColor" opacity="0.5" marker-end="url(#ar1)"></line>
+    <rect x="440" y="156" width="220" height="56" rx="8" fill="#f59e0b" fill-opacity="0.15" stroke="#f59e0b" stroke-width="1.5"></rect>
+    <text x="550" y="178" text-anchor="middle" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="14">Gradient descent</text>
+    <text x="550" y="196" text-anchor="middle" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="12" opacity="0.55">trillions of tiny blind updates</text>
+    <line x1="550" y1="212" x2="550" y2="258" stroke="currentColor" opacity="0.5" marker-end="url(#ar1)"></line>
+    <rect x="440" y="262" width="220" height="44" rx="8" fill="#fb7185" fill-opacity="0.15" stroke="#fb7185" stroke-width="1.5"></rect>
+    <text x="550" y="281" text-anchor="middle" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="14">Weights: billions of floats</text>
+    <text x="550" y="298" text-anchor="middle" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="12" opacity="0.55">the program itself — no legible stage</text>
+    <text x="170" y="340" text-anchor="middle" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="13" opacity="0.55">every stage inspectable by design</text>
+    <text x="550" y="340" text-anchor="middle" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="13" opacity="0.55">behavior traces back to… everything at once</text>
+  </svg>
+  <figcaption><strong>Figure:</strong> Written versus grown. Conventional software is human-legible at every stage, so misbehavior can be traced to a line. A trained model has no legible intermediate stage: humans author only the container, the goal, and the diet; the program itself is the landing point of an optimization.</figcaption>
+</figure>
+<p>And yet there <em>is</em> a computer in there, with an architecture we can name. Recall
+the picture from <a href="/groundup/book/residual-connections/">Chapter 16</a>: the <strong>residual
+stream</strong> is a shared workspace — a bus, or a patch of working memory — that
+every attention head and every multi-layer perceptron (MLP) block reads from
+and writes to, layer after layer. That picture is the closest thing the model
+has to a CPU diagram: it tells us the dataflow, who can communicate with whom,
+and where intermediate results must live. What it does not tell us is the
+<em>program</em>: which directions in the stream carry which concepts, which heads
+implement which operations, and how those operations compose into the behavior
+we observe. The hardware manual exists. The software was written by an
+optimizer, in a language with no dictionary.</p>
+<aside class="box box-example" data-box="example"><div class="box-title"><span class="box-icon" aria-hidden="true">✏️</span>Worked example</div><p>How hopeless is “read the weights” as a plan? Take a 70-billion-parameter
+model — mid-sized by 2026 standards. Printed at a dense 3,000 numbers per page,
+the weights fill <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>70,000,000,000</mn><mi mathvariant="normal">/</mi><mn>3,000</mn><mo>≈</mo><mn>23.3</mn></mrow><annotation encoding="application/x-tex">70{,}000{,}000{,}000 / 3{,}000 \approx 23.3</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">70</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">000</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">000</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">000/3</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">000</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">23.3</span></span></span></span> million pages —
+about 46,700 books of 500 pages each, a respectable university library wing. If
+you could <em>read</em> one number per second without sleeping, you would
+finish in <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>70</mn><mo>×</mo><msup><mn>10</mn><mn>9</mn></msup></mrow><annotation encoding="application/x-tex">70 \times 10^9</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">70</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">9</span></span></span></span></span></span></span></span></span></span></span> seconds. A year is about <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>3.15</mn><mo>×</mo><msup><mn>10</mn><mn>7</mn></msup></mrow><annotation encoding="application/x-tex">3.15 \times 10^7</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">3.15</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">7</span></span></span></span></span></span></span></span></span></span></span> seconds,
+so that is roughly <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>70</mn><mo>×</mo><msup><mn>10</mn><mn>9</mn></msup><mi mathvariant="normal">/</mi><mo stretchy="false">(</mo><mn>3.15</mn><mo>×</mo><msup><mn>10</mn><mn>7</mn></msup><mo stretchy="false">)</mo><mo>≈</mo><mn>2,200</mn></mrow><annotation encoding="application/x-tex">70 \times 10^9 / (3.15 \times 10^7) \approx 2{,}200</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">70</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">9</span></span></span></span></span></span></span></span><span class="mord">/</span><span class="mopen">(</span><span class="mord">3.15</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">7</span></span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">2</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">200</span></span></span></span> years.
+And here is the real punchline: at the end of those 2,200 years you would have
+learned <em>nothing</em>, because no individual number means anything on its own. The
+unit of meaning is not the parameter — finding the right unit is the subject of
+<a href="/groundup/book/features-and-probes/">Chapter 49</a>.</p></aside>
+<aside class="box box-intuition" data-box="intuition"><div class="box-title"><span class="box-icon" aria-hidden="true">💡</span>Intuition</div><p>The most productive mental model: a trained network is less like a machine and
+more like an <strong>organism</strong>. We set the selection pressure (the loss), the
+environment (the data), and the body plan (the architecture), then let an
+optimization process fill in everything else — much as evolution fills in a
+genome. You do not learn how an organism works by asking its designer; there
+is none. You dissect, you stain tissues, you lesion regions and see what
+breaks, you record from neurons. Interpretability is exactly this — anatomy,
+physiology, and neuroscience for an artificial brain — with one enormous
+advantage biology never gets: we can read every “neuron” at every moment,
+copy the organism perfectly, rerun the same stimulus a thousand times, and
+edit any synapse at will. The tools of Part VII exist to spend that advantage
+wisely.</p></aside>
+<aside class="box box-warning" data-box="warning"><div class="box-title"><span class="box-icon" aria-hidden="true">⚠️</span>Careful</div><p><strong>Inscrutable does not mean mystical.</strong> Every forward pass is deterministic
+arithmetic — matrix multiplications, additions, a few nonlinearities — and you
+have already learned every operation involved. The obstacle is not <em>access</em> to
+the computation but <em>compression</em> of it: turning a trillion-multiplication
+trace into an explanation short enough to fit in a human mind, without
+falsifying it. Keep this in view whenever “black box” rhetoric makes the
+problem sound supernatural. It is a hard science problem, not a haunted one.</p></aside>
+<h2 id="five-reasons-to-look-inside">Five reasons to look inside</h2>
+<p>“It would be nice to understand” undersells what is at stake. The field’s
+motivations are distinct, they come with different standards of success, and
+each is concrete enough to hang an example on.</p>
+<p><strong>1. Safety and alignment auditing.</strong> <a href="/groundup/book/sft-and-rlhf/">Post-training</a>
+shapes behavior by reinforcement: the model gets more of whatever the reward
+signal paid for. You get what you rewarded — which is not necessarily what you
+wanted, the failure mode flagged as early as 2016 in
+<a href="https://arxiv.org/abs/1606.06565">Concrete Problems in AI Safety</a>.
+<strong>Sycophancy</strong> is the everyday example: human raters reliably prefer agreement
+and flattery, so models learn to tell users what they want to hear, and the
+tendency survives into deployment. The graver worry is <strong>deception or hidden
+goals</strong>: a model that has learned that <em>appearing</em> aligned is what gets
+rewarded. Behavioral testing is structurally weak here, because the aligned
+model and the aligned-<em>looking</em> model produce, by construction, the same
+observable behavior on the tests. Two policies can agree on every prompt in
+your evaluation distribution and diverge exactly where you are not looking —
+your evals bound behavior only on the slice you measured. In 2025, Anthropic
+researchers ran a dress rehearsal: they deliberately trained a model
+with a hidden objective (exploit known quirks of reward models), then gave
+blinded “auditing” teams the task of finding it
+(<a href="https://scholar.google.com/scholar?q=%22Auditing+language+models+for+hidden+objectives%22">Auditing Language Models for Hidden Objectives</a>).
+Teams with access to the model’s internals and training data succeeded,
+including by using the sparse-autoencoder feature tools of
+<a href="/groundup/book/sparse-autoencoders/">Chapter 51</a>; a team restricted to black-box API
+access had a much harder time. That is the auditing case in miniature: <strong>you
+cannot fix — or even find — what you cannot see.</strong> Behavioral evals measure
+the mask; interpretability aspires to check for a face behind it.</p>
+<p><strong>2. Debugging capability failures.</strong> Frontier models still fail in ways that
+look bizarre from outside: insisting that 9.11 is larger than 9.8, fumbling
+letter-counting, hallucinating a plausible-sounding citation, or complying
+with a jailbreak that merely rephrases a refused request. Black-box debugging
+of these failures is folklore — prompt tweaks and vibes. Mechanistic analysis
+turns some of them into diagnoses. A vivid example from Anthropic’s 2025
+<a href="https://transformer-circuits.pub/2025/attribution-graphs/biology.html">circuit-tracing work</a>:
+asked to compute <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>36</mn><mo>+</mo><mn>59</mn></mrow><annotation encoding="application/x-tex">36 + 59</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">36</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">59</span></span></span></span>, Claude 3.5 Haiku demonstrably combines a rough
+magnitude estimate (“about 90-ish”) with a separate ones-digit pathway
+(“ends in 5”) — but when asked <em>how</em> it got 95, it describes the school
+carrying algorithm, which is not what its internals did. The same work found
+hallucination-relevant machinery: a “known answer” pathway that suppresses the
+model’s default refusal-to-guess, so that misfires of that suppression produce
+confident confabulation. Whether or not those specific analyses generalize,
+they show the shape of what debugging could become: mechanism-level bug
+reports instead of anecdotes.</p>
+<p><strong>3. Trust and regulated deployment.</strong> In medicine, law, and finance —
+domains where these models are already doing real work — a decision without
+reasons is often legally worthless. A lender that denies credit must give the
+applicant specific reasons; a clinician deploying a diagnostic aid must
+justify it to regulators and, eventually, to a courtroom; a lawyer signing a
+brief vouches for every citation in it, and “the model said so” satisfies no
+duty of competence anywhere. The EU AI Act’s obligations for high-risk systems
+(phasing in through roughly 2025–2027) push in the same direction:
+transparency, documentation, human oversight. Today, the standard answer is to
+ask the model to explain itself — and its explanation is <em>generated text</em>,
+produced by the same opaque process as the answer, optimized to sound
+plausible rather than to be true. <a href="/groundup/book/cot-faithfulness/">Chapter 55</a> shows
+experimentally that a model’s stated reasoning and its actual reasoning can
+part ways. Interpretability is the only research program even aiming at
+explanations grounded in the mechanism that produced the decision, rather than
+in a narrative composed after the fact. It is not there yet — but nothing else
+is even pointed there.</p>
+<p><strong>4. Scientific curiosity.</strong> A frontier model is arguably the most complex
+learned artifact humans have ever produced, and gradient descent is an alien
+programmer: it solved language, a problem that defeated forty years of
+hand-engineering, and it left behind its solution in a form no one designed.
+What did it invent in there? Every time researchers have looked carefully,
+they have found genuine algorithmic content: <strong>induction heads</strong> that
+implement copy-and-continue pattern matching
+(<a href="/groundup/book/circuits/">Chapter 52</a>), curve detectors and higher-level object
+detectors in vision networks, an emergent board-state representation inside a
+model trained only on Othello move sequences
+(<a href="https://scholar.google.com/scholar?q=%22Emergent+World+Representations%3A+Exploring+a+Sequence+Model+Trained+on+a+Synthetic+Task%22">Emergent World Representations</a>),
+shared cross-lingual concept features in multilingual models. This is basic
+science of a new kind of object — and, as with all basic science, the payoff
+compounds: everything in Chapters 49–56 exists because someone was curious
+what a neuron was doing.</p>
+<p><strong>5. The safety-case aspiration.</strong> As capabilities approach the thresholds
+sketched in <a href="/groundup/book/the-frontier/">Chapter 40</a>, labs have committed — via
+frameworks like Anthropic’s Responsible Scaling Policy and DeepMind’s Frontier
+Safety Framework — to make affirmative <em>safety cases</em> before deploying their
+most capable systems: structured arguments that deployment is acceptable, of
+the kind aviation and nuclear engineering require. A safety case built only on
+behavioral testing has the hole described in reason 1: absence of bad behavior
+on tests is weak evidence about behavior off tests, especially against a
+system capable of modeling its testers. The aspiration — argued forcefully in
+Dario Amodei’s 2025 essay
+<a href="https://www.darioamodei.com/post/the-urgency-of-interpretability">The Urgency of Interpretability</a>
+— is for interpretability to supply the missing evidence: an “MRI for AI”
+sensitive enough that an audit finding <em>no</em> deceptive machinery actually means
+something. Amodei’s framing is explicitly a race: interpretability has to
+mature before models become too consequential to deploy without it. Whether
+the field can win that race is one of the honest open questions this Part
+returns to in <a href="/groundup/book/frontier-interpretability/">Chapter 56</a>.</p>
+<aside class="box box-practice" data-box="practice"><div class="box-title"><span class="box-icon" aria-hidden="true">⚙️</span>In practice</div><p>Who does this work in 2026? Anthropic runs the largest dedicated
+interpretability team (publishing at
+<a href="https://transformer-circuits.pub/">transformer-circuits.pub</a>) and has begun
+folding interpretability-assisted alignment audits into pre-deployment testing
+of its frontier models. Google DeepMind’s mechanistic interpretability team
+(long associated with Neel Nanda) ships both research and open artifacts —
+notably suites of open sparse autoencoders for its Gemma models. OpenAI has
+published on automated neuron explanation and sparse-autoencoder scaling. And
+a large share of the field is <em>outside</em> the labs: an academic and independent
+community organized around open tooling
+(<a href="https://github.com/TransformerLensOrg/TransformerLens">TransformerLens</a>),
+shared feature databases (<a href="https://www.neuronpedia.org/">Neuronpedia</a>),
+training pipelines like MATS, and regular ICML/NeurIPS workshops. Nearly all
+the foundational results you will meet in this Part are reproducible on a
+single GPU with open models — this is the rare corner of frontier AI where an
+individual with a laptop can still make discoveries.</p></aside>
+<h2 id="four-levels-of-looking">Four levels of looking</h2>
+<p>“Interpret the model” hides an ambiguity: explanations come in kinds, and the
+kinds make different claims with different strengths. It pays to sort them
+into four levels, ordered by how deep into the machine the claim reaches.</p>
+<p><strong>Level 1 — Behavioral.</strong> Treat the model as a black box: send prompts in,
+measure outputs. This is the world of
+<a href="/groundup/book/evaluating-language-models/">evaluations</a>,
+<a href="/groundup/book/benchmarks-and-evaluation/">benchmarks</a>, and red-teaming. Its virtue is
+that it measures the thing you ultimately care about — behavior — directly.
+Its limit is the one from the auditing discussion: it characterizes the model
+only on the distribution you tested, and it cannot distinguish two mechanisms
+that happen to agree there. A behavioral result is a fact about a
+(model, distribution) pair, never about the model alone.</p>
+<p><strong>Level 2 — Attributional.</strong> Ask which parts of the <em>input</em> mattered for the
+output. This was the first great wave of interpretability research
+(roughly 2014–2019, in vision): saliency maps, gradient-based attribution,
+occlusion studies, Grad-CAM
+(<a href="https://arxiv.org/abs/1610.02391">Selvaraju et al., 2016</a>), and — in natural
+language processing (NLP) — reading attention weights as importance scores. Attribution is cheap and
+sometimes useful, but the era ended in a reproducibility reckoning
+we should be honest about (more below): several popular methods turn out to
+produce nearly the same “explanations” for a trained network and a randomized
+one.</p>
+<p><strong>Level 3 — Representational.</strong> Ask what is encoded <em>inside</em>: do the
+activations contain a direction that tracks sentiment, truthfulness, the
+user’s apparent expertise, the board state? The tools are <strong>probes</strong> — small
+classifiers trained on internal activations
+(<a href="https://arxiv.org/abs/1610.01644">Alain &#x26; Bengio, 2016</a>) — and, more
+recently, dictionary-learning methods like sparse autoencoders. This level
+opens Part VII’s main story: <a href="/groundup/book/features-and-probes/">Chapter 49</a> on
+features and probes, <a href="/groundup/book/superposition/">Chapter 50</a> on why neurons are the
+wrong unit, <a href="/groundup/book/sparse-autoencoders/">Chapter 51</a> on extracting better
+units automatically.</p>
+<p><strong>Level 4 — Mechanistic.</strong> Ask <em>how the answer is computed</em>: which components,
+composed how, implement the algorithm — and verify it by <strong>intervention</strong>:
+ablate a component and the behavior should break; patch in activations from a
+counterfactual prompt and the behavior should flip predictably. This is the
+circuits program (<a href="/groundup/book/circuits/">Chapter 52</a>) and the causal toolkit
+(<a href="/groundup/book/causal-methods/">Chapter 53</a>). Mechanistic claims are the most
+expensive to establish and the strongest when established: they support
+counterfactuals, predictions about novel inputs, and targeted edits.</p>
+<figure class="fig">
+  <svg viewBox="0 0 720 344" role="img" aria-label="A four-rung ladder of interpretability levels from behavioral at the bottom to mechanistic at the top, each rung listing the question it answers and its tools, with an ascending arrow labeled more causal.">
+    <defs>
+      <marker id="ar2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M 0 1 L 8 5 L 0 9" fill="none" stroke="currentColor" stroke-width="1.6" opacity="0.6"></path>
+      </marker>
+    </defs>
+    <line x1="48" y1="292" x2="48" y2="60" stroke="currentColor" opacity="0.45" stroke-width="1.5" marker-end="url(#ar2)"></line>
+    <text x="66" y="52" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="12" opacity="0.55">stronger, more causal claims</text>
+    <text x="66" y="316" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="12" opacity="0.55">cheaper, weaker claims</text>
+    <rect x="80" y="64" width="600" height="56" rx="8" fill="#14b8a6" fill-opacity="0.15" stroke="#14b8a6" stroke-width="1.5"></rect>
+    <text x="96" y="87" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="14" font-weight="600">Mechanistic</text>
+    <text x="230" y="87" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="13.5">“How is the answer computed?”</text>
+    <text x="96" y="108" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="12.5" opacity="0.55">circuits, ablation, activation patching — Chapters 52–53</text>
+    <rect x="80" y="134" width="600" height="56" rx="8" fill="#818cf8" fill-opacity="0.15" stroke="#818cf8" stroke-width="1.5"></rect>
+    <text x="96" y="157" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="14" font-weight="600">Representational</text>
+    <text x="230" y="157" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="13.5">“What is encoded inside?”</text>
+    <text x="96" y="178" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="12.5" opacity="0.55">probes, feature directions, sparse autoencoders — Chapters 49–51</text>
+    <rect x="80" y="204" width="600" height="56" rx="8" fill="#f59e0b" fill-opacity="0.15" stroke="#f59e0b" stroke-width="1.5"></rect>
+    <text x="96" y="227" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="14" font-weight="600">Attributional</text>
+    <text x="230" y="227" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="13.5">“Which inputs mattered?”</text>
+    <text x="96" y="248" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="12.5" opacity="0.55">saliency maps, gradient × input, attention inspection</text>
+    <rect x="80" y="274" width="600" height="56" rx="8" fill="#38bdf8" fill-opacity="0.15" stroke="#38bdf8" stroke-width="1.5"></rect>
+    <text x="96" y="297" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="14" font-weight="600">Behavioral</text>
+    <text x="230" y="297" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="13.5">“What does it do?”</text>
+    <text x="96" y="318" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="12.5" opacity="0.55">prompting, evals, red-teaming — Chapters 21 and 46</text>
+  </svg>
+  <figcaption><strong>Figure:</strong> Four levels of looking inside. Each rung answers a different question, and each higher rung makes a stronger — and costlier — claim about the model. Part VII climbs this ladder: representations first (Chapters 49–51), then mechanisms (52–53), then interventions built on both (54–55).</figcaption>
+</figure>
+<aside class="box box-math" data-box="math"><div class="box-title"><span class="box-icon" aria-hidden="true">∑</span>The math</div><p>The attributional level is worth one formal beat, because it shows both why
+attribution is seductive and where it breaks. For a model output <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">f(x)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mclose">)</span></span></span></span> with
+input features <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mn>1</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>x</mi><mi>n</mi></msub></mrow><annotation encoding="application/x-tex">x_1, \dots, x_n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner">…</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>, the simplest attribution is
+<strong>gradient × input</strong>:</p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>a</mi><mi>i</mi></msub><mtext>  </mtext><mo>=</mo><mtext>  </mtext><msub><mi>x</mi><mi>i</mi></msub><mtext> </mtext><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>f</mi></mrow><mrow><mi mathvariant="normal">∂</mi><msub><mi>x</mi><mi>i</mi></msub></mrow></mfrac><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo separator="true">,</mo></mrow><annotation encoding="application/x-tex">a_i \;=\; x_i \,\frac{\partial f}{\partial x_i}(x),</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.2074em;vertical-align:-0.836em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3714em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.0556em;">∂</span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.0556em;">∂</span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.836em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mclose">)</span><span class="mpunct">,</span></span></span></span></span><p>where <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">∂</mi><mi>f</mi><mi mathvariant="normal">/</mi><mi mathvariant="normal">∂</mi><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">\partial f / \partial x_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord" style="margin-right:0.0556em;">∂</span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="mord">/</span><span class="mord" style="margin-right:0.0556em;">∂</span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> — the <a href="/groundup/book/derivatives-and-gradients/">gradient</a>
+you already know how to compute with backpropagation — measures the local
+sensitivity of the output to feature <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi></mrow><annotation encoding="application/x-tex">i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6595em;"></span><span class="mord mathnormal">i</span></span></span></span>. For a <em>linear</em> model
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><msub><mo>∑</mo><mi>i</mi></msub><msub><mi>w</mi><mi>i</mi></msub><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">f(x) = \sum_i w_i x_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.0497em;vertical-align:-0.2997em;"></span><span class="mop"><span class="mop op-symbol small-op" style="position:relative;top:0em;">∑</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.162em;"><span style="top:-2.4003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2997em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0269em;">w</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0269em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> this is exact bookkeeping: <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>a</mi><mi>i</mi></msub><mo>=</mo><msub><mi>w</mi><mi>i</mi></msub><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">a_i = w_i x_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0269em;">w</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0269em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>, and the
+attributions sum to the output precisely. Nonlinearity breaks the guarantee,
+because a local slope at <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi></mrow><annotation encoding="application/x-tex">x</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">x</span></span></span></span> can wildly misrepresent what the function does
+over the <em>range</em> of the feature. Integrated gradients
+(<a href="https://arxiv.org/abs/1703.01365">Sundararajan et al., 2017</a>) repairs part
+of this by averaging the gradient along a path from a baseline <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>x</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow><annotation encoding="application/x-tex">x'</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7519em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span></span></span></span> to <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi></mrow><annotation encoding="application/x-tex">x</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">x</span></span></span></span>:</p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>a</mi><mi>i</mi></msub><mtext>  </mtext><mo>=</mo><mtext>  </mtext><mo stretchy="false">(</mo><msub><mi>x</mi><mi>i</mi></msub><mo>−</mo><msubsup><mi>x</mi><mi>i</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msubsup><mo stretchy="false">)</mo><msubsup><mo>∫</mo><mn>0</mn><mn>1</mn></msubsup><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>f</mi></mrow><mrow><mi mathvariant="normal">∂</mi><msub><mi>x</mi><mi>i</mi></msub></mrow></mfrac><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><msup><mi>x</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>+</mo><mi>α</mi><mtext> </mtext><mo stretchy="false">(</mo><mi>x</mi><mo>−</mo><msup><mi>x</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo><mtext> </mtext><mi>d</mi><mi>α</mi><mo separator="true">,</mo></mrow><annotation encoding="application/x-tex">a_i \;=\; (x_i - x_i')\int_0^1 \frac{\partial f}{\partial x_i}\big(x' + \alpha\,(x - x')\big)\,d\alpha,</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:2.476em;vertical-align:-0.9119em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8019em;"><span style="top:-2.453em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.247em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop"><span class="mop op-symbol large-op" style="margin-right:0.4445em;position:relative;top:-0.0011em;">∫</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.564em;"><span style="top:-1.7881em;margin-left:-0.4445em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span><span style="top:-3.8129em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.9119em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3714em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.0556em;">∂</span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.0556em;">∂</span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.836em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mord"><span class="delimsizing size1">(</span></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8019em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0037em;">α</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1.2em;vertical-align:-0.35em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8019em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mclose">)</span><span class="mord"><span class="delimsizing size1">)</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">d</span><span class="mord mathnormal" style="margin-right:0.0037em;">α</span><span class="mpunct">,</span></span></span></span></span><p>which restores the summing property
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mo>∑</mo><mi>i</mi></msub><msub><mi>a</mi><mi>i</mi></msub><mo>=</mo><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>−</mo><mi>f</mi><mo stretchy="false">(</mo><msup><mi>x</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\sum_i a_i = f(x) - f(x')</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0497em;vertical-align:-0.2997em;"></span><span class="mop"><span class="mop op-symbol small-op" style="position:relative;top:0em;">∑</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.162em;"><span style="top:-2.4003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2997em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1.0019em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span> (called <em>completeness</em>). But no attribution method
+escapes the deeper limitation: it assigns credit over inputs, and says nothing
+about the computation in between.</p></aside>
+<aside class="box box-example" data-box="example"><div class="box-title"><span class="box-icon" aria-hidden="true">✏️</span>Worked example</div><p>Watch gradient-based attribution fail on arithmetic you can do by hand. Let
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mi>σ</mi><mo stretchy="false">(</mo><mn>5</mn><mi>x</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">f(x) = \sigma(5x)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span><span class="mopen">(</span><span class="mord">5</span><span class="mord mathnormal">x</span><span class="mclose">)</span></span></span></span>, where <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>σ</mi></mrow><annotation encoding="application/x-tex">\sigma</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span></span></span></span> is the sigmoid from
+<a href="/groundup/book/activation-functions/">Chapter 15</a>, and take the input <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi><mo>=</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">x = 2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">2</span></span></span></span>. The
+pre-activation is <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>5</mn><mo>×</mo><mn>2</mn><mo>=</mo><mn>10</mn></mrow><annotation encoding="application/x-tex">5 \times 2 = 10</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">5</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">10</span></span></span></span>, so <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo stretchy="false">(</mo><mn>2</mn><mo stretchy="false">)</mo><mo>=</mo><mi>σ</mi><mo stretchy="false">(</mo><mn>10</mn><mo stretchy="false">)</mo><mo>≈</mo><mn>0.99995</mn></mrow><annotation encoding="application/x-tex">f(2) = \sigma(10) \approx 0.99995</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="mopen">(</span><span class="mord">2</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span><span class="mopen">(</span><span class="mord">10</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0.99995</span></span></span></span>.
+The gradient is <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>f</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mn>5</mn><mtext> </mtext><mi>σ</mi><mo stretchy="false">(</mo><mn>10</mn><mo stretchy="false">)</mo><mo fence="true" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><mn>1</mn><mo>−</mo><mi>σ</mi><mo stretchy="false">(</mo><mn>10</mn><mo stretchy="false">)</mo><mo fence="true" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo><mo>≈</mo><mn>5</mn><mo>×</mo><mn>0.99995</mn><mo>×</mo><mn>0.0000454</mn><mo>≈</mo><mn>0.000227</mn></mrow><annotation encoding="application/x-tex">f'(x) = 5\,\sigma(10)\bigl(1 - \sigma(10)\bigr) \approx 5
+\times 0.99995 \times 0.0000454 \approx 0.000227</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0019em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.2em;vertical-align:-0.35em;"></span><span class="mord">5</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span><span class="mopen">(</span><span class="mord">10</span><span class="mclose">)</span><span class="mopen"><span class="delimsizing size1">(</span></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1.2em;vertical-align:-0.35em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span><span class="mopen">(</span><span class="mord">10</span><span class="mclose">)</span><span class="mclose"><span class="delimsizing size1">)</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">5</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">0.99995</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0.0000454</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0.000227</span></span></span></span>. Gradient × input:
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mo>×</mo><mn>0.000227</mn><mo>≈</mo><mn>0.00045</mn></mrow><annotation encoding="application/x-tex">2 \times 0.000227 \approx 0.00045</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0.000227</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0.00045</span></span></span></span> — approximately zero. The attribution
+declares <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi></mrow><annotation encoding="application/x-tex">x</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">x</span></span></span></span> irrelevant. Now intervene instead: set <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">x = 0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span> and the output
+drops to <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>σ</mi><mo stretchy="false">(</mo><mn>0</mn><mo stretchy="false">)</mo><mo>=</mo><mn>0.5</mn></mrow><annotation encoding="application/x-tex">\sigma(0) = 0.5</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span><span class="mopen">(</span><span class="mord">0</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0.5</span></span></span></span>; set <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi><mo>=</mo><mo>−</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">x = -2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">−</span><span class="mord">2</span></span></span></span> and it collapses to
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>σ</mi><mo stretchy="false">(</mo><mo>−</mo><mn>10</mn><mo stretchy="false">)</mo><mo>≈</mo><mn>0.00005</mn></mrow><annotation encoding="application/x-tex">\sigma(-10) \approx 0.00005</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span><span class="mopen">(</span><span class="mord">−</span><span class="mord">10</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0.00005</span></span></span></span>. The input <em>completely determines</em> the output —
+the function is merely saturated, so the local slope is flat. Sensitivity is
+not importance. This tiny example is why Part VII’s standard of proof is
+intervention (Chapter 53), not gradients.</p></aside>
+<aside class="box box-warning" data-box="warning"><div class="box-title"><span class="box-icon" aria-hidden="true">⚠️</span>Careful</div><p><strong>The saliency era’s reproducibility troubles were real.</strong>
+<a href="https://arxiv.org/abs/1810.03292">Sanity Checks for Saliency Maps</a>
+(Adebayo et al., 2018) ran an experiment that should have been unnecessary:
+randomize the network’s weights — destroying everything it learned — and
+recompute the saliency maps. Several widely used methods produced maps nearly
+identical to those of the trained network, because they were functioning
+largely as edge detectors on the input. In parallel, NLP fought a literature
+war over whether attention weights count as explanation at all
+(<a href="https://scholar.google.com/scholar?q=%22Attention+is+not+Explanation%22">“Attention is not Explanation”</a>
+versus its rebuttal “Attention is not not Explanation”). The lesson the modern
+field internalized: <strong>an explanation method must itself be validated</strong> — by
+randomization tests, by intervention, by predictions it makes — or it is
+decoration. When this book presents a method in Chapters 49–56, it will also
+present the check.</p></aside>
+<aside class="box box-note" data-box="note"><div class="box-title"><span class="box-icon" aria-hidden="true">✎</span>Note</div><p>Readers who know cognitive science will recognize the ladder as a cousin of
+<strong>Marr’s levels of analysis</strong> (David Marr, <em>Vision</em>, 1982): the
+<em>computational</em> level (what problem is being solved), the
+<em>algorithmic/representational</em> level (what representations and algorithm), and
+the <em>implementational</em> level (what physical substrate). The behavioral level
+roughly probes Marr’s computational story; the representational and
+mechanistic levels together target the algorithmic one; the raw weights and
+<a href="/groundup/book/compute-and-parallelism/">GPU kernels</a> are the implementation. The
+analogy is useful and imperfect — Marr’s levels describe <em>a scientist’s
+descriptions</em>, and in a neural network the boundaries blur, since the
+algorithm is smeared across the same tensors as the implementation. Hold it
+lightly.</p></aside>
+<h2 id="a-short-history-of-looking-inside">A short history of looking inside</h2>
+<aside class="box box-history" data-box="history"><div class="box-title"><span class="box-icon" aria-hidden="true">🕰</span>History</div><p><strong>2014–2019: the vision era.</strong> Interpretability grew up on image classifiers.
+Saliency maps asked which pixels mattered; <strong>feature visualization</strong>
+(<a href="https://distill.pub/2017/feature-visualization/">Olah et al., 2017</a>)
+asked the sharper question — what does this neuron <em>want to see?</em> — by
+optimizing an input image to maximally excite it, revealing curve detectors,
+fur textures, and dog-face neurons in networks like InceptionV1. The Distill
+journal era (<a href="https://distill.pub/2018/building-blocks/">Building Blocks</a>,
+2018) made the results legible, while the sanity-check papers
+(above) pruned the methods that did not survive scrutiny.</p><p><strong>2020: the circuits manifesto.</strong>
+<a href="https://distill.pub/2020/circuits/zoom-in/">Zoom In</a> (Olah et al.) reframed
+the project around three working hypotheses: networks are built from
+<strong>features</strong> (directions in activation space that mean something), features
+connect via weights into <strong>circuits</strong> (sub-networks implementing algorithms),
+and both show <strong>universality</strong> (similar features and circuits recur across
+different networks). The stated ambition was unabashedly biological — do for
+neural networks what microscopy did for cell theory.</p><p><strong>2021–2022: the pivot to transformers.</strong> With GPT-3 making clear where the
+field was heading, Olah’s group moved to the newly founded Anthropic and
+published
+<a href="https://transformer-circuits.pub/2021/framework/index.html">A Mathematical Framework for Transformer Circuits</a>
+(Elhage et al., 2021): fully reverse-engineering one- and two-layer
+attention-only transformers, introducing the residual-stream-as-communication-bus
+picture this book borrowed in Chapter 16, and discovering <strong>induction heads</strong>
+— which a 2022 follow-up
+(<a href="https://transformer-circuits.pub/2022/in-context-learning-and-induction-heads/index.html">In-context Learning and Induction Heads</a>)
+argued are a major driver of in-context learning. The same year,
+<a href="https://transformer-circuits.pub/2022/toy_model/index.html">Toy Models of Superposition</a>
+explained <em>why</em> individual neurons had always been so maddeningly
+polysemantic (Chapter 50), and academic work found the first end-to-end
+circuit in a real language model — indirect object identification in GPT-2
+small (<a href="https://arxiv.org/abs/2211.00593">Wang et al., 2022</a>).</p><p><strong>2023–2026: scaling the microscope.</strong> Sparse autoencoders (SAEs) turned
+superposition theory into an extraction tool
+(<a href="https://transformer-circuits.pub/2023/monosemantic-features/index.html">Towards Monosemanticity</a>, 2023),
+then scaled to a production model —
+<a href="https://transformer-circuits.pub/2024/scaling-monosemanticity/index.html">Scaling Monosemanticity</a>
+(2024) pulled ~34 million features out of Claude 3 Sonnet, one of which
+produced the memorable
+<a href="https://www.anthropic.com/news/golden-gate-claude">Golden Gate Claude</a> demo.
+DeepMind released open SAE suites for Gemma; OpenAI showed GPT-4 writing
+candidate explanations for GPT-2’s neurons, prototyping automated
+interpretability. In 2025, attribution graphs
+(<a href="https://transformer-circuits.pub/2025/attribution-graphs/biology.html">On the Biology of a Large Language Model</a>)
+traced multi-step circuits through Claude 3.5 Haiku, and a broad coalition of
+authors published
+<a href="https://arxiv.org/abs/2501.16496">Open Problems in Mechanistic Interpretability</a>
+— the clearest sign a research program has become a field: it has a survey of
+what it cannot yet do.</p></aside>
+<p>By 2026 the field has institutions: dedicated teams at Anthropic, Google
+DeepMind, and OpenAI; a distributed academic and independent community that
+Neel Nanda’s tooling and problem lists helped bootstrap; TransformerLens and
+Neuronpedia as shared infrastructure; and recurring workshops at the major
+machine-learning conferences. It also has, less obviously, two temperaments.</p>
+<h2 id="the-two-cultures">The two cultures</h2>
+<p>Running through Part VII you will notice two styles of work, and it is worth
+naming them now so you can tell which one you are reading.</p>
+<p>The <strong>bottom-up culture</strong> — mechanistic interpretability proper, the circuits
+lineage — starts from the components and reverse-engineers upward: understand
+what each head and feature does, find how they compose, and accept an
+explanation only when it is mechanically complete enough to predict and
+survive intervention. Its virtue is rigor; its risk is microscopy — years of
+careful work on GPT-2-small-sized questions while frontier models get three
+generations bigger.</p>
+<p>The <strong>top-down culture</strong> starts from a behavior or concept and looks for its
+representation: train a probe for “the model thinks this statement is false,”
+find a “refusal direction,” locate a sycophancy feature, then intervene along
+it. This is the lineage of probing (<a href="/groundup/book/features-and-probes/">Chapter 49</a>),
+representation engineering, and activation steering
+(<a href="/groundup/book/steering-and-editing/">Chapter 54</a>). Its virtue is that it engages
+frontier-relevant behaviors <em>now</em>, at full scale; its risk is
+self-deception — a direction that correlates with a concept on your dataset
+may be neither what the model uses nor what your intervention actually moves.</p>
+<p>The cultures are converging, and the meeting point is the <strong>linear
+representation hypothesis</strong> — the claim, developed properly in Chapter 49,
+that models encode features as directions in activation space. Sparse
+autoencoders are the marriage in institutional form: a bottom-up, unsupervised
+method for discovering exactly the kind of directions the top-down culture
+wants to steer. This book teaches both cultures without pretending they are
+one, because the honest state of the art uses both: circuits-grade rigor where
+it can be afforded, representation-level tools where scale demands it.</p>
+<h2 id="the-honest-ledger">The honest ledger</h2>
+<p>A chapter selling <em>why</em> owes you a sober account of <em>how far</em>. Here is the
+ledger as of mid-2026, wins first.</p>
+<p><strong>Delivered.</strong> Small models have yielded complete reverse
+engineering: induction heads; the indirect-object-identification circuit; full
+mechanistic accounts of toy tasks like modular addition, where the learned
+algorithm (a discrete-Fourier-flavored trick no human suggested) was recovered
+from the weights. At frontier scale, sparse autoencoders extract
+tens-of-millions-strong dictionaries of interpretable features —
+concrete entries include unsafe-code features, sycophantic-praise features,
+and deception-adjacent features, exactly the inventory an auditor would want —
+and steering one of them (Golden Gate Claude) demonstrated causal handle, not
+just correlation, in a production system. Attribution graphs have traced
+multi-step computations in Claude 3.5 Haiku: two-hop factual reasoning
+(“Dallas → Texas → Austin”), forward planning of rhymes in poetry composition
+several tokens before the rhyme word is emitted, and language-agnostic
+concept features shared across English, French, and Chinese. And the auditing
+dress rehearsal described earlier showed interpretability tools contributing
+to finding a deliberately hidden objective. Ten years ago the field had
+saliency maps that failed randomization tests. This is real progress.</p>
+<p><strong>Not delivered.</strong> Three gaps, stated plainly. <em>Coverage:</em> the
+attribution-graph authors themselves report that their method yields a
+satisfying circuit-level story on only a minority of prompts attempted — on
+the order of a quarter, by their own accounting (treat the figure as
+approximate and fast-moving; <a href="/groundup/book/circuits/">Chapter 52</a> examines the
+methodology and its error bars). The rest of the time, the trace is too
+tangled, too diffuse, or too dependent on attention patterns the method holds
+fixed. <em>Fidelity:</em> sparse autoencoders reconstruct activations imperfectly;
+the residue — unexplained “dark matter” — and artifacts like feature
+splitting mean we cannot yet claim the extracted features are <em>the</em> model’s
+features rather than a useful basis for them (<a href="/groundup/book/sparse-autoencoders/">Chapter 51</a>
+presents this dispute in full). <em>Completeness at scale:</em> every fully verified
+circuit lives in a small or dated model; for frontier systems we have partial
+maps, not blueprints — and no deployment decision has yet rested on an
+interpretability-based safety case. The aspiration of reason 5 remains an
+aspiration.</p>
+<aside class="box box-example" data-box="example"><div class="box-title"><span class="box-icon" aria-hidden="true">✏️</span>Worked example</div><p>The scaling problem, in arithmetic. Scaling Monosemanticity extracted roughly
+34 million features from the middle layer of Claude 3 Sonnet — one layer of
+one model. Suppose a researcher can vet one feature per minute
+(read its top activating examples, check its steering effect, write a label)
+and works a monastic 8 hours a day: <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>480</mn></mrow><annotation encoding="application/x-tex">480</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">480</span></span></span></span> features per day, so
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>34,000,000</mn><mi mathvariant="normal">/</mi><mn>480</mn><mo>≈</mo><mn>70,800</mn></mrow><annotation encoding="application/x-tex">34{,}000{,}000 / 480 \approx 70{,}800</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">34</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">000</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">000/480</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">70</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">800</span></span></span></span> days <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>≈</mo><mn>194</mn></mrow><annotation encoding="application/x-tex">\approx 194</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4831em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">194</span></span></span></span> years. A team of
+twenty gets that down to about a decade — for one layer of one model version
+that will be superseded within a year. Human attention does not scale to the
+object of study; that is not a complaint, it is a design constraint. It is why
+the field increasingly uses models to interpret models — automated feature
+labeling, audits driven by other language models — which trades the scaling problem for a
+trust-the-interpreter problem that <a href="/groundup/book/frontier-interpretability/">Chapter 56</a>
+takes head on.</p></aside>
+<aside class="box box-note" data-box="note"><div class="box-title"><span class="box-icon" aria-hidden="true">✎</span>Note</div><p>There are thoughtful skeptics, and their case deserves stating in its
+strongest form. One line: interpretability is condemned to interpret
+<em>yesterday’s</em> models — by the time a system is understood, the frontier has
+moved, so understanding never touches the systems that matter. Another line:
+even at its best, a mechanistic story is a <em>compression</em> of the computation,
+and nothing guarantees the safety-relevant behavior lives in the compressed
+part rather than the residue. A third: for practical safety, black-box
+methods — better evals, control protocols that assume the model may be
+adversarial, monitoring at deployment — may deliver more protection per
+research-dollar than microscopy ever will. The field’s own
+<a href="https://arxiv.org/abs/2501.16496">open-problems survey</a> engages several of
+these seriously rather than dismissing them. This book’s stance: the critiques
+are reasons to measure interpretability’s claims carefully, not reasons to
+leave a trillion-dollar deployed technology unexamined from the inside — and
+Chapters 49–56 will flag, method by method, which claims are load-bearing and
+which are hopeful.</p></aside>
+<h2 id="the-road-through-part-vii">The road through Part VII</h2>
+<p>Here is how the next eight chapters climb the ladder.</p>
+<figure class="fig">
+  <svg viewBox="0 0 720 300" role="img" aria-label="Map of Part VII: chapters 49 through 51 build the representation toolkit, 52 and 53 build the mechanism toolkit, 54 and 55 apply interventions and test faithfulness, and 56 confronts frontier scale.">
+    <defs>
+      <marker id="ar3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M 0 1 L 8 5 L 0 9" fill="none" stroke="currentColor" stroke-width="1.6" opacity="0.6"></path>
+      </marker>
+    </defs>
+    <rect x="30" y="52" width="150" height="62" rx="8" fill="#818cf8" fill-opacity="0.15" stroke="#818cf8" stroke-width="1.5"></rect>
+    <text x="105" y="74" text-anchor="middle" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="12" opacity="0.55">Ch 49</text>
+    <text x="105" y="92" text-anchor="middle" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="13.5">Features, directions,</text>
+    <text x="105" y="108" text-anchor="middle" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="13.5">and probes</text>
+    <line x1="180" y1="83" x2="203" y2="83" stroke="currentColor" opacity="0.5" marker-end="url(#ar3)"></line>
+    <rect x="205" y="52" width="150" height="62" rx="8" fill="#818cf8" fill-opacity="0.15" stroke="#818cf8" stroke-width="1.5"></rect>
+    <text x="280" y="74" text-anchor="middle" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="12" opacity="0.55">Ch 50</text>
+    <text x="280" y="92" text-anchor="middle" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="13.5">Superposition and</text>
+    <text x="280" y="108" text-anchor="middle" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="13.5">polysemanticity</text>
+    <line x1="355" y1="83" x2="378" y2="83" stroke="currentColor" opacity="0.5" marker-end="url(#ar3)"></line>
+    <rect x="380" y="52" width="150" height="62" rx="8" fill="#818cf8" fill-opacity="0.15" stroke="#818cf8" stroke-width="1.5"></rect>
+    <text x="455" y="74" text-anchor="middle" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="12" opacity="0.55">Ch 51</text>
+    <text x="455" y="92" text-anchor="middle" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="13.5">Sparse</text>
+    <text x="455" y="108" text-anchor="middle" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="13.5">autoencoders</text>
+    <line x1="530" y1="83" x2="553" y2="83" stroke="currentColor" opacity="0.5" marker-end="url(#ar3)"></line>
+    <rect x="555" y="52" width="150" height="62" rx="8" fill="#14b8a6" fill-opacity="0.15" stroke="#14b8a6" stroke-width="1.5"></rect>
+    <text x="630" y="74" text-anchor="middle" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="12" opacity="0.55">Ch 52</text>
+    <text x="630" y="92" text-anchor="middle" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="13.5">Circuits: induction to</text>
+    <text x="630" y="108" text-anchor="middle" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="13.5">attribution graphs</text>
+    <path d="M 630 114 L 630 142 L 105 142 L 105 168" fill="none" stroke="currentColor" opacity="0.4" marker-end="url(#ar3)"></path>
+    <rect x="30" y="172" width="150" height="62" rx="8" fill="#14b8a6" fill-opacity="0.15" stroke="#14b8a6" stroke-width="1.5"></rect>
+    <text x="105" y="194" text-anchor="middle" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="12" opacity="0.55">Ch 53</text>
+    <text x="105" y="212" text-anchor="middle" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="13.5">Causal methods:</text>
+    <text x="105" y="228" text-anchor="middle" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="13.5">patching, ablation</text>
+    <line x1="180" y1="203" x2="203" y2="203" stroke="currentColor" opacity="0.5" marker-end="url(#ar3)"></line>
+    <rect x="205" y="172" width="150" height="62" rx="8" fill="#f59e0b" fill-opacity="0.15" stroke="#f59e0b" stroke-width="1.5"></rect>
+    <text x="280" y="194" text-anchor="middle" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="12" opacity="0.55">Ch 54</text>
+    <text x="280" y="212" text-anchor="middle" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="13.5">Steering and</text>
+    <text x="280" y="228" text-anchor="middle" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="13.5">model editing</text>
+    <line x1="355" y1="203" x2="378" y2="203" stroke="currentColor" opacity="0.5" marker-end="url(#ar3)"></line>
+    <rect x="380" y="172" width="150" height="62" rx="8" fill="#f59e0b" fill-opacity="0.15" stroke="#f59e0b" stroke-width="1.5"></rect>
+    <text x="455" y="194" text-anchor="middle" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="12" opacity="0.55">Ch 55</text>
+    <text x="455" y="212" text-anchor="middle" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="13.5">Chain-of-thought</text>
+    <text x="455" y="228" text-anchor="middle" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="13.5">faithfulness</text>
+    <line x1="530" y1="203" x2="553" y2="203" stroke="currentColor" opacity="0.5" marker-end="url(#ar3)"></line>
+    <rect x="555" y="172" width="150" height="62" rx="8" fill="#fb7185" fill-opacity="0.15" stroke="#fb7185" stroke-width="1.5"></rect>
+    <text x="630" y="194" text-anchor="middle" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="12" opacity="0.55">Ch 56</text>
+    <text x="630" y="212" text-anchor="middle" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="13.5">Interpretability</text>
+    <text x="630" y="228" text-anchor="middle" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="13.5">at the frontier</text>
+    <text x="105" y="270" text-anchor="middle" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="12" opacity="0.55">representations (indigo)</text>
+    <text x="330" y="270" text-anchor="middle" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="12" opacity="0.55">mechanisms (teal)</text>
+    <text x="540" y="270" text-anchor="middle" fill="currentColor" font-family="Inter Variable, sans-serif" font-size="12" opacity="0.55">interventions &#x26; stakes (amber, rose)</text>
+  </svg>
+  <figcaption><strong>Figure:</strong> The road through Part VII. Chapters 49–51 build the representation toolkit (what is encoded), 52–53 the mechanism toolkit (how it is computed), 54–55 put the tools to work as interventions and honesty checks, and 56 asks what all of it buys at frontier scale.</figcaption>
+</figure>
+<p><a href="/groundup/book/features-and-probes/"><strong>Chapter 49 — Features, Directions, and Probes</strong></a>
+makes the field’s central bet precise: features as directions in activation
+space, and probes as the instrument for detecting them — including the
+decodable-versus-used trap. <a href="/groundup/book/superposition/"><strong>Chapter 50 — Superposition</strong></a>
+explains why individual neurons mean many things at once, with the counting
+argument (via <a href="/groundup/book/high-dimensional-geometry/">Chapter 3</a>’s
+almost-orthogonal-directions geometry) for how a model crams more features
+than dimensions into its residual stream.
+<a href="/groundup/book/sparse-autoencoders/"><strong>Chapter 51 — Sparse Autoencoders</strong></a> is the
+extraction machine: how dictionary learning unmixes superposed features, and
+the fidelity debates. <a href="/groundup/book/circuits/"><strong>Chapter 52 — Circuits</strong></a> climbs to
+mechanism: induction heads through attribution graphs.
+<a href="/groundup/book/causal-methods/"><strong>Chapter 53 — Causal Methods</strong></a> supplies the standard
+of proof — patching, ablation, and the logit lens family.
+<a href="/groundup/book/steering-and-editing/"><strong>Chapter 54 — Steering and Editing</strong></a> turns
+understanding into control. <a href="/groundup/book/cot-faithfulness/"><strong>Chapter 55 — Chain-of-Thought Faithfulness</strong></a>
+tests whether a <a href="/groundup/book/reasoning-models/">reasoning model’s</a> visible thoughts
+match its actual computation. And
+<a href="/groundup/book/frontier-interpretability/"><strong>Chapter 56 — Interpretability at the Frontier</strong></a>
+returns to this chapter’s stakes with the full toolkit in hand: audits,
+safety cases, automated interpretability, and the race Amodei described.</p>
+<h2 id="where-this-leaves-us">Where this leaves us</h2>
+<ul>
+<li>Frontier models are <strong>grown, not written</strong>: humans author only the
+architecture, objective, and data, so there is no source code to read — the
+weights are the program, and the residual stream is the closest thing to a
+CPU diagram we get for free.</li>
+<li>You can state <strong>five concrete reasons</strong> interpretability matters — alignment
+auditing (evals measure the mask), debugging (mechanism-level bug reports),
+regulated trust (explanations grounded in mechanism, not post-hoc text),
+basic science (what did gradient descent invent?), and safety cases
+(affirmative evidence, not absence of failure).</li>
+<li>You can classify any interpretability claim on the <strong>four-level ladder</strong> —
+behavioral, attributional, representational, mechanistic — and you know why
+the field’s standard of proof is intervention, not gradients: sensitivity is
+not importance, and saliency methods famously failed randomization tests.</li>
+<li>You know the <strong>history in one breath</strong>: vision-era feature visualization →
+the 2020 circuits manifesto → the 2021 transformer pivot → superposition and
+sparse autoencoders → attribution graphs on a production model.</li>
+<li>You can name the <strong>two cultures</strong> — bottom-up circuits and top-down
+probing/steering — and the linear-representation bet where they meet.</li>
+<li>And you hold the <strong>honest ledger</strong>: real verified circuits and
+causally-steerable features exist, but coverage is partial (a minority of
+prompts yield clean stories), fidelity is contested, and human attention
+does not scale to 34 million features — which is why the field is racing.</li>
+</ul>
+<p>The toolkit starts now, with the field’s central bet about where meaning
+lives: <a href="/groundup/book/features-and-probes/">Next: Features, Directions, and Probes</a>.</p> <div class="papers-card" id="papers-card"> <div class="pc-title">Key papers &amp; readings in this chapter</div> <ul> <li> <div> <a href="https://distill.pub/2020/circuits/zoom-in/" target="_blank" rel="noopener">Zoom In: An Introduction to Circuits</a> <span class="p-meta"> — Olah et al., 2020</span> <span class="p-note">The manifesto of the circuits program — features, circuits, and universality as the field&#39;s three working hypotheses.</span> </div> </li><li> <div> <a href="https://www.darioamodei.com/post/the-urgency-of-interpretability" target="_blank" rel="noopener">The Urgency of Interpretability</a> <span class="p-meta"> — Amodei, 2025</span> <span class="p-note">The safety-case argument from a lab CEO: interpretability must mature before models become too capable to deploy blind.</span> </div> </li><li> <div> <a href="https://arxiv.org/abs/1606.06565" target="_blank" rel="noopener">Concrete Problems in AI Safety</a> <span class="p-meta"> — Amodei et al., 2016</span> <span class="p-note">The 2016 paper that framed reward hacking and unintended objectives — the failure modes interpretability now hunts for.</span> </div> </li><li> <div> <a href="https://arxiv.org/abs/2501.16496" target="_blank" rel="noopener">Open Problems in Mechanistic Interpretability</a> <span class="p-meta"> — Sharkey et al., 2025</span> <span class="p-note">A field-wide survey of what is unsolved — the best single snapshot of where the frontier of the science sits.</span> </div> </li><li> <div> <a href="https://transformer-circuits.pub/2021/framework/index.html" target="_blank" rel="noopener">A Mathematical Framework for Transformer Circuits</a> <span class="p-meta"> — Elhage et al., 2021</span> <span class="p-note">The document that pivoted the circuits program from vision to transformers; the residual-stream-as-bus picture starts here.</span> </div> </li><li> <div> <a href="https://arxiv.org/abs/1810.03292" target="_blank" rel="noopener">Sanity Checks for Saliency Maps</a> <span class="p-meta"> — Adebayo et al., 2018</span> <span class="p-note">The cautionary tale of the attribution era: popular explanation methods that barely change when you randomize the weights.</span> </div> </li><li> <div> <a href="https://transformer-circuits.pub/2025/attribution-graphs/biology.html" target="_blank" rel="noopener">On the Biology of a Large Language Model</a> <span class="p-meta"> — Lindsey et al., 2025</span> <span class="p-note">Circuit-tracing on a production model (Claude 3.5 Haiku) — both the field&#39;s biggest recent win and the source of its most honest coverage caveats.</span> </div> </li> </ul> </div> <nav class="chapter-nav"> <a href="/groundup/book/open-vs-closed/" class="prev"> <span class="dir">← Previous</span> <span class="t">Open vs Closed Models</span> </a> <a href="/groundup/book/features-and-probes/" class="next"> <span class="dir">Next →</span> <span class="t">Features, Directions, and Probes</span> </a> </nav> <div class="chapter-foot"> <span>Last updated 2026-08-24</span> <a href="https://github.com/joewilbert/aisite/edit/main/src/content/book/48-why-interpretability.md" target="_blank" rel="noopener">Edit this chapter</a> <a href="https://github.com/joewilbert/aisite/issues/new" target="_blank" rel="noopener">Report an issue</a> </div> </article> </div>  </main> </div> <!-- Right panel: papers / tutor / notes --> <aside class="panel-host" id="panel" aria-label="Side panel"> <div class="panel-resizer" id="panel-resizer"></div> <div class="panel-tabs"> <button class="panel-tab" data-tab="paper">Paper</button> <button class="panel-tab" data-tab="tutor">AI tutor</button> <button class="panel-tab" data-tab="notes">Notes</button> <button class="hbtn panel-close" id="panel-close" aria-label="Close panel"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg> </button> </div> <div class="panel-body"> <div class="panel-view" data-view="paper" id="view-paper"></div> <div class="panel-view" data-view="tutor" id="view-tutor"></div> <div class="panel-view" data-view="notes" id="view-notes"></div> </div> </aside> <!-- Selection toolbar --> <div class="sel-toolbar" id="sel-toolbar"> <div class="swatches"> <button class="sw" data-color="yellow" style="background:var(--hl-yellow)" aria-label="Highlight yellow"></button> <button class="sw" data-color="green" style="background:var(--hl-green)" aria-label="Highlight green"></button> <button class="sw" data-color="blue" style="background:var(--hl-blue)" aria-label="Highlight blue"></button> <button class="sw" data-color="pink" style="background:var(--hl-pink)" aria-label="Highlight pink"></button> </div> <div class="divider"></div> <button id="sel-note">✎ Note</button> <button id="sel-explain">✦ Explain</button> <button id="sel-remove" style="display:none">✕ Remove</button> </div> <!-- Settings modal --> <div class="modal-scrim" id="settings-scrim"> <div class="modal" role="dialog" aria-label="Settings" id="settings-modal"></div> </div> <!-- Search modal --> <div class="modal-scrim" id="search-scrim"> <div class="modal search-modal" role="dialog" aria-label="Search"> <input class="q" id="search-input" type="text" placeholder="Search the book…" autocomplete="off"> <div class="search-results" id="search-results"></div> </div> </div> <script>(function(){const base = "/groundup";
+const slug = "why-interpretability";
+const pageTitle = "Why Interpretability · Ground Up";
+
+      window.__GU__ = { base, slug, pageTitle };
+    })();</script> <script type="module" src="/groundup/_astro/Base.astro_astro_type_script_index_0_lang.65xM_WgJ.js"></script>  </body></html>

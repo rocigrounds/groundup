@@ -1,0 +1,765 @@
+<!DOCTYPE html><html lang="en"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Causal Methods: Patching, Ablation, and Lenses · Ground Up</title><meta name="description" content="The experimental toolkit of interpretability — activation patching, ablations, and logit/tuned lenses — taught as a lab manual, with the metrics, controls, and honest caveats that separate evidence from illusion."><meta name="theme-color" content="#faf9f6"><meta property="og:title" content="Causal Methods: Patching, Ablation, and Lenses · Ground Up"><meta property="og:description" content="The experimental toolkit of interpretability — activation patching, ablations, and logit/tuned lenses — taught as a lab manual, with the metrics, controls, and honest caveats that separate evidence from illusion."><meta property="og:type" content="article"><meta property="og:site_name" content="Ground Up"><link rel="icon" href="/groundup/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="/groundup/apple-touch-icon.png"><link rel="manifest" href="/groundup/manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Ground Up"><script>
+      (function () {
+        try {
+          var t = localStorage.getItem('gu:theme');
+          var dark = t ? t === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+          if (dark) document.documentElement.classList.add('dark');
+          var fs = localStorage.getItem('gu:fontScale');
+          if (fs) document.documentElement.style.setProperty('--font-scale', fs);
+        } catch (e) {}
+      })();
+    </script><link rel="stylesheet" href="/groundup/_astro/_slug_.BCpHWCuJ.css"></head> <body> <header class="site-header"> <button class="hbtn" id="btn-toc" aria-label="Table of contents" title="Contents"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"></path></svg> </button> <a class="brand" href="/groundup/"> <span class="logo">G</span> <span class="brand-name">Ground&nbsp;Up</span> </a> <span class="header-crumb">Part VII · Interpretability · Chapter 53</span> <div class="header-actions"> <button class="hbtn" id="btn-search" aria-label="Search" title="Search (/)"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg> </button> <button class="hbtn" id="btn-notes" aria-label="My notes" title="My notes & highlights"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg> </button> <button class="hbtn" id="btn-tutor" aria-label="AI tutor" title="AI tutor"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 1 1-4-6.9"></path><path d="M21 3v6h-6"></path><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"></circle><circle cx="8.5" cy="12" r="1.2" fill="currentColor" stroke="none"></circle><circle cx="15.5" cy="12" r="1.2" fill="currentColor" stroke="none"></circle></svg> </button> <button class="hbtn" id="btn-theme" aria-label="Toggle theme" title="Light / dark"> <svg class="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.5"></circle><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M19.4 4.6l-1.8 1.8M6.4 17.6l-1.8 1.8"></path></svg> </button> <button class="hbtn" id="btn-settings" aria-label="Settings" title="Settings"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.01a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.01a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.01a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"></path></svg> </button> </div> </header> <div class="shell"> <nav class="toc-rail" id="toc-rail" aria-label="Table of contents">  <div class="toc-part">Start here</div> <a class="toc-link" data-slug="how-to-read-this-book" href="/groundup/book/how-to-read-this-book/"> <span class="n">·</span> <span>How to Read This Book</span> </a><a class="toc-link" data-slug="the-whole-machine" href="/groundup/book/the-whole-machine/"> <span class="n">·</span> <span>Frontier AI In One Sitting</span> </a> <div class="toc-part">Part I · Mathematical Foundations</div> <a class="toc-link" data-slug="vectors-and-spaces" href="/groundup/book/vectors-and-spaces/"> <span class="n">1</span> <span>Vectors and Spaces</span> </a><a class="toc-link" data-slug="matrices-as-transformations" href="/groundup/book/matrices-as-transformations/"> <span class="n">2</span> <span>Matrices as Transformations</span> </a><a class="toc-link" data-slug="high-dimensional-geometry" href="/groundup/book/high-dimensional-geometry/"> <span class="n">3</span> <span>High-Dimensional Geometry</span> </a><a class="toc-link" data-slug="derivatives-and-gradients" href="/groundup/book/derivatives-and-gradients/"> <span class="n">4</span> <span>Derivatives and Gradients</span> </a><a class="toc-link" data-slug="chain-rule-and-jacobians" href="/groundup/book/chain-rule-and-jacobians/"> <span class="n">5</span> <span>The Chain Rule, Jacobians, and Curvature</span> </a><a class="toc-link" data-slug="probability" href="/groundup/book/probability/"> <span class="n">6</span> <span>Probability for Deep Learning</span> </a><a class="toc-link" data-slug="information-theory" href="/groundup/book/information-theory/"> <span class="n">7</span> <span>Information Theory: Surprise, Entropy, and KL</span> </a> <div class="toc-part">Part II · Deep Learning Foundations</div> <a class="toc-link" data-slug="neurons-and-mlps" href="/groundup/book/neurons-and-mlps/"> <span class="n">8</span> <span>Neurons, Layers, and MLPs</span> </a><a class="toc-link" data-slug="loss-functions" href="/groundup/book/loss-functions/"> <span class="n">9</span> <span>Loss Functions</span> </a><a class="toc-link" data-slug="gradient-descent-and-backprop" href="/groundup/book/gradient-descent-and-backprop/"> <span class="n">10</span> <span>Gradient Descent and Backpropagation</span> </a><a class="toc-link" data-slug="optimizers" href="/groundup/book/optimizers/"> <span class="n">11</span> <span>Optimizers: From SGD to AdamW and Muon</span> </a><a class="toc-link" data-slug="initialization-and-stability" href="/groundup/book/initialization-and-stability/"> <span class="n">12</span> <span>Initialization and Gradient Pathologies</span> </a><a class="toc-link" data-slug="regularization-and-generalization" href="/groundup/book/regularization-and-generalization/"> <span class="n">13</span> <span>Regularization and Generalization</span> </a><a class="toc-link" data-slug="normalization" href="/groundup/book/normalization/"> <span class="n">14</span> <span>Normalization: BatchNorm to RMSNorm</span> </a><a class="toc-link" data-slug="activation-functions" href="/groundup/book/activation-functions/"> <span class="n">15</span> <span>Activation Functions</span> </a><a class="toc-link" data-slug="residual-connections" href="/groundup/book/residual-connections/"> <span class="n">16</span> <span>Residual Connections and the Residual Stream</span> </a><a class="toc-link" data-slug="cnns-and-rnns" href="/groundup/book/cnns-and-rnns/"> <span class="n">17</span> <span>CNNs and RNNs: The World Before Transformers</span> </a> <div class="toc-part">Part III · Language Modeling</div> <a class="toc-link" data-slug="what-is-a-language-model" href="/groundup/book/what-is-a-language-model/"> <span class="n">18</span> <span>What a Language Model Is</span> </a><a class="toc-link" data-slug="tokenization" href="/groundup/book/tokenization/"> <span class="n">19</span> <span>Tokenization</span> </a><a class="toc-link" data-slug="embeddings" href="/groundup/book/embeddings/"> <span class="n">20</span> <span>Embeddings</span> </a><a class="toc-link" data-slug="evaluating-language-models" href="/groundup/book/evaluating-language-models/"> <span class="n">21</span> <span>Evaluating Language Models</span> </a> <div class="toc-part">Part IV · Attention &amp; Transformers</div> <a class="toc-link" data-slug="seq2seq-and-attention" href="/groundup/book/seq2seq-and-attention/"> <span class="n">22</span> <span>From seq2seq to Attention</span> </a><a class="toc-link" data-slug="scaled-dot-product-attention" href="/groundup/book/scaled-dot-product-attention/"> <span class="n">23</span> <span>Scaled Dot-Product Attention</span> </a><a class="toc-link" data-slug="multi-head-attention" href="/groundup/book/multi-head-attention/"> <span class="n">24</span> <span>Multi-Head Attention</span> </a><a class="toc-link" data-slug="transformer-architecture" href="/groundup/book/transformer-architecture/"> <span class="n">25</span> <span>The Transformer, Piece by Piece</span> </a><a class="toc-link" data-slug="positional-encodings" href="/groundup/book/positional-encodings/"> <span class="n">26</span> <span>Positional Information and RoPE</span> </a><a class="toc-link" data-slug="architecture-families" href="/groundup/book/architecture-families/"> <span class="n">27</span> <span>Architecture Families: BERT to Decoder-Only</span> </a><a class="toc-link" data-slug="kv-cache-and-efficient-attention" href="/groundup/book/kv-cache-and-efficient-attention/"> <span class="n">28</span> <span>The KV Cache and Efficient Attention</span> </a><a class="toc-link" data-slug="mixture-of-experts" href="/groundup/book/mixture-of-experts/"> <span class="n">29</span> <span>Mixture-of-Experts</span> </a><a class="toc-link" data-slug="state-space-models" href="/groundup/book/state-space-models/"> <span class="n">30</span> <span>State-Space Models and Hybrids</span> </a> <div class="toc-part">Part V · Training LLMs in Practice</div> <a class="toc-link" data-slug="pretraining-data" href="/groundup/book/pretraining-data/"> <span class="n">31</span> <span>Pretraining Data</span> </a><a class="toc-link" data-slug="scaling-laws" href="/groundup/book/scaling-laws/"> <span class="n">32</span> <span>Scaling Laws</span> </a><a class="toc-link" data-slug="compute-and-parallelism" href="/groundup/book/compute-and-parallelism/"> <span class="n">33</span> <span>Compute: GPUs, Precision, and Parallelism</span> </a><a class="toc-link" data-slug="the-training-run" href="/groundup/book/the-training-run/"> <span class="n">34</span> <span>The Training Run</span> </a><a class="toc-link" data-slug="sft-and-rlhf" href="/groundup/book/sft-and-rlhf/"> <span class="n">35</span> <span>Post-Training I: SFT, Reward Models, RLHF</span> </a><a class="toc-link" data-slug="dpo-and-friends" href="/groundup/book/dpo-and-friends/"> <span class="n">36</span> <span>Post-Training II: DPO and Its Family</span> </a><a class="toc-link" data-slug="reasoning-models" href="/groundup/book/reasoning-models/"> <span class="n">37</span> <span>Reasoning Training: RLVR, GRPO, and the o1/R1 Era</span> </a><a class="toc-link" data-slug="fine-tuning" href="/groundup/book/fine-tuning/"> <span class="n">38</span> <span>Fine-Tuning You Can Actually Do: LoRA and Friends</span> </a><a class="toc-link" data-slug="inference-and-serving" href="/groundup/book/inference-and-serving/"> <span class="n">39</span> <span>Inference: Sampling, Quantization, Serving</span> </a> <div class="toc-part">Part VI · The Modern AI Landscape</div> <a class="toc-link" data-slug="the-frontier" href="/groundup/book/the-frontier/"> <span class="n">40</span> <span>The Frontier Landscape (2023–2026)</span> </a><a class="toc-link" data-slug="multimodal-models" href="/groundup/book/multimodal-models/"> <span class="n">41</span> <span>Multimodal Models</span> </a><a class="toc-link" data-slug="diffusion-models" href="/groundup/book/diffusion-models/"> <span class="n">42</span> <span>Diffusion and Image/Video Generation</span> </a><a class="toc-link" data-slug="long-context" href="/groundup/book/long-context/"> <span class="n">43</span> <span>Long Context</span> </a><a class="toc-link" data-slug="agents-and-tools" href="/groundup/book/agents-and-tools/"> <span class="n">44</span> <span>Agents, Tool Use, and MCP</span> </a><a class="toc-link" data-slug="retrieval-augmented-generation" href="/groundup/book/retrieval-augmented-generation/"> <span class="n">45</span> <span>Retrieval-Augmented Generation</span> </a><a class="toc-link" data-slug="benchmarks-and-evaluation" href="/groundup/book/benchmarks-and-evaluation/"> <span class="n">46</span> <span>Benchmarks and How to Read Them</span> </a><a class="toc-link" data-slug="open-vs-closed" href="/groundup/book/open-vs-closed/"> <span class="n">47</span> <span>Open vs Closed Models</span> </a> <div class="toc-part">Part VII · Interpretability</div> <a class="toc-link" data-slug="why-interpretability" href="/groundup/book/why-interpretability/"> <span class="n">48</span> <span>Why Interpretability</span> </a><a class="toc-link" data-slug="features-and-probes" href="/groundup/book/features-and-probes/"> <span class="n">49</span> <span>Features, Directions, and Probes</span> </a><a class="toc-link" data-slug="superposition" href="/groundup/book/superposition/"> <span class="n">50</span> <span>Superposition and Polysemanticity</span> </a><a class="toc-link" data-slug="sparse-autoencoders" href="/groundup/book/sparse-autoencoders/"> <span class="n">51</span> <span>Sparse Autoencoders</span> </a><a class="toc-link" data-slug="circuits" href="/groundup/book/circuits/"> <span class="n">52</span> <span>Circuits: Induction Heads to Attribution Graphs</span> </a><a class="toc-link active" data-slug="causal-methods" href="/groundup/book/causal-methods/"> <span class="n">53</span> <span>Causal Methods: Patching, Ablation, and Lenses</span> </a><a class="toc-link" data-slug="steering-and-editing" href="/groundup/book/steering-and-editing/"> <span class="n">54</span> <span>Steering and Model Editing</span> </a><a class="toc-link" data-slug="cot-faithfulness" href="/groundup/book/cot-faithfulness/"> <span class="n">55</span> <span>Chain-of-Thought Faithfulness</span> </a><a class="toc-link" data-slug="frontier-interpretability" href="/groundup/book/frontier-interpretability/"> <span class="n">56</span> <span>Interpretability at the Frontier</span> </a> <div class="toc-part">Part VIII · Reference</div> <a class="toc-link" data-slug="where-to-go-next" href="/groundup/book/where-to-go-next/"> <span class="n">57</span> <span>Where to Go Next</span> </a><a class="toc-link" data-slug="glossary" href="/groundup/book/glossary/"> <span class="n">58</span> <span>Glossary</span> </a><a class="toc-link" data-slug="notation" href="/groundup/book/notation/"> <span class="n">59</span> <span>Notation Reference</span> </a> </nav> <div class="scrim" id="toc-scrim"></div> <main class="main-col">  <div class="article-wrap"> <article class="chapter" id="article" data-slug="causal-methods" data-title="Causal Methods: Patching, Ablation, and Lenses" data-file="53-causal-methods.md" data-pagefind-body> <div class="chapter-kicker">Part VII · Interpretability · Chapter 53</div> <h1>Causal Methods: Patching, Ablation, and Lenses</h1> <p class="chapter-desc">The experimental toolkit of interpretability — activation patching, ablations, and logit/tuned lenses — taught as a lab manual, with the metrics, controls, and honest caveats that separate evidence from illusion.</p> <details class="section-nav"> <summary>In this chapter</summary> <ol> <li><a href="#correlation-causation-and-what-an-intervention-buys-you">Correlation, causation, and what an intervention buys you</a></li><li><a href="#activation-patching-the-core-protocol">Activation patching: the core protocol</a></li><li><a href="#ablation-what-does-removing-a-component-even-mean">Ablation: what does “removing” a component even mean?</a></li><li><a href="#lenses-watching-the-answer-form-over-depth">Lenses: watching the answer form over depth</a></li><li><a href="#the-methodology-honesty-section">The methodology-honesty section</a></li><li><a href="#tooling-your-first-patching-experiment">Tooling: your first patching experiment</a></li><li><a href="#where-this-leaves-us">Where this leaves us</a></li> </ol> </details> <p>The last few chapters made claims that should have left you a little uneasy.
+We said a <a href="/groundup/book/features-and-probes/">direction in activation space</a> “represents”
+the concept of the Golden Gate Bridge. We said a
+<a href="/groundup/book/sparse-autoencoders/">sparse autoencoder</a> latent “is” a feature for legal
+language. We said an attention head in a <a href="/groundup/book/circuits/">circuit</a> “moves the
+name to the final position.” Every one of those claims used causal language —
+<em>represents</em>, <em>is</em>, <em>moves</em> — but much of the evidence behind such claims, at
+first pass, is correlational: this neuron fires when the concept appears, this
+probe can decode the concept from the activations, these examples maximally
+excite this latent.</p>
+<p>Correlation is where every science starts and where bad science stops.
+A probe reaching 95% accuracy tells you the information is <em>present</em> in the
+activations; it does not tell you the model <em>uses</em> it, and
+<a href="/groundup/book/features-and-probes/">Chapter 49</a> showed how those come apart. A neuron
+that fires on French text might cause the model’s French output — or it might be
+a passenger, downstream of whatever does the work, like a rooster
+taking credit for the sunrise.</p>
+<p>The fix is the same one the rest of science uses: <strong>intervene</strong>. Reach into the
+running model, change one thing, and watch what happens to the output. If
+overwriting a single activation flips the model’s answer from “Rome” to “Paris,”
+you have learned something no probe could tell you. This chapter is the lab
+manual for those interventions: <strong>activation patching</strong> (the core protocol, with
+a full worked example), <strong>ablations</strong> (and the surprisingly subtle question of
+what “removing” a component even means), and the <strong>lenses</strong> that let you watch a
+prediction assemble itself layer by layer. It ends with the part most write-ups
+skip: how these methods fail, the illusions they generate, and the controls that
+separate a real finding from a compelling story.</p>
+<h2 id="correlation-causation-and-what-an-intervention-buys-you">Correlation, causation, and what an intervention buys you</h2>
+<p>Interpretability inherits a problem that observational sciences know well. You
+cannot randomly assign a transformer to a “treatment group.” But unlike
+epidemiologists, we hold a privilege no other science has: total, instant,
+reversible control over the system’s internal state. We can pause the model
+mid-computation, edit any activation to any value, and resume — a perfect
+surgical intervention, repeatable millions of times for pennies. The model
+never notices, never adapts, never files a complaint with the ethics board.</p>
+<p>This privilege is why the field insists on causal evidence. The standard
+observational tools — probing classifiers, max-activating dataset examples,
+attention-weight visualizations — are <em>hypothesis generators</em>. They tell you
+where to look. The tools in this chapter are <em>hypothesis testers</em>. A claim like
+“head 9 in layer 5 copies the subject’s name” graduates from folklore to finding
+when an intervention on that head, and nothing else, changes the output in the
+predicted way.</p>
+<aside class="box box-intuition" data-box="intuition"><div class="box-title"><span class="box-icon" aria-hidden="true">💡</span>Intuition</div><p>Think of the model as a suspect factory floor. Probes are security-camera
+footage: you can see which stations light up when a particular product ships,
+but a station can be busy without contributing anything. Patching is walking
+onto the floor and swapping the contents of one station’s conveyor belt with the
+contents from a different production run. If the product changes, that station
+mattered — and <em>how</em> the product changes tells you what the station was
+carrying.</p></aside>
+<p>Two words will organize everything that follows. A component is <strong>necessary</strong>
+for a behavior if breaking it breaks the behavior. It is <strong>sufficient</strong> (in the
+restoration sense used in this field) if restoring it — inside an otherwise
+broken run — restores the behavior. These are different claims, established by
+different experiments, and conflating them is the single most common
+methodological error in interpretability write-ups. Keep them separate and half
+the pitfalls in this chapter become easy to spot.</p>
+<h2 id="activation-patching-the-core-protocol">Activation patching: the core protocol</h2>
+<p>Activation patching (also called <strong>causal tracing</strong> in the paper that
+popularized it, <a href="https://arxiv.org/abs/2202.05262">Meng et al., 2022</a>, and
+<strong>interchange intervention</strong> in the causal-abstraction literature) is the
+field’s workhorse. Here is the protocol, lab-manual style.</p>
+<p><strong>Step 0 — choose a prompt pair.</strong> You need two prompts that are identical in
+structure but differ in the one thing you care about, and that lead to different
+answers:</p>
+<ul>
+<li><strong>Clean prompt:</strong> “The Eiffel Tower is in” → the model says ” Paris”.</li>
+<li><strong>Corrupted prompt:</strong> “The Colosseum is in” → the model says ” Rome”.</li>
+</ul>
+<p>The pair defines the question. Because only the subject differs, any activation
+whose transplantation moves the answer must carry information <em>about the
+subject</em> — the fact being recalled, or something downstream of it.</p>
+<p><strong>Step 1 — run the clean prompt and cache everything.</strong> One forward pass.
+At every layer <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">ℓ</mi></mrow><annotation encoding="application/x-tex">\ell</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord">ℓ</span></span></span></span> and every token position <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>t</mi></mrow><annotation encoding="application/x-tex">t</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6151em;"></span><span class="mord mathnormal">t</span></span></span></span>, store the residual-stream
+vector <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>h</mi><mi>t</mi><mrow><mo stretchy="false">(</mo><mi mathvariant="normal">ℓ</mi><mo stretchy="false">)</mo></mrow></msubsup></mrow><annotation encoding="application/x-tex">h^{(\ell)}_t</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.2906em;vertical-align:-0.2458em;"></span><span class="mord"><span class="mord mathnormal">h</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.0448em;"><span style="top:-2.4542em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span><span style="top:-3.2198em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mopen mtight">(</span><span class="mord mtight">ℓ</span><span class="mclose mtight">)</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2458em;"><span></span></span></span></span></span></span></span></span></span> (and, if you want finer resolution, each attention head’s
+output and each multi-layer perceptron (MLP) block’s output — the taps you met in
+<a href="/groundup/book/features-and-probes/">Chapter 49</a>). For a 12-layer model on a 6-token
+prompt this is a few hundred vectors; for a frontier model it is gigabytes,
+which is why patching research mostly runs on small open models.</p>
+<p><strong>Step 2 — run the corrupted prompt and record the baseline.</strong> Note the
+output logits — in particular the logits for ” Paris” and ” Rome”.</p>
+<p><strong>Step 3 — patch, one site at a time.</strong> Run the corrupted prompt again, but
+at one chosen site <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">(</mo><mi mathvariant="normal">ℓ</mi><mo separator="true">,</mo><mi>t</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">(\ell, t)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">ℓ</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">t</span><span class="mclose">)</span></span></span></span>, overwrite the activation with the cached clean
+value mid-forward-pass, and let the computation continue downstream through the
+modified state. Everything before the patch is pure corrupted-run; everything
+after is a hybrid.</p>
+<p><strong>Step 4 — measure recovery.</strong> How far did the output move from the corrupted
+answer back toward the clean answer? (The metric deserves its own section —
+below.) Repeat steps 3–4 for every site, and you have a heatmap over layers and
+positions.</p>
+<figure class="fig">
+  <svg viewBox="0 0 720 420" role="img" aria-label="Activation patching protocol: a clean run whose activations are cached, a corrupted run, and a patched run where one cached clean activation is inserted into the corrupted computation">
+    <defs>
+      <marker id="arr53a" markerWidth="9" markerHeight="8" refX="7" refY="4" orient="auto">
+        <path d="M1,1 L7,4 L1,7" fill="none" stroke="currentColor" stroke-width="1.5"></path>
+      </marker>
+      <marker id="arr53t" markerWidth="9" markerHeight="8" refX="7" refY="4" orient="auto">
+        <path d="M1,1 L7,4 L1,7" fill="none" stroke="#14b8a6" stroke-width="1.8"></path>
+      </marker>
+    </defs>
+    <!-- Row 1: clean run -->
+    <text x="24" y="42" font-family="Inter Variable, sans-serif" font-size="14" fill="currentColor" font-weight="600">Run 1 — clean</text>
+    <rect x="24" y="56" width="168" height="40" rx="8" fill="#14b8a6" fill-opacity="0.15" stroke="#14b8a6"></rect>
+    <text x="108" y="80" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="middle">“The Eiffel Tower is in”</text>
+    <line x1="192" y1="76" x2="228" y2="76" stroke="currentColor" opacity="0.35" marker-end="url(#arr53a)"></line>
+    <rect x="232" y="56" width="52" height="40" rx="6" fill="none" stroke="currentColor" opacity="0.45"></rect>
+    <text x="258" y="80" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="middle" opacity="0.75">L1</text>
+    <rect x="296" y="56" width="52" height="40" rx="6" fill="#14b8a6" fill-opacity="0.15" stroke="#14b8a6"></rect>
+    <text x="322" y="80" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="middle">L2</text>
+    <rect x="360" y="56" width="52" height="40" rx="6" fill="none" stroke="currentColor" opacity="0.45"></rect>
+    <text x="386" y="80" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="middle" opacity="0.75">L3</text>
+    <line x1="412" y1="76" x2="448" y2="76" stroke="currentColor" opacity="0.35" marker-end="url(#arr53a)"></line>
+    <text x="460" y="72" font-family="Inter Variable, sans-serif" font-size="14" fill="currentColor">“ Paris”</text>
+    <text x="460" y="90" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.55">logit diff  +4.2</text>
+    <text x="592" y="80" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.55">cache every</text>
+    <text x="592" y="97" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.55">activation</text>
+    <!-- Row 2: corrupted run -->
+    <text x="24" y="164" font-family="Inter Variable, sans-serif" font-size="14" fill="currentColor" font-weight="600">Run 2 — corrupted</text>
+    <rect x="24" y="178" width="168" height="40" rx="8" fill="#fb7185" fill-opacity="0.15" stroke="#fb7185"></rect>
+    <text x="108" y="202" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="middle">“The Colosseum is in”</text>
+    <line x1="192" y1="198" x2="228" y2="198" stroke="currentColor" opacity="0.35" marker-end="url(#arr53a)"></line>
+    <rect x="232" y="178" width="52" height="40" rx="6" fill="none" stroke="currentColor" opacity="0.45"></rect>
+    <text x="258" y="202" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="middle" opacity="0.75">L1</text>
+    <rect x="296" y="178" width="52" height="40" rx="6" fill="none" stroke="currentColor" opacity="0.45"></rect>
+    <text x="322" y="202" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="middle" opacity="0.75">L2</text>
+    <rect x="360" y="178" width="52" height="40" rx="6" fill="none" stroke="currentColor" opacity="0.45"></rect>
+    <text x="386" y="202" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="middle" opacity="0.75">L3</text>
+    <line x1="412" y1="198" x2="448" y2="198" stroke="currentColor" opacity="0.35" marker-end="url(#arr53a)"></line>
+    <text x="460" y="194" font-family="Inter Variable, sans-serif" font-size="14" fill="currentColor">“ Rome”</text>
+    <text x="460" y="212" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.55">logit diff  −3.1</text>
+    <!-- patch arrow from clean L2 down to patched L2 -->
+    <path d="M 322 96 C 322 140, 322 260, 322 296" fill="none" stroke="#14b8a6" stroke-width="1.8" stroke-dasharray="5 4" marker-end="url(#arr53t)"></path>
+    <text x="338" y="252" font-family="Inter Variable, sans-serif" font-size="13" fill="#14b8a6">patch one cached clean</text>
+    <text x="338" y="269" font-family="Inter Variable, sans-serif" font-size="13" fill="#14b8a6">activation into run 3</text>
+    <!-- Row 3: patched run -->
+    <text x="24" y="284" font-family="Inter Variable, sans-serif" font-size="14" fill="currentColor" font-weight="600">Run 3 — patched</text>
+    <rect x="24" y="298" width="168" height="40" rx="8" fill="#fb7185" fill-opacity="0.15" stroke="#fb7185"></rect>
+    <text x="108" y="322" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="middle">“The Colosseum is in”</text>
+    <line x1="192" y1="318" x2="228" y2="318" stroke="currentColor" opacity="0.35" marker-end="url(#arr53a)"></line>
+    <rect x="232" y="298" width="52" height="40" rx="6" fill="none" stroke="currentColor" opacity="0.45"></rect>
+    <text x="258" y="322" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="middle" opacity="0.75">L1</text>
+    <rect x="296" y="298" width="52" height="40" rx="6" fill="#14b8a6" fill-opacity="0.25" stroke="#14b8a6" stroke-width="2"></rect>
+    <text x="322" y="322" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="middle" font-weight="600">L2</text>
+    <rect x="360" y="298" width="52" height="40" rx="6" fill="#818cf8" fill-opacity="0.12" stroke="#818cf8"></rect>
+    <text x="386" y="322" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="middle" opacity="0.75">L3</text>
+    <line x1="412" y1="318" x2="448" y2="318" stroke="currentColor" opacity="0.35" marker-end="url(#arr53a)"></line>
+    <text x="460" y="314" font-family="Inter Variable, sans-serif" font-size="14" fill="currentColor">“ Paris” recovers</text>
+    <text x="460" y="332" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.55">logit diff  +2.9  (82% recovery)</text>
+    <text x="24" y="392" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.55">Everything upstream of the patch is corrupted-run; everything downstream (violet) is a hybrid.</text>
+  </svg>
+  <figcaption><strong>Figure:</strong> The activation patching protocol. Cache activations from a clean run, replay the corrupted prompt, and overwrite one site with its cached clean value. If the answer swings back toward "Paris," that site carried the Eiffel-Tower information at that point in the computation.</figcaption>
+</figure>
+<aside class="box box-example" data-box="example"><div class="box-title"><span class="box-icon" aria-hidden="true">✏️</span>Worked example</div><p>Concrete numbers for one patch. Define the <strong>logit difference</strong>
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">L</mi><mi mathvariant="normal">D</mi></mrow><mo>=</mo><msub><mi>z</mi><mtext>Paris</mtext></msub><mo>−</mo><msub><mi>z</mi><mtext>Rome</mtext></msub></mrow><annotation encoding="application/x-tex">\mathrm{LD} = z_{\text{Paris}} - z_{\text{Rome}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord"><span class="mord mathrm">LD</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.044em;">z</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.044em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">Paris</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.044em;">z</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.044em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">Rome</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>, where <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>z</mi></mrow><annotation encoding="application/x-tex">z</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.044em;">z</span></span></span></span> is the model’s
+raw output score (logit) for each token. Suppose the clean run gives
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mrow><mi mathvariant="normal">L</mi><mi mathvariant="normal">D</mi></mrow><mtext>clean</mtext></msub><mo>=</mo><mo>+</mo><mn>4.2</mn></mrow><annotation encoding="application/x-tex">\mathrm{LD}_{\text{clean}} = +4.2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord"><span class="mord mathrm">LD</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">clean</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">+</span><span class="mord">4.2</span></span></span></span> (Paris strongly ahead) and the corrupted run
+gives <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mrow><mi mathvariant="normal">L</mi><mi mathvariant="normal">D</mi></mrow><mtext>corr</mtext></msub><mo>=</mo><mo>−</mo><mn>3.1</mn></mrow><annotation encoding="application/x-tex">\mathrm{LD}_{\text{corr}} = -3.1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord"><span class="mord mathrm">LD</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">corr</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">−</span><span class="mord">3.1</span></span></span></span> (Rome ahead, as it should be).
+Patching the layer-2 residual stream at the subject token yields
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mrow><mi mathvariant="normal">L</mi><mi mathvariant="normal">D</mi></mrow><mtext>patched</mtext></msub><mo>=</mo><mo>+</mo><mn>2.9</mn></mrow><annotation encoding="application/x-tex">\mathrm{LD}_{\text{patched}} = +2.9</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord"><span class="mord mathrm">LD</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">patched</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">+</span><span class="mord">2.9</span></span></span></span>. The normalized recovery is</p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mfrac><mrow><msub><mrow><mi mathvariant="normal">L</mi><mi mathvariant="normal">D</mi></mrow><mtext>patched</mtext></msub><mo>−</mo><msub><mrow><mi mathvariant="normal">L</mi><mi mathvariant="normal">D</mi></mrow><mtext>corr</mtext></msub></mrow><mrow><msub><mrow><mi mathvariant="normal">L</mi><mi mathvariant="normal">D</mi></mrow><mtext>clean</mtext></msub><mo>−</mo><msub><mrow><mi mathvariant="normal">L</mi><mi mathvariant="normal">D</mi></mrow><mtext>corr</mtext></msub></mrow></mfrac><mo>=</mo><mfrac><mrow><mn>2.9</mn><mo>−</mo><mo stretchy="false">(</mo><mo>−</mo><mn>3.1</mn><mo stretchy="false">)</mo></mrow><mrow><mn>4.2</mn><mo>−</mo><mo stretchy="false">(</mo><mo>−</mo><mn>3.1</mn><mo stretchy="false">)</mo></mrow></mfrac><mo>=</mo><mfrac><mn>6.0</mn><mn>7.3</mn></mfrac><mo>≈</mo><mn>0.82.</mn></mrow><annotation encoding="application/x-tex">\frac{\mathrm{LD}_{\text{patched}} - \mathrm{LD}_{\text{corr}}}{\mathrm{LD}_{\text{clean}} - \mathrm{LD}_{\text{corr}}}
+= \frac{2.9 - (-3.1)}{4.2 - (-3.1)} = \frac{6.0}{7.3} \approx 0.82.</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.1963em;vertical-align:-0.836em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord"><span class="mord mathrm">LD</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">clean</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mord"><span class="mord mathrm">LD</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">corr</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord"><span class="mord mathrm">LD</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">patched</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mord"><span class="mord mathrm">LD</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">corr</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.836em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.363em;vertical-align:-0.936em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.427em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">4.2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mopen">(</span><span class="mord">−</span><span class="mord">3.1</span><span class="mclose">)</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2.9</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mopen">(</span><span class="mord">−</span><span class="mord">3.1</span><span class="mclose">)</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.936em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.0074em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">7.3</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">6.0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0.82.</span></span></span></span></span><p>One patched vector recovered 82% of the behavioral gap. A site with recovery
+near 0 carried nothing the output needed; a site near 1 carried nearly the
+whole difference between the two prompts.</p></aside>
+<aside class="box box-warning" data-box="warning"><div class="box-title"><span class="box-icon" aria-hidden="true">⚠️</span>Careful</div><p><strong>Token alignment is a real constraint, not a detail.</strong> The clean and corrupted
+prompts must tokenize to the same length with the differing tokens in the same
+positions — otherwise “patch position 3” means different things in the two runs.
+“Eiffel Tower” and “Colosseum” may occupy different numbers of tokens depending
+on the <a href="/groundup/book/tokenization/">tokenizer</a>, so in practice you check alignment
+first and choose subjects (or padding) that line up. Meng et al. sidestepped
+this entirely: instead of a second prompt, they <em>corrupted the clean prompt
+itself</em> by adding Gaussian noise to the subject’s token embeddings, then patched
+clean activations back in. Same protocol, no alignment problem — at the cost of
+an unnatural corruption (more on that trade-off in the ablation section).</p></aside>
+<h3 id="reading-the-heatmap">Reading the heatmap</h3>
+<p>The payoff of sweeping every site is a picture like the one below: layers on the
+horizontal axis, token positions on the vertical, each cell colored by recovery.
+This heatmap — from causal tracing on factual prompts — is one of the most
+replicated results in interpretability, and learning to read it teaches you the
+grammar of every patching plot you will ever see.</p>
+<figure class="fig">
+  <svg viewBox="0 0 720 330" role="img" aria-label="Schematic patching heatmap over layers and token positions showing two hotspots: early-to-mid layers at the subject tokens and late layers at the final position">
+    <defs>
+      <marker id="arr53b" markerWidth="9" markerHeight="8" refX="7" refY="4" orient="auto">
+        <path d="M1,1 L7,4 L1,7" fill="none" stroke="currentColor" stroke-width="1.5"></path>
+      </marker>
+    </defs>
+    <!-- y labels: tokens -->
+    <text x="96" y="66" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="end" opacity="0.75">The</text>
+    <text x="96" y="106" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="end">Eiffel</text>
+    <text x="96" y="146" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="end">Tower</text>
+    <text x="96" y="186" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="end" opacity="0.75">is</text>
+    <text x="96" y="226" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="end">in</text>
+    <!-- grid: 12 layers x 5 tokens, cell 44x40, origin (108,44) -->
+    <!-- base cells -->
+    <g>
+      <!-- row The (y=44): all faint -->
+      <rect x="108" y="44" width="524" height="40" fill="currentColor" opacity="0.05"></rect>
+      <!-- row Eiffel (y=84) -->
+      <rect x="108" y="84" width="524" height="40" fill="currentColor" opacity="0.05"></rect>
+      <rect x="152" y="84" width="44" height="40" fill="#14b8a6" fill-opacity="0.35"></rect>
+      <rect x="196" y="84" width="44" height="40" fill="#14b8a6" fill-opacity="0.6"></rect>
+      <rect x="240" y="84" width="44" height="40" fill="#14b8a6" fill-opacity="0.8"></rect>
+      <rect x="284" y="84" width="44" height="40" fill="#14b8a6" fill-opacity="0.55"></rect>
+      <rect x="328" y="84" width="44" height="40" fill="#14b8a6" fill-opacity="0.25"></rect>
+      <!-- row Tower (y=124) -->
+      <rect x="108" y="124" width="524" height="40" fill="currentColor" opacity="0.05"></rect>
+      <rect x="196" y="124" width="44" height="40" fill="#14b8a6" fill-opacity="0.45"></rect>
+      <rect x="240" y="124" width="44" height="40" fill="#14b8a6" fill-opacity="0.7"></rect>
+      <rect x="284" y="124" width="44" height="40" fill="#14b8a6" fill-opacity="0.5"></rect>
+      <rect x="328" y="124" width="44" height="40" fill="#14b8a6" fill-opacity="0.2"></rect>
+      <!-- row is (y=164) -->
+      <rect x="108" y="164" width="524" height="40" fill="currentColor" opacity="0.05"></rect>
+      <!-- row in (y=204) -->
+      <rect x="108" y="204" width="524" height="40" fill="currentColor" opacity="0.05"></rect>
+      <rect x="416" y="204" width="44" height="40" fill="#818cf8" fill-opacity="0.3"></rect>
+      <rect x="460" y="204" width="44" height="40" fill="#818cf8" fill-opacity="0.55"></rect>
+      <rect x="504" y="204" width="44" height="40" fill="#818cf8" fill-opacity="0.75"></rect>
+      <rect x="548" y="204" width="44" height="40" fill="#818cf8" fill-opacity="0.85"></rect>
+      <rect x="592" y="204" width="40" height="40" fill="#818cf8" fill-opacity="0.9"></rect>
+    </g>
+    <!-- grid lines -->
+    <g stroke="currentColor" opacity="0.18">
+      <line x1="108" y1="44" x2="632" y2="44"></line><line x1="108" y1="84" x2="632" y2="84"></line>
+      <line x1="108" y1="124" x2="632" y2="124"></line><line x1="108" y1="164" x2="632" y2="164"></line>
+      <line x1="108" y1="204" x2="632" y2="204"></line><line x1="108" y1="244" x2="632" y2="244"></line>
+      <line x1="108" y1="44" x2="108" y2="244"></line><line x1="152" y1="44" x2="152" y2="244"></line>
+      <line x1="196" y1="44" x2="196" y2="244"></line><line x1="240" y1="44" x2="240" y2="244"></line>
+      <line x1="284" y1="44" x2="284" y2="244"></line><line x1="328" y1="44" x2="328" y2="244"></line>
+      <line x1="372" y1="44" x2="372" y2="244"></line><line x1="416" y1="44" x2="416" y2="244"></line>
+      <line x1="460" y1="44" x2="460" y2="244"></line><line x1="504" y1="44" x2="504" y2="244"></line>
+      <line x1="548" y1="44" x2="548" y2="244"></line><line x1="592" y1="44" x2="592" y2="244"></line>
+      <line x1="632" y1="44" x2="632" y2="244"></line>
+    </g>
+    <!-- x axis -->
+    <line x1="108" y1="262" x2="632" y2="262" stroke="currentColor" opacity="0.35" marker-end="url(#arr53b)"></line>
+    <text x="130" y="282" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.75">layer 0</text>
+    <text x="600" y="282" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.75" text-anchor="end">layer 11</text>
+    <!-- annotations -->
+    <text x="150" y="26" font-family="Inter Variable, sans-serif" font-size="13" fill="#14b8a6">fact retrieved at the subject tokens (mid-layer MLPs)</text>
+    <text x="632" y="316" font-family="Inter Variable, sans-serif" font-size="13" fill="#818cf8" text-anchor="end">answer assembled at the final position (late attention + MLPs)</text>
+  </svg>
+  <figcaption><strong>Figure:</strong> Schematic of a residual-stream patching heatmap for "The Eiffel Tower is in." Darker cells recover more of the clean behavior. The two-hotspot shape — subject tokens early, final position late — is the classic causal-tracing signature. (After Meng et al., 2022 — redrawn schematically.)</figcaption>
+</figure>
+<p>The two hotspots tell a story with a plot. Patching the residual stream at the
+<em>subject tokens</em> in early-to-mid layers restores the answer: that is where the
+model, having recognized “Eiffel Tower,” enriches the subject’s representation
+with associated facts — and component-level patching shows the mid-layer
+<strong>MLPs</strong> doing most of that work, which is why the field describes MLPs as
+key–value memories. Patching at the <em>final position</em> in late layers also
+restores the answer: by then the fact has been ferried — by <strong>attention heads</strong>,
+the only components that move information <a href="/groundup/book/multi-head-attention/">between
+positions</a> — to the position that must produce
+” Paris”. Patching “is”/“in” positions, or very late layers at the subject,
+recovers almost nothing: the information has already moved on. One sweep, and
+you have a <em>where and when</em> map of a memory being recalled.</p>
+<p>One honest caveat before you over-trust such maps: localization by patching
+does not automatically mean that <em>editing</em> the model at that location is the
+right or only way to change the fact — later work found you can often edit
+facts successfully at layers causal tracing does <em>not</em> highlight
+(<a href="https://scholar.google.com/scholar?q=%22Does+Localization+Inform+Editing%22">Hase et al., 2023</a>).
+Patching tells you where information is causally readable in this forward pass,
+which is related to, but not identical with, where it is stored. We pick this
+thread back up in <a href="/groundup/book/steering-and-editing/">model editing</a>.</p>
+<h3 id="denoising-vs-noising-which-direction-proves-what">Denoising vs noising: which direction proves what</h3>
+<p>You can run the patch in either direction, and the two directions answer
+different questions — this asymmetry is the conceptual heart of the method
+(<a href="https://arxiv.org/abs/2404.15255">Heimersheim &#x26; Nanda, 2024</a>).</p>
+<p><strong>Denoising</strong> (clean → corrupted, what we did above): start from a broken run
+and restore one activation. Success shows the patched site is <strong>sufficient</strong> to
+restore the behavior, given everything else stays corrupted. It is a strong,
+specific claim: this one vector, dropped into a run that got everything else
+wrong, carried enough to fix the output.</p>
+<p><strong>Noising</strong> (corrupted → clean): start from a working run and break one
+activation. Success — the behavior degrading — shows the site is <strong>necessary</strong>:
+the working run could not do without it. Failure, however, proves less than you
+would hope, because of redundancy. Transformers routinely contain backup
+components that take over when a primary component is damaged — the indirect-object-identification (IOI) circuit’s
+“backup name-mover heads” activate precisely when the main name-movers are
+ablated, a phenomenon dubbed the Hydra effect
+(<a href="https://scholar.google.com/scholar?q=%22The+Hydra+Effect%22+language+model+self-repair">McGrath et al., 2023</a>).
+Cut off one head and two grow back; the noising experiment then reports “not
+necessary” for a component that is, in the intact model, doing the work.</p>
+<aside class="box box-intuition" data-box="intuition"><div class="box-title"><span class="box-icon" aria-hidden="true">💡</span>Intuition</div><p>Denoising asks: <em>is this ingredient enough to rescue the dish?</em> Noising asks:
+<em>does removing this ingredient ruin the dish?</em> A restaurant with a backup chef
+passes the noising test for “head chef” while the head chef still cooks every
+meal. When you read a patching result, first ask which direction was run — the
+paper’s claim should match its arrow.</p></aside>
+<h3 id="the-metric-matters-more-than-you-think">The metric matters more than you think</h3>
+<p>Step 4 said “measure recovery,” and the choice of measurement can flip your
+conclusions. Three standard options:</p>
+<aside class="box box-math" data-box="math"><div class="box-title"><span class="box-icon" aria-hidden="true">∑</span>The math</div><p>Let <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>z</mi></mrow><annotation encoding="application/x-tex">z</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.044em;">z</span></span></span></span> be the final logits and <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo>=</mo><mi mathvariant="normal">softmax</mi><mo>⁡</mo><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">p = \softmax(z)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">p</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mop"><span class="mord mathrm">softmax</span></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.044em;">z</span><span class="mclose">)</span></span></span></span>. With answer token <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi></mrow><annotation encoding="application/x-tex">a</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">a</span></span></span></span>
+(” Paris”) and counterfactual token <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>b</mi></mrow><annotation encoding="application/x-tex">b</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">b</span></span></span></span> (” Rome”):</p><p><strong>Logit difference:</strong> <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">L</mi><mi mathvariant="normal">D</mi></mrow><mo>=</mo><msub><mi>z</mi><mi>a</mi></msub><mo>−</mo><msub><mi>z</mi><mi>b</mi></msub></mrow><annotation encoding="application/x-tex">\mathrm{LD} = z_a - z_b</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord"><span class="mord mathrm">LD</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.044em;">z</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.044em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">a</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.044em;">z</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.044em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">b</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>. Because the final logits are a
+<a href="/groundup/book/matrices-as-transformations/">linear</a> function of the final residual
+stream (one unembedding matrix away, after LayerNorm), logit differences respond
+smoothly and additively to interventions, and contributions from individual
+components can be meaningfully compared. This is the default in careful work.</p><p><strong>Answer probability:</strong> <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>p</mi><mi>a</mi></msub></mrow><annotation encoding="application/x-tex">p_a</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">a</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>. Intuitive, but softmax saturates: changes in a
+logit that is far below the top logit barely move the probability, so real
+causal effects can register as zero.</p><p><strong>Kullback–Leibler (KL) divergence:</strong> <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>D</mi><mrow><mi mathvariant="normal">K</mi><mi mathvariant="normal">L</mi></mrow></msub><mo stretchy="false">(</mo><msub><mi>p</mi><mtext>clean</mtext></msub><mtext> </mtext><mi mathvariant="normal">∥</mi><mtext> </mtext><msub><mi>p</mi><mtext>patched</mtext></msub><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\KL(p_{\text{clean}} \,\|\, p_{\text{patched}})</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0361em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0278em;">D</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathrm mtight">KL</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">clean</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">∥</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">patched</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span> — the
+<a href="/groundup/book/information-theory/">information-theoretic distance</a> from the clean
+distribution to the patched one. It sees the whole distribution, not only two
+tokens, which is its strength (nothing cherry-picked) and its weakness (it is
+direction-blind: it cannot tell you whether the patch moved the model <em>toward</em>
+the right answer or merely <em>somewhere else</em>).</p></aside>
+<aside class="box box-example" data-box="example"><div class="box-title"><span class="box-icon" aria-hidden="true">✏️</span>Worked example</div><p>Why probability misleads: suppose in the corrupted run the top logit belongs to
+” the” at <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>z</mi><mo>=</mo><mn>8</mn></mrow><annotation encoding="application/x-tex">z = 8</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.044em;">z</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">8</span></span></span></span>, with <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>z</mi><mtext>Paris</mtext></msub><mo>=</mo><mo>−</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">z_{\text{Paris}} = -2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.044em;">z</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.044em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">Paris</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">−</span><span class="mord">2</span></span></span></span>. A patch raises
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>z</mi><mtext>Paris</mtext></msub></mrow><annotation encoding="application/x-tex">z_{\text{Paris}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.044em;">z</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.044em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">Paris</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> to <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>+</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">+1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">+</span><span class="mord">1</span></span></span></span> — a three-logit causal effect, the difference between
+a token being implausible and plausible. The probabilities:
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>p</mi><mtext>Paris</mtext></msub></mrow><annotation encoding="application/x-tex">p_{\text{Paris}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">Paris</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> goes from roughly <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>e</mi><mrow><mo>−</mo><mn>2</mn><mo>−</mo><mn>8</mn></mrow></msup><mo>≈</mo><mn>4.5</mn><mo>×</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>5</mn></mrow></msup></mrow><annotation encoding="application/x-tex">e^{-2-8} \approx 4.5\times10^{-5}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord"><span class="mord mathnormal">e</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">2</span><span class="mbin mtight">−</span><span class="mord mtight">8</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">4.5</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">5</span></span></span></span></span></span></span></span></span></span></span></span> to
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>e</mi><mrow><mn>1</mn><mo>−</mo><mn>8</mn></mrow></msup><mo>≈</mo><mn>9</mn><mo>×</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>4</mn></mrow></msup></mrow><annotation encoding="application/x-tex">e^{1-8} \approx 9\times10^{-4}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord"><span class="mord mathnormal">e</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span><span class="mbin mtight">−</span><span class="mord mtight">8</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">9</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">4</span></span></span></span></span></span></span></span></span></span></span></span> of the mass — from 0.005% to 0.09%. On a
+probability plot, both are indistinguishable from zero and the site looks inert.
+The logit-difference plot shows the +3.0 effect plainly.</p></aside>
+<aside class="box box-warning" data-box="warning"><div class="box-title"><span class="box-icon" aria-hidden="true">⚠️</span>Careful</div><p>A subtler trap: metrics computed on a <em>single</em> prompt pair. Any one pair
+confounds the variable you care about with everything else that differs between
+the prompts (token frequency, position, syntax). Serious patching studies
+average over a <em>distribution</em> of prompt pairs — dozens to thousands of
+subject/answer combinations — so that only the systematic effect survives.</p></aside>
+<h3 id="path-patching-and-edge-attribution">Path patching and edge attribution</h3>
+<p>Vanilla patching intervenes on a <em>node</em> — everything downstream of the patched
+activation feels the change through every route. Often the hypothesis is
+sharper: “head 8.6 matters <em>because it feeds head 9.9’s query</em>, not through any
+other route.” <strong>Path patching</strong>, developed for the IOI circuit analysis
+(<a href="https://arxiv.org/abs/2211.00593">Wang et al., 2022</a>), tests exactly this:
+the patched value of a sender component is allowed to propagate only along one
+chosen edge to one receiver, while every other path is frozen at its corrupted
+value (implemented by extra forward passes that carefully mix cached
+activations). The result is causal evidence at the resolution of <em>edges</em> in the
+computational graph — which is what you need to draw the circuit diagrams of
+<a href="/groundup/book/circuits/">Chapter 52</a> with a straight face, and what modern
+<strong>edge-attribution</strong> methods automate.</p>
+<h3 id="attribution-patching-patching-at-industrial-scale">Attribution patching: patching at industrial scale</h3>
+<p>The full protocol needs one forward pass <em>per site</em>. A mid-sized model has
+millions of (component, position) sites; a sweep over prompt distributions
+multiplies that again. <strong>Attribution patching</strong> replaces the inner loop with
+calculus (<a href="https://arxiv.org/abs/2310.10348">Syed et al., 2023</a>, building on
+<a href="https://www.neelnanda.io/mechanistic-interpretability/attribution-patching">Nanda’s 2023 write-up</a>).</p>
+<aside class="box box-math" data-box="math"><div class="box-title"><span class="box-icon" aria-hidden="true">∑</span>The math</div><p>Let <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">M(a)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span><span class="mopen">(</span><span class="mord mathnormal">a</span><span class="mclose">)</span></span></span></span> be the metric as a function of one activation <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi></mrow><annotation encoding="application/x-tex">a</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">a</span></span></span></span>, holding the rest
+of the corrupted run fixed. Patching changes the metric by
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi><mo stretchy="false">(</mo><msub><mi>a</mi><mtext>clean</mtext></msub><mo stretchy="false">)</mo><mo>−</mo><mi>M</mi><mo stretchy="false">(</mo><msub><mi>a</mi><mtext>corr</mtext></msub><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">M(a_{\text{clean}}) - M(a_{\text{corr}})</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">clean</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">corr</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span>. Take the first-order
+<a href="/groundup/book/derivatives-and-gradients/">Taylor approximation</a> around the corrupted
+value:</p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>M</mi><mo stretchy="false">(</mo><msub><mi>a</mi><mtext>clean</mtext></msub><mo stretchy="false">)</mo><mo>−</mo><mi>M</mi><mo stretchy="false">(</mo><msub><mi>a</mi><mtext>corr</mtext></msub><mo stretchy="false">)</mo><mtext>  </mtext><mo>≈</mo><mtext>  </mtext><msub><mi mathvariant="normal">∇</mi><mi>a</mi></msub><mi>M</mi><msub><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">∣</mo><msub><mi>a</mi><mtext>corr</mtext></msub></msub><mo>⋅</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><msub><mi>a</mi><mtext>clean</mtext></msub><mo>−</mo><msub><mi>a</mi><mtext>corr</mtext></msub><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo><mi mathvariant="normal">.</mi></mrow><annotation encoding="application/x-tex">M(a_{\text{clean}}) - M(a_{\text{corr}}) \;\approx\;
+\nabla_a M \big|_{a_{\text{corr}}} \cdot \big(a_{\text{clean}} - a_{\text{corr}}\big).</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">clean</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">corr</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.3498em;vertical-align:-0.4998em;"></span><span class="mord"><span class="mord">∇</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">a</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span><span class="mord"><span class="mord"><span class="delimsizing mult"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.85em;"><span style="top:-2.85em;"><span class="pstrut" style="height:3.2em;"></span><span style="width:0.333em;height:1.2em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.333em" height="1.2em" viewBox="0 0 333 1200"><path d="M145 15 v585 v0 v585 c2.667,10,9.667,15,21,15
+c10,0,16.667,-5,20,-15 v-585 v0 v-585 c-2.667,-10,-9.667,-15,-21,-15
+c-10,0,-16.667,5,-20,15z M188 15 H145 v585 v0 v585 h43z"></path></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.35em;"><span></span></span></span></span></span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:-0.0983em;"><span style="top:-2.3003em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathnormal mtight">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1645em;"><span style="top:-2.357em;margin-left:0em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">corr</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.143em;"><span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.4998em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1.2em;vertical-align:-0.35em;"></span><span class="mord"><span class="delimsizing size1">(</span></span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">clean</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1.2em;vertical-align:-0.35em;"></span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">corr</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="delimsizing size1">)</span></span><span class="mord">.</span></span></span></span></span><p>The gradient <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi mathvariant="normal">∇</mi><mi>a</mi></msub><mi>M</mi></mrow><annotation encoding="application/x-tex">\nabla_a M</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord">∇</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">a</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span></span></span></span> at <em>every</em> site comes from a single
+<a href="/groundup/book/gradient-descent-and-backprop/">backward pass</a>, and the activation
+differences come from the two forward passes you already ran. Total cost:
+two forward passes plus one backward pass, for approximate patching effects at
+<em>all</em> sites simultaneously.</p></aside>
+<aside class="box box-example" data-box="example"><div class="box-title"><span class="box-icon" aria-hidden="true">✏️</span>Worked example</div><p>A two-dimensional cartoon: at some site,
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi mathvariant="normal">∇</mi><mi>a</mi></msub><mi>M</mi><mo>=</mo><mo stretchy="false">[</mo><mn>0.5</mn><mo separator="true">,</mo><mo>−</mo><mn>1.0</mn><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">\nabla_a M = [0.5, -1.0]</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord">∇</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">a</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord">0.5</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">−</span><span class="mord">1.0</span><span class="mclose">]</span></span></span></span> and
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>a</mi><mtext>clean</mtext></msub><mo>−</mo><msub><mi>a</mi><mtext>corr</mtext></msub><mo>=</mo><mo stretchy="false">[</mo><mn>2.0</mn><mo separator="true">,</mo><mn>0.4</mn><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">a_{\text{clean}} - a_{\text{corr}} = [2.0, 0.4]</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">clean</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">corr</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord">2.0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">0.4</span><span class="mclose">]</span></span></span></span>. The estimated patching
+effect is <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0.5</mn><mo>×</mo><mn>2.0</mn><mo>+</mo><mo stretchy="false">(</mo><mo>−</mo><mn>1.0</mn><mo stretchy="false">)</mo><mo>×</mo><mn>0.4</mn><mo>=</mo><mn>1.0</mn><mo>−</mo><mn>0.4</mn><mo>=</mo><mn>0.6</mn></mrow><annotation encoding="application/x-tex">0.5 \times 2.0 + (-1.0) \times 0.4 = 1.0 - 0.4 = 0.6</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">0.5</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2.0</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">−</span><span class="mord">1.0</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0.4</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1.0</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0.4</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0.6</span></span></span></span>. Running the
+real patch might give 0.55 or 0.7 — the estimate is a linearization, exact only
+if <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi></mrow><annotation encoding="application/x-tex">M</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span></span></span></span> were linear in <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi></mrow><annotation encoding="application/x-tex">a</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">a</span></span></span></span> over that gap.</p></aside>
+<p>The approximation is good when the activation change is small or the downstream
+function is locally linear — which holds surprisingly often for individual
+attention heads — and bad where nonlinearities saturate: LayerNorm’s
+normalization, attention softmax near one-hot, and large residual-stream patches
+in early layers are the known failure zones. The 2026 workflow treats
+attribution patching as a <em>screen</em>: rank all sites by estimated effect in one
+cheap pass, then verify the top candidates with real activation patching.
+Edge-level variants (edge attribution patching — EAP — and gradient-refined
+versions like EAP with integrated gradients) are what make automated circuit discovery
+tractable, and the same trick underlies the attribution graphs of
+<a href="/groundup/book/frontier-interpretability/">frontier interpretability</a>.</p>
+<h2 id="ablation-what-does-removing-a-component-even-mean">Ablation: what does “removing” a component even mean?</h2>
+<p>Patching swaps information between two specific runs. <strong>Ablation</strong> asks a
+blunter question — what happens if this component contributes <em>nothing</em>? — and
+immediately runs into a philosophical pothole: what value represents “nothing”?</p>
+<p><strong>Zero ablation</strong> sets the component’s output to the zero vector. It feels like
+the obvious choice and it is usually the wrong one. Nothing in training ever
+asked the network to treat zero as neutral: a component’s output may hover in a
+cloud far from the origin, with downstream LayerNorms and biases
+<a href="/groundup/book/normalization/">calibrated</a> to inputs in that cloud. Zeroing it feeds
+downstream components an input unlike anything seen in training — you are not
+measuring “the model without this component,” you are measuring “the model
+kicked off-distribution at this spot.” Damage you observe may be shock, not
+lost function.</p>
+<p><strong>Mean ablation</strong> replaces the output with its average over a reference dataset.
+The component still says something — it says the <em>least informative</em> thing it
+typically says, staying inside its usual operating range while erasing its
+input-specific content. This isolates the component’s <em>variation</em> (its actual
+information) from its constant offset (which mean ablation deliberately
+preserves).</p>
+<p><strong>Resample ablation</strong> replaces the output with its value from a <em>different
+random input</em> drawn from the same distribution. This is the most principled
+“nothing”: the component emits a perfectly natural output — real, on-distribution,
+internally coherent — that happens to be irrelevant to the current input. Note that
+patching is resample ablation with a <em>chosen</em> donor input rather than a random
+one; the methods form one family.</p>
+<figure class="fig">
+  <svg viewBox="0 0 720 310" role="img" aria-label="Cartoon of a component&#x27;s output distribution in activation space showing that zero ablation lands far outside the cloud of natural outputs while mean ablation lands at its centroid and resample ablation lands on another sample">
+    <defs>
+      <marker id="arr53c" markerWidth="9" markerHeight="8" refX="7" refY="4" orient="auto">
+        <path d="M1,1 L7,4 L1,7" fill="none" stroke="currentColor" stroke-width="1.5"></path>
+      </marker>
+    </defs>
+    <!-- axes -->
+    <line x1="70" y1="260" x2="690" y2="260" stroke="currentColor" opacity="0.35" marker-end="url(#arr53c)"></line>
+    <line x1="70" y1="260" x2="70" y2="30" stroke="currentColor" opacity="0.35" marker-end="url(#arr53c)"></line>
+    <text x="672" y="284" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.55" text-anchor="end">activation dim 1</text>
+    <text x="88" y="40" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.55">activation dim 2</text>
+    <!-- cloud of natural outputs, centered ~ (490,120) -->
+    <g fill="#14b8a6" fill-opacity="0.5">
+      <circle cx="448" cy="104" r="5"></circle><circle cx="472" cy="88" r="5"></circle><circle cx="500" cy="76" r="5"></circle>
+      <circle cx="530" cy="96" r="5"></circle><circle cx="556" cy="118" r="5"></circle><circle cx="536" cy="146" r="5"></circle>
+      <circle cx="502" cy="158" r="5"></circle><circle cx="468" cy="150" r="5"></circle><circle cx="444" cy="132" r="5"></circle>
+      <circle cx="490" cy="112" r="5"></circle><circle cx="516" cy="126" r="5"></circle><circle cx="478" cy="128" r="5"></circle>
+      <circle cx="558" cy="86" r="5"></circle><circle cx="430" cy="92" r="5"></circle><circle cx="524" cy="62" r="5"></circle>
+    </g>
+    <text x="596" y="66" font-family="Inter Variable, sans-serif" font-size="13" fill="#14b8a6">natural outputs of</text>
+    <text x="596" y="83" font-family="Inter Variable, sans-serif" font-size="13" fill="#14b8a6">this component</text>
+    <!-- mean point -->
+    <circle cx="494" cy="115" r="8" fill="#818cf8" fill-opacity="0.25" stroke="#818cf8" stroke-width="2"></circle>
+    <text x="380" y="205" font-family="Inter Variable, sans-serif" font-size="13" fill="#818cf8">mean ablation: centroid,</text>
+    <text x="380" y="222" font-family="Inter Variable, sans-serif" font-size="13" fill="#818cf8">still in distribution</text>
+    <line x1="470" y1="192" x2="490" y2="128" stroke="#818cf8" opacity="0.6"></line>
+    <!-- resample point -->
+    <circle cx="558" cy="86" r="8" fill="none" stroke="#f59e0b" stroke-width="2"></circle>
+    <text x="592" y="140" font-family="Inter Variable, sans-serif" font-size="13" fill="#f59e0b">resample: another</text>
+    <text x="592" y="157" font-family="Inter Variable, sans-serif" font-size="13" fill="#f59e0b">input's real output</text>
+    <line x1="600" y1="126" x2="566" y2="94" stroke="#f59e0b" opacity="0.6"></line>
+    <!-- zero point -->
+    <g stroke="#fb7185" stroke-width="2.5">
+      <line x1="98" y1="224" x2="118" y2="244"></line>
+      <line x1="118" y1="224" x2="98" y2="244"></line>
+    </g>
+    <text x="134" y="228" font-family="Inter Variable, sans-serif" font-size="13" fill="#fb7185">zero ablation: the origin —</text>
+    <text x="134" y="245" font-family="Inter Variable, sans-serif" font-size="13" fill="#fb7185">a value the model may never produce</text>
+  </svg>
+  <figcaption><strong>Figure:</strong> Why zero ablation misleads. A component's natural outputs (teal cloud) live far from the origin. Zeroing it (rose ×) feeds downstream layers an out-of-distribution input; mean ablation (indigo) and resample ablation (amber) erase the input-specific signal while staying on familiar ground.</figcaption>
+</figure>
+<aside class="box box-practice" data-box="practice"><div class="box-title"><span class="box-icon" aria-hidden="true">⚙️</span>In practice</div><p>Defaults in 2026 tooling: <strong>resample or mean ablation over a task
+distribution</strong> for circuit claims; zero ablation survives mainly for quick
+sanity checks and for <a href="/groundup/book/sparse-autoencoders/">sparse autoencoder (SAE)</a> latents, where zero is
+a value the latent takes (a sparse latent is <em>off</em> — exactly zero —
+most of the time, so zeroing it is on-distribution in a way that zeroing a
+neuron or head is not). When you see “we ablated head X and accuracy dropped
+20%,” your first question should be: ablated <em>to what</em>, and over <em>which
+distribution</em>? Papers that do not say are papers to trust less.</p></aside>
+<p>Ablations map onto the necessity/sufficiency frame directly: an ablation is a
+noising experiment (“break this, does behavior break?” — necessity, modulo
+Hydra-effect backups), while patching a component <em>into</em> an otherwise-ablated
+or corrupted model tests sufficiency. A complete circuit claim needs both: the
+proposed components together are sufficient (model works with <em>only</em> them
+intact, everything else mean-ablated) and the important ones are necessary
+(ablating them hurts).</p>
+<h3 id="causal-scrubbing-in-one-paragraph">Causal scrubbing, in one paragraph</h3>
+<p>The most demanding version of “both” is <strong>causal scrubbing</strong>
+(<a href="https://www.alignmentforum.org/posts/JvZhhzycHu2Yd57RN/causal-scrubbing-a-method-for-rigorously-testing">Chan et al., 2022</a>):
+take your hypothesis seriously as a formal claim about which activations matter
+and <em>which distinctions between inputs they are allowed to depend on</em> — then
+resample-ablate <em>everything the hypothesis says should not matter</em>, all at once,
+using donor inputs the hypothesis claims are equivalent. If your story says
+head 7 only computes “is the previous token a name?”, then its activation on
+this prompt may be swapped with its activation on <em>any</em> prompt whose previous
+token is also a name. Run the model under this aggressive scrub and measure how
+much task performance survives; the fraction recovered is the hypothesis’s
+faithfulness score. It is the field’s closest thing to a falsifiable
+end-to-end test — and its results have been humbling: many published circuits
+recover well under gentle patching but lose meaningful performance under a full
+scrub, which tells you the tidy story is at best incomplete.</p>
+<h2 id="lenses-watching-the-answer-form-over-depth">Lenses: watching the answer form over depth</h2>
+<p>Patching tells you <em>where</em> information matters. Lenses answer a different
+question: <em>what is the model’s best guess so far?</em> They exploit a fact you met
+in <a href="/groundup/book/residual-connections/">Chapter 16</a>: the residual stream is an
+accumulating sum — every layer reads from it and adds its contribution back —
+and the final prediction is read off with one linear map (the unembedding
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>W</mi><mi>U</mi></msub></mrow><annotation encoding="application/x-tex">W_U</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.109em;">U</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>) applied to the final state. Nothing stops you from applying that same
+map <em>early</em>.</p>
+<p>The <strong>logit lens</strong>
+(<a href="https://www.lesswrong.com/posts/AcKRB8wDpdaN6v6ru/interpreting-gpt-the-logit-lens">nostalgebraist, 2020</a>)
+does exactly this: take the residual stream <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>h</mi><mrow><mo stretchy="false">(</mo><mi mathvariant="normal">ℓ</mi><mo stretchy="false">)</mo></mrow></msup></mrow><annotation encoding="application/x-tex">h^{(\ell)}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.888em;"></span><span class="mord"><span class="mord mathnormal">h</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.888em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mopen mtight">(</span><span class="mord mtight">ℓ</span><span class="mclose mtight">)</span></span></span></span></span></span></span></span></span></span></span></span> after layer <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">ℓ</mi></mrow><annotation encoding="application/x-tex">\ell</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord">ℓ</span></span></span></span>,
+apply the final LayerNorm and the unembedding,
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>z</mi><mrow><mo stretchy="false">(</mo><mi mathvariant="normal">ℓ</mi><mo stretchy="false">)</mo></mrow></msup><mo>=</mo><msub><mi>W</mi><mi>U</mi></msub><mtext> </mtext><mrow><mi mathvariant="normal">L</mi><mi mathvariant="normal">N</mi></mrow><mo stretchy="false">(</mo><msup><mi>h</mi><mrow><mo stretchy="false">(</mo><mi mathvariant="normal">ℓ</mi><mo stretchy="false">)</mo></mrow></msup><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">z^{(\ell)} = W_U\,\mathrm{LN}(h^{(\ell)})</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.888em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.044em;">z</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.888em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mopen mtight">(</span><span class="mord mtight">ℓ</span><span class="mclose mtight">)</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.138em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.109em;">U</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathrm">LN</span></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">h</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.888em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mopen mtight">(</span><span class="mord mtight">ℓ</span><span class="mclose mtight">)</span></span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span>, and read out the top tokens —
+the model’s “current
+draft” of its prediction. Applied at every layer, you watch the answer develop
+like a photograph. Here is the characteristic pattern for a factual prompt,
+shown for the final position of “The Eiffel Tower is located in the city of”
+(illustrative of a GPT-2-small-scale model — the qualitative shape is what
+replicates, not these exact tokens):</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Layer</th><th>Top-1 token</th><th>Runner-ups</th><th>Reading</th></tr></thead><tbody><tr><td>0–2</td><td>” the”</td><td>” a”, ”,”</td><td>Generic frequent tokens; no task signal yet</td></tr><tr><td>4</td><td>” London”</td><td>” the”, ” Rome”</td><td>“A city name goes here” — right category, wrong instance</td></tr><tr><td>6</td><td>” Paris”</td><td>” London”, ” France”</td><td>The fact surfaces, weakly</td></tr><tr><td>8</td><td>” Paris”</td><td>” France”, ” Par”</td><td>Confident; France competes (wrong type, right topic)</td></tr><tr><td>11</td><td>” Paris”</td><td>” France”, ” the”</td><td>Final answer, unchanged since layer 8</td></tr></tbody></table>
+<p>Two lessons hide in that table. First, predictions form <em>gradually and
+monotonically-ish</em> — mid layers know the answer’s type before its identity,
+matching the patching heatmap’s story that mid-layer MLPs at the subject inject
+the fact which late layers then use. Second, the last few layers often change
+little, which is the observation behind <strong>early-exit</strong> inference schemes: if
+layer 8’s draft equals layer 11’s answer, you could have stopped computing —
+and indeed the tuned-lens authors frame lenses and early-exit as the same
+question (“when is the prediction ready?”) asked for different purposes.</p>
+<aside class="box box-warning" data-box="warning"><div class="box-title"><span class="box-icon" aria-hidden="true">⚠️</span>Careful</div><p><strong>The logit lens can lie to you.</strong> It assumes each layer’s residual stream is
+written in the same “language” the final unembedding reads — that the
+representation does not drift across depth. In GPT-2 the assumption holds
+tolerably; in other families it collapses. The tuned-lens paper
+(<a href="https://arxiv.org/abs/2303.08112">Belrose et al., 2023</a>) showed that on
+models like GPT-Neo and BLOOM, the raw logit lens outputs near-garbage for most
+of the network — not because those models lack intermediate predictions, but
+because their intermediate states are affinely <em>rotated and scaled</em> relative to
+the final basis, and <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>W</mi><mi>U</mi></msub></mrow><annotation encoding="application/x-tex">W_U</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.109em;">U</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> reads them in the wrong coordinates. An empty lens
+reading is evidence about the <em>lens</em>, not the model.</p></aside>
+<p>The <strong>tuned lens</strong> repairs this with the obvious fix: instead of reusing <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>W</mi><mi>U</mi></msub></mrow><annotation encoding="application/x-tex">W_U</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.109em;">U</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>
+raw, learn a small per-layer affine correction — a <em>translator</em>
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>A</mi><mrow><mo stretchy="false">(</mo><mi mathvariant="normal">ℓ</mi><mo stretchy="false">)</mo></mrow></msup><mi>h</mi><mo>+</mo><msup><mi>b</mi><mrow><mo stretchy="false">(</mo><mi mathvariant="normal">ℓ</mi><mo stretchy="false">)</mo></mrow></msup></mrow><annotation encoding="application/x-tex">A^{(\ell)} h + b^{(\ell)}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9713em;vertical-align:-0.0833em;"></span><span class="mord"><span class="mord mathnormal">A</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.888em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mopen mtight">(</span><span class="mord mtight">ℓ</span><span class="mclose mtight">)</span></span></span></span></span></span></span></span></span><span class="mord mathnormal">h</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.888em;"></span><span class="mord"><span class="mord mathnormal">b</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.888em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mopen mtight">(</span><span class="mord mtight">ℓ</span><span class="mclose mtight">)</span></span></span></span></span></span></span></span></span></span></span></span> — trained so that the translated layer-<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">ℓ</mi></mrow><annotation encoding="application/x-tex">\ell</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord">ℓ</span></span></span></span>
+state, pushed through the frozen unembedding, matches the model’s own final
+distribution as closely as possible (minimizing KL, with the rest of the model
+untouched). Each translator is a learned change of coordinates, nothing more; if
+the logit lens needed no correction, the translator would learn the identity.
+Tuned-lens drafts are dramatically more accurate and better calibrated at every
+depth, and the failure cases of the raw lens vanish.</p>
+<figure class="fig">
+  <svg viewBox="0 0 720 380" role="img" aria-label="Logit lens versus tuned lens: taps on the residual stream go either directly through the frozen unembedding, or first through a learned per-layer affine translator">
+    <defs>
+      <marker id="arr53d" markerWidth="9" markerHeight="8" refX="7" refY="4" orient="auto">
+        <path d="M1,1 L7,4 L1,7" fill="none" stroke="currentColor" stroke-width="1.5"></path>
+      </marker>
+    </defs>
+    <!-- residual stream column -->
+    <rect x="60" y="40" width="120" height="300" rx="10" fill="#38bdf8" fill-opacity="0.08" stroke="#38bdf8"></rect>
+    <text x="120" y="28" font-family="Inter Variable, sans-serif" font-size="14" fill="currentColor" text-anchor="middle">residual stream</text>
+    <g>
+      <rect x="80" y="288" width="80" height="30" rx="6" fill="none" stroke="currentColor" opacity="0.45"></rect>
+      <text x="120" y="308" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="middle" opacity="0.75">layer 2</text>
+      <rect x="80" y="200" width="80" height="30" rx="6" fill="none" stroke="currentColor" opacity="0.45"></rect>
+      <text x="120" y="220" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="middle" opacity="0.75">layer 5</text>
+      <rect x="80" y="112" width="80" height="30" rx="6" fill="none" stroke="currentColor" opacity="0.45"></rect>
+      <text x="120" y="132" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="middle" opacity="0.75">layer 8</text>
+      <rect x="80" y="52" width="80" height="30" rx="6" fill="none" stroke="currentColor" opacity="0.45"></rect>
+      <text x="120" y="72" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="middle" opacity="0.75">layer 11</text>
+    </g>
+    <!-- Logit lens path (top half, teal) -->
+    <text x="300" y="88" font-family="Inter Variable, sans-serif" font-size="14" fill="#14b8a6" font-weight="600">logit lens</text>
+    <line x1="160" y1="127" x2="380" y2="127" stroke="#14b8a6" stroke-width="1.8" marker-end="url(#arr53d)"></line>
+    <rect x="386" y="105" width="130" height="44" rx="8" fill="#14b8a6" fill-opacity="0.15" stroke="#14b8a6"></rect>
+    <text x="451" y="123" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="middle">final LN + W_U</text>
+    <text x="451" y="140" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" text-anchor="middle" opacity="0.55">(frozen, reused as-is)</text>
+    <line x1="516" y1="127" x2="580" y2="127" stroke="#14b8a6" stroke-width="1.8" marker-end="url(#arr53d)"></line>
+    <text x="592" y="123" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor">draft logits</text>
+    <text x="592" y="140" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55">wrong basis?</text>
+    <text x="592" y="155" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55">garbage out</text>
+    <!-- Tuned lens path (bottom half, indigo) -->
+    <text x="300" y="188" font-family="Inter Variable, sans-serif" font-size="14" fill="#818cf8" font-weight="600">tuned lens</text>
+    <line x1="160" y1="215" x2="222" y2="215" stroke="#818cf8" stroke-width="1.8" marker-end="url(#arr53d)"></line>
+    <rect x="228" y="193" width="140" height="44" rx="8" fill="#818cf8" fill-opacity="0.15" stroke="#818cf8"></rect>
+    <text x="298" y="211" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="middle">translator A⁽⁵⁾h + b⁽⁵⁾</text>
+    <text x="298" y="228" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" text-anchor="middle" opacity="0.55">learned per layer</text>
+    <line x1="368" y1="215" x2="380" y2="215" stroke="#818cf8" stroke-width="1.8" marker-end="url(#arr53d)"></line>
+    <rect x="386" y="193" width="130" height="44" rx="8" fill="#14b8a6" fill-opacity="0.15" stroke="#14b8a6"></rect>
+    <text x="451" y="211" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" text-anchor="middle">final LN + W_U</text>
+    <text x="451" y="228" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" text-anchor="middle" opacity="0.55">(still frozen)</text>
+    <line x1="516" y1="215" x2="580" y2="215" stroke="#818cf8" stroke-width="1.8" marker-end="url(#arr53d)"></line>
+    <text x="592" y="211" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor">draft logits</text>
+    <text x="592" y="228" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55">accurate at</text>
+    <text x="592" y="243" font-family="Inter Variable, sans-serif" font-size="12" fill="currentColor" opacity="0.55">every depth</text>
+    <!-- training note -->
+    <text x="228" y="300" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.55">Each translator is trained to make its layer's draft match the</text>
+    <text x="228" y="318" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.55">model's own final distribution (min KL). Model weights untouched.</text>
+    <text x="228" y="336" font-family="Inter Variable, sans-serif" font-size="13" fill="currentColor" opacity="0.55">If no correction is needed, a translator learns the identity map.</text>
+  </svg>
+  <figcaption><strong>Figure:</strong> Two lenses on the same residual stream. The logit lens (teal) reuses the model's final LayerNorm and unembedding on an intermediate state — free, but wrong wherever representations drift across depth. The tuned lens (indigo) inserts a learned affine translator per layer before the same frozen readout. (After Belrose et al., 2023 — redrawn.)</figcaption>
+</figure>
+<p>One caution applies to both lenses: they are <em>observational</em>, not causal — a
+lens reading is a correlation between an intermediate state and a linear
+readout, right back on the wrong side of this chapter’s dividing line. The
+lens tells you a draft answer is <em>decodable</em> at layer 8; patching tells you
+whether the layer-8 state actually <em>drives</em> the output. Use lenses to form
+hypotheses cheaply, patching to test them. (The tuned lens partially bridges
+the gap: its authors validated that tuned-lens drafts track causally relevant
+features under interventions — but the validation was the intervention, not the
+lens.)</p>
+<h3 id="steering-as-an-experiment">Steering as an experiment</h3>
+<p>There is a fourth intervention that doubles as a product feature: <em>add</em> a
+vector instead of swapping one. If you believe direction <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>v</mi></mrow><annotation encoding="application/x-tex">v</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">v</span></span></span></span> means “sycophancy,”
+add <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>α</mi><mi>v</mi></mrow><annotation encoding="application/x-tex">\alpha v</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0037em;">α</span><span class="mord mathnormal" style="margin-right:0.0359em;">v</span></span></span></span> to the residual stream and see whether the model starts
+flattering you; subtract it and see whether flattery stops. Where patching
+transplants naturally occurring states, steering synthesizes new ones — which
+makes success a strong form of causal evidence for the <em>meaning of a
+direction</em>: the direction is sufficient to induce the behavior in contexts
+where it never naturally arose. Golden Gate Claude was exactly this experiment
+run at frontier scale. Steering, its variants, and its cousins in weight-space
+(model editing, including ROME — the editing half of the causal-tracing paper)
+get their full treatment in <a href="/groundup/book/steering-and-editing/">the next chapter</a>.</p>
+<h2 id="the-methodology-honesty-section">The methodology-honesty section</h2>
+<p>Interpretability is a young science, and young sciences earn trust by
+developing an immune system against their own enthusiasm. This section is that
+immune system, and it is as much a part of the toolkit as any patch.</p>
+<p><strong>The cautionary tale the field grew up on.</strong> In the late 2010s, <em>saliency
+maps</em> — heatmaps claiming to show which input pixels a vision model relied on —
+were everywhere. Then
+<a href="https://arxiv.org/abs/1810.03292">Adebayo et al. (2018)</a> ran a sanity check
+that should have been run first: randomize the model’s weights and regenerate
+the map. Several popular methods produced nearly identical maps for the trained
+and the randomized network — they were functioning as fancy edge detectors on
+the <em>input</em>, explaining nothing about the <em>model</em>. An entire literature of
+compelling visualizations, invalidated by one control experiment. Mechanistic
+interpretability defines itself against this failure mode, which is precisely
+why the field insists on interventions — but interventions are not immune to
+their own illusions.</p>
+<p><strong>Interp illusions are real and documented.</strong>
+<a href="https://arxiv.org/abs/2104.07143">Bolukbasi et al. (2021)</a> studied BERT
+neurons that looked monosemantic — every top-activating example on
+one dataset shared an obvious concept — and then showed that the <em>same neuron’s</em>
+top examples on a different dataset shared a <em>different</em> obvious concept. The
+“meaning” was a property of the dataset lens, not the neuron. The general
+pattern: any method that summarizes a high-dimensional object through a
+low-dimensional window (top examples, one metric, one prompt distribution) can
+manufacture coherence that is not there. <a href="/groundup/book/superposition/">Superposition</a>
+makes this worse, since single neurons do host multiple features.</p>
+<p><strong>The controls that catch illusions.</strong> A short checklist that recurs in careful
+2026 work:</p>
+<ul>
+<li><strong>Random-direction baselines.</strong> Before celebrating that ablating your
+feature direction changed behavior, ablate a <em>random</em> direction of the same
+norm at the same site. High-dimensional interventions have generic effects;
+your direction must beat the generic effect, not zero.</li>
+<li><strong>Shuffled-patch and unrelated-donor controls.</strong> Patch activations from an
+<em>unrelated</em> clean prompt. If “The Great Wall is in” restores “Paris” as well
+as the Eiffel prompt does, your patch is restoring “a landmark is being
+discussed,” not the specific fact.</li>
+<li><strong>Multiple metrics.</strong> Report logit diff <em>and</em> KL (and accuracy over a
+distribution). A finding that only appears under one metric is a finding
+about the metric.</li>
+<li><strong>Held-out validation.</strong> Localize your circuit on one set of prompts, verify
+on a disjoint set. The patching sweep is a search over thousands of
+hypotheses; without held-out data you are reading tea leaves you yourself
+arranged — the same <a href="/groundup/book/regularization-and-generalization/">generalization</a>
+discipline that applies to training models applies to explaining them.</li>
+</ul>
+<p><strong>Replication and pre-registration.</strong> Several celebrated early findings have
+survived replication well (causal tracing’s heatmap shape, induction heads);
+others shrank on contact — circuits that explained less of the behavior than
+claimed once causal scrubbing was applied, or that turned out specific to one
+model seed or size. In response, a modest pre-registration culture has been
+emerging: stating the hypothesis and the pass/fail criterion <em>before</em> running
+the sweep, publishing negative results, and standardizing tasks and metrics so
+results compare across papers. It is uneven — this is a fast-moving field with
+blog-post publication norms — but the direction of travel is toward the boring
+virtues, and papers like the activation-patching best-practices guide exist
+precisely to codify them.</p>
+<aside class="box box-note" data-box="note"><div class="box-title"><span class="box-icon" aria-hidden="true">✎</span>Note</div><p>Honest summary of where the field stands in 2026: patching-style interventions
+are the most trusted tool in interpretability, <em>and</em> every one of them
+intervenes on states the model produces off its training distribution to some
+degree, reads results through imperfect metrics, and tests hypotheses selected
+by the same researcher who ran the sweep. The methods in this chapter are the
+best available standard of evidence — a real and rising standard — not a
+guarantee. Treat any single patching heatmap the way you would treat any single
+biology experiment: suggestive until controlled, replicated, and stress-tested.</p></aside>
+<h2 id="tooling-your-first-patching-experiment">Tooling: your first patching experiment</h2>
+<p>Everything in this chapter is runnable on a free Colab GPU (or a laptop) with
+mature open-source tooling:</p>
+<ul>
+<li><strong><a href="https://github.com/TransformerLensOrg/TransformerLens">TransformerLens</a></strong> —
+the standard library for hook-based interpretability on open models (GPT-2,
+Pythia, Llama-class). Loads a model with named hook points at every
+activation you saw in this chapter; caching and patching are a few lines.</li>
+<li><strong><a href="https://nnsight.net/">nnsight</a></strong> — intervention-first framework that scales
+the same ideas to larger models, including remote execution on models too big
+for your hardware, via the National Deep Inference Fabric (NDIF) research
+infrastructure.</li>
+<li><strong><a href="https://github.com/stanfordnlp/pyvene">pyvene</a></strong> — Stanford’s library for
+composable interventions, built around the causal-abstraction framing
+(interchange interventions as first-class objects).</li>
+<li><strong><a href="https://www.neuronpedia.org/">Neuronpedia</a></strong> — browser-based: dashboards
+for SAE features across open models, with search and steering built in. The
+fastest way to <em>look at</em> features before writing any code.</li>
+</ul>
+<aside class="box box-example" data-box="example"><div class="box-title"><span class="box-icon" aria-hidden="true">✏️</span>Worked example</div><p><strong>A first experiment, as a recipe.</strong> (1) Install TransformerLens; load
+GPT-2-small (124M parameters — small enough that a full patching sweep takes
+seconds). (2) Pick the prompt pair from this chapter — “The Eiffel Tower is
+in” / “The Colosseum is in” — and check both tokenize to equal length; adjust
+subjects if not. (3) Run both prompts with <code>run_with_cache</code>, and record the
+clean and corrupted logit differences for ” Paris” vs ” Rome”. (4) Loop over
+layers and positions, patching the cached clean residual stream into the
+corrupted run with a hook, and compute normalized recovery at each site.
+(5) Plot the heatmap and compare it with the schematic figure above. Then do it
+again patching <em>only MLP outputs</em>, then <em>only attention outputs</em>, and watch the
+two-hotspot story separate into its components. The
+<a href="https://www.arena.education/">ARENA (Alignment Research Engineer Accelerator) program’s interpretability track</a>
+has a polished, exercise-driven version of exactly this notebook (activation
+patching, path patching, and the IOI circuit), and it is the single best on-ramp
+from this chapter to doing the work yourself — <a href="/groundup/book/where-to-go-next/">where to go
+next</a> maps the paths beyond it.</p></aside>
+<h2 id="where-this-leaves-us">Where this leaves us</h2>
+<ul>
+<li>You can now state the field’s central methodological rule: probes and
+max-activating examples show information is <em>present</em>; only interventions
+show it is <em>used</em> — and you know why the distinction bites (passenger
+neurons, unused directions, dataset-lens illusions).</li>
+<li>You can run the activation patching protocol from memory — clean run, cache;
+corrupted run, baseline; patch one site; measure normalized logit-difference
+recovery — and read a patching heatmap’s grammar: <em>where</em> in layers, <em>when</em>
+in positions, fact retrieval at the subject, answer assembly at the end.</li>
+<li>You can say what each experimental direction proves: denoising →
+sufficiency to restore; noising → necessity, weakened by backup components;
+and why logit difference beats raw probability as a metric.</li>
+<li>You can choose an ablation and defend it: zero (off-distribution, avoid),
+mean (erases variation, keeps the operating point), resample (the principled
+“irrelevant but natural” baseline) — and you know causal scrubbing as the
+everything-at-once version.</li>
+<li>You can use the logit lens to watch a prediction form across depth, say
+exactly when it misleads (representational drift; GPT-Neo/BLOOM), and explain
+the tuned lens’s per-layer affine fix — while remembering that lenses are
+observational and patching is what tests their stories.</li>
+<li>You can list the controls that separate findings from illusions: random
+directions, unrelated donors, multiple metrics, held-out prompts — and cite
+the saliency-map episode as the reason they are non-negotiable.</li>
+<li>You know the tools (TransformerLens, nnsight, pyvene, Neuronpedia) and have a
+concrete first experiment to run tonight.</li>
+</ul>
+<p>Patching transplants activations the model produced on its own. The obvious
+next question is whether we can <em>write</em> activations of our choosing — amplify a
+feature, delete a fact, steer a behavior — and what happens when we do:
+<a href="/groundup/book/steering-and-editing/">Next: Steering and Model Editing</a>.</p> <div class="papers-card" id="papers-card"> <div class="pc-title">Key papers &amp; readings in this chapter</div> <ul> <li> <div> <a href="https://arxiv.org/abs/2202.05262" target="_blank" rel="noopener">Locating and Editing Factual Associations in GPT</a> <span class="p-meta"> — Meng et al., 2022</span> <span class="p-note">Introduced causal tracing — the Eiffel-Tower-style patching experiment this chapter walks through. Section 2 is the method.</span> </div> </li><li> <div> <a href="https://arxiv.org/abs/2404.15255" target="_blank" rel="noopener">How to Use and Interpret Activation Patching</a> <span class="p-meta"> — Heimersheim &amp; Nanda, 2024</span> <span class="p-note">The best-practices manual: denoising vs noising, metric choice, and the standard pitfalls. Read alongside this chapter.</span> </div> </li><li> <div> <a href="https://arxiv.org/abs/2310.10348" target="_blank" rel="noopener">Attribution Patching Outperforms Automated Circuit Discovery</a> <span class="p-meta"> — Syed et al., 2023</span> <span class="p-note">The gradient approximation that turns millions of patching runs into two forward passes and one backward pass.</span> </div> </li><li> <div> <a href="https://www.lesswrong.com/posts/AcKRB8wDpdaN6v6ru/interpreting-gpt-the-logit-lens" target="_blank" rel="noopener">interpreting GPT: the logit lens</a> <span class="p-meta"> — nostalgebraist, 2020</span> <span class="p-note">The blog post that started reading the residual stream mid-network. Short and worth reading in full.</span> </div> </li><li> <div> <a href="https://arxiv.org/abs/2303.08112" target="_blank" rel="noopener">Eliciting Latent Predictions from Transformers with the Tuned Lens</a> <span class="p-meta"> — Belrose et al., 2023</span> <span class="p-note">Fixes the logit lens with learned per-layer probes; Figures 1–2 show exactly where the logit lens fails.</span> </div> </li><li> <div> <a href="https://www.alignmentforum.org/posts/JvZhhzycHu2Yd57RN/causal-scrubbing-a-method-for-rigorously-testing" target="_blank" rel="noopener">Causal Scrubbing: a method for rigorously testing interpretability hypotheses</a> <span class="p-meta"> — Chan et al., 2022</span> <span class="p-note">The most demanding standard of evidence in the field: replace everything your hypothesis says should not matter, and see if behavior survives.</span> </div> </li><li> <div> <a href="https://arxiv.org/abs/2104.07143" target="_blank" rel="noopener">An Interpretability Illusion for BERT</a> <span class="p-meta"> — Bolukbasi et al., 2021</span> <span class="p-note">The canonical demonstration that a neuron can look monosemantic on one dataset and mean something else on another.</span> </div> </li><li> <div> <a href="https://arxiv.org/abs/1810.03292" target="_blank" rel="noopener">Sanity Checks for Saliency Maps</a> <span class="p-meta"> — Adebayo et al., 2018</span> <span class="p-note">The cautionary tale: popular explanation methods that barely change when you randomize the model they claim to explain.</span> </div> </li><li> <div> <a href="https://arxiv.org/abs/2211.00593" target="_blank" rel="noopener">Interpretability in the Wild: a Circuit for Indirect Object Identification in GPT-2 small</a> <span class="p-meta"> — Wang et al., 2022</span> <span class="p-note">Where path patching was developed; Section 3 defines the method this chapter sketches.</span> </div> </li> </ul> </div> <nav class="chapter-nav"> <a href="/groundup/book/circuits/" class="prev"> <span class="dir">← Previous</span> <span class="t">Circuits: Induction Heads to Attribution Graphs</span> </a> <a href="/groundup/book/steering-and-editing/" class="next"> <span class="dir">Next →</span> <span class="t">Steering and Model Editing</span> </a> </nav> <div class="chapter-foot"> <span>Last updated 2026-08-24</span> <a href="https://github.com/joewilbert/aisite/edit/main/src/content/book/53-causal-methods.md" target="_blank" rel="noopener">Edit this chapter</a> <a href="https://github.com/joewilbert/aisite/issues/new" target="_blank" rel="noopener">Report an issue</a> </div> </article> </div>  </main> </div> <!-- Right panel: papers / tutor / notes --> <aside class="panel-host" id="panel" aria-label="Side panel"> <div class="panel-resizer" id="panel-resizer"></div> <div class="panel-tabs"> <button class="panel-tab" data-tab="paper">Paper</button> <button class="panel-tab" data-tab="tutor">AI tutor</button> <button class="panel-tab" data-tab="notes">Notes</button> <button class="hbtn panel-close" id="panel-close" aria-label="Close panel"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg> </button> </div> <div class="panel-body"> <div class="panel-view" data-view="paper" id="view-paper"></div> <div class="panel-view" data-view="tutor" id="view-tutor"></div> <div class="panel-view" data-view="notes" id="view-notes"></div> </div> </aside> <!-- Selection toolbar --> <div class="sel-toolbar" id="sel-toolbar"> <div class="swatches"> <button class="sw" data-color="yellow" style="background:var(--hl-yellow)" aria-label="Highlight yellow"></button> <button class="sw" data-color="green" style="background:var(--hl-green)" aria-label="Highlight green"></button> <button class="sw" data-color="blue" style="background:var(--hl-blue)" aria-label="Highlight blue"></button> <button class="sw" data-color="pink" style="background:var(--hl-pink)" aria-label="Highlight pink"></button> </div> <div class="divider"></div> <button id="sel-note">✎ Note</button> <button id="sel-explain">✦ Explain</button> <button id="sel-remove" style="display:none">✕ Remove</button> </div> <!-- Settings modal --> <div class="modal-scrim" id="settings-scrim"> <div class="modal" role="dialog" aria-label="Settings" id="settings-modal"></div> </div> <!-- Search modal --> <div class="modal-scrim" id="search-scrim"> <div class="modal search-modal" role="dialog" aria-label="Search"> <input class="q" id="search-input" type="text" placeholder="Search the book…" autocomplete="off"> <div class="search-results" id="search-results"></div> </div> </div> <script>(function(){const base = "/groundup";
+const slug = "causal-methods";
+const pageTitle = "Causal Methods: Patching, Ablation, and Lenses · Ground Up";
+
+      window.__GU__ = { base, slug, pageTitle };
+    })();</script> <script type="module" src="/groundup/_astro/Base.astro_astro_type_script_index_0_lang.65xM_WgJ.js"></script>  </body></html>
